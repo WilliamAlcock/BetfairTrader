@@ -1,0 +1,124 @@
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+body {
+    padding-bottom: 30px;
+    min-width: 970px;
+}
+
+ul.nav.nav-tabs.nav-justified {
+    padding-bottom: 10px;
+}
+
+.event-item {
+    border-top: solid rgb(224, 230, 230) 1px;
+    cursor: pointer;
+}
+
+.event-item-bottom-border {
+    border-bottom: solid rgb(224, 230, 230) 1px;
+}
+
+.price-label {
+    color: #2789ce;
+}
+
+.bf-price {
+    border-right: solid white 10px;
+    font-weight: 400 !important;
+}
+
+.bf-ladder-square {
+    width: 60px;
+    border-left: solid rgb(224, 230, 230) 1px;
+    border-right: solid rgb(224, 230, 230) 1px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    line-height: 30px;
+}
+
+.bf-event-price-square {
+    border-left: solid white 1px;
+    border-right: solid white 1px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    line-height: 30px;
+}
+
+.bf-price-font {
+    font-weight: bold;
+}
+
+.bf-market-price-filled-square {
+    border-left: solid white 1px;
+    border-right: solid white 1px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.bf-market-price-empty-square {
+    border: solid rgb(224, 230, 230) 1px;
+    line-height: 19px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.bf-runner-description {
+    border-top: solid rgb(224, 230, 230) 1px;
+    height: 41px;
+}
+
+.bf-runner-description-bottom {
+    border-bottom: solid rgb(224, 230, 230) 1px;
+    height: 42px;
+}
+
+.bf-back-color {
+    background: #72bbef;
+}
+
+.bf-lay-color {
+    background: #faa9ba
+}
+
+.panel-group .panel-default {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.panel-group .panel-default .panel-heading {
+    height: 26px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    background-color: rgb(39,58,71);
+    background-image: none;
+    color: white;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.panel-group .panel-default .panel-heading .panel-title {
+    font-size:13px;
+    line-height: 26px;
+}
+
+.panel-group .panel-default .panel-heading .panel-title i {
+    line-height: inherit;
+}
+
+.panel-group .panel-default .panel-heading a:focus {
+    text-decoration: none;
+}
+
+.panel-group .panel-default .panel-heading a:hover {
+    text-decoration: none;
+}
+
+footer {
+    text-align: center;
+}

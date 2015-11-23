@@ -1,0 +1,11 @@
+<uib-accordion close-others="oneAtATime">
+    <uib-accordion-group is-open="market.open" ng-repeat="market in markets.data">
+        <uib-accordion-heading>
+            <i class="pull-left glyphicon" ng-class="{true:'glyphicon-triangle-bottom', false:'glyphicon-triangle-right'}[market.open]"></i>
+            &nbsp{{market.description}}
+        </uib-accordion-heading>
+        <runner ng-repeat="runner in market.runners"
+                description="{{runner.description}}" av-to-back="runner.avToBack" av-to-lay="runner.avToLay" bottom-border="$last">
+        </runner>
+    </uib-accordion-group>
+</uib-accordion>

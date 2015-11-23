@@ -1,0 +1,40 @@
+<div class="row" style="margin-left:1px; margin-right:1px">
+    <div class="col-xs-6 bf-runner-description" ng-class="{true:'bf-runner-description-bottom'}[bottomBorder]"
+         ng-click="openLadder()">
+        {{description}}
+    </div>
+    <div class="col-xs-6">
+        <div class="row" style="border-top: solid white 1px">
+            <div>
+                <div class="col-xs-2 bf-market-price-empty-square">
+                    <div class="bf-price-font">{{avToBack[2].price}}</div>{{avToBack[2].size}}
+                </div>
+            </div>
+            <div>
+                <div class="col-xs-2 bf-market-price-empty-square">
+                    <div class="bf-price-font">{{avToBack[1].price}}</div>{{avToBack[1].size}}
+                </div>
+            </div>
+            <div>
+                <div class="col-xs-2 bf-market-price-filled-square bf-back-color">
+                    <div class="bf-price-font">{{avToBack[0].price}}</div>{{avToBack[0].size}}
+                </div>
+            </div>
+            <div>
+                <div class="col-xs-2 bf-market-price-filled-square bf-lay-color">
+                    <div class="bf-price-font">{{avToLay[0].price}}</div>{{avToLay[0].size}}
+                </div>
+            </div>
+            <div>
+                <div class="col-xs-2 bf-market-price-empty-square">
+                    <div class="bf-price-font">{{avToLay[1].price}}</div>{{avToLay[1].size}}
+                </div>
+            </div>
+            <div>
+                <div class="col-xs-2 bf-market-price-empty-square">
+                    <div class="bf-price-font">{{avToLay[2].price}}</div>{{avToLay[2].size}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
