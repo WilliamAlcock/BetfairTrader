@@ -1,4 +1,4 @@
-directivesModule.directive('marketContent',  ['$log', 'DataModelService', 'WebSocketService', ($log, DataModelService, WebSocketService) ->
+directivesModule.directive('market',  ['$log', 'DataModelService', 'WebSocketService', ($log, DataModelService, WebSocketService) ->
   templateUrl: '/assets/partials/main/event/directives/market.html'
   scope: {
     item: '='

@@ -1,9 +1,31 @@
 package services
 
-import play.api.libs.json.Json
+import core.api.commands._
+import play.api.libs.json._
 
-case class JsonRpcRequest(implicit val jsonrpc = "2.0") {}
+case class JsonrpcRequest(jsonrpc: String = "2.0", method: String, id: Int, params: JsObject) {
+  def toCommand(): Command = {
+    method match {
+      case "subscribeToNavData" => SubscribeToNavData
+      case "subscribeToMarkets" => params.as[SubscribeToMarkets]
+      case "unSubscribeFromMarkets" => params.as[UnSubscribeFromMarkets]
+      case "listMarketCatalogue" => params.as[ListMarketCatalogue]
 
-object JsonRpcRequest {
-  implicit val formatJsonRpcRequest = Json.format[JsonRpcRequest]
+      case "listEventTypes" => ListEventTypes
+      case "listEvents" => params.as[ListEvents]
+//      case "startPollingMarkets" => params.as[StartPollingMarkets]
+//      case "stopPollingMarkets" => params.as[StopPollingMarkets]
+//      case "stopPollingAllMarkets" => StopPollingAllMarkets()
+      case "placeOrders" => params.as[PlaceOrders]
+      case "replaceOrders" => params.as[ReplaceOrders]
+      case "updateOrders" => params.as[UpdateOrders]
+      case "cancelOrders" => params.as[CancelOrders]
+
+      case _ => throw new Exception("Invalid Request")
+    }
+  }
+}
+
+object JsonrpcRequest {
+  implicit val readJsonrpcRequest = Json.reads[JsonrpcRequest]
 }
