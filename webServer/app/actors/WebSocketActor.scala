@@ -1,33 +1,45 @@
 package actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import core.api.{ListEventTypes, Output, Subscribe}
+import core.api.output._
+import play.api.libs.json.{JsObject, Json}
+import services.{JsonrpcRequest, JsonrpcResponse, JsonrpcResponseResult}
 
 class WebSocketActor(out: ActorRef) extends Actor with ActorLogging {
   // TODO get this from config
-  println ("SETTING UP WEB SOCKET ACTOR")
-  val remote = context.actorSelection("akka.tcp://BFTrader@127.0.0.1:2552/user/controller")
+  val server = context.actorSelection("akka.tcp://BFTrader@127.0.0.1:2552/user/controller")
+
+  def sendResponse(responseType: String, data: JsObject) = {
+    val response = JsonrpcResponse(result = Some(JsonrpcResponseResult(responseType, data)))
+    val r = Json.toJson(response).toString()
+    out ! r
+  }
 
   override def receive = {
-    case "Subscribe" =>
-      println ("Subscribing")
-      remote ! Subscribe(self, Seq("*"))
-    case "ListEventTypes" =>
-      println ("listing events")
-      remote ! ListEventTypes()
-    case x: Output =>
-      println ("I have a message: " + x)
-      out ! (x.toString)
-//    case x: String =>
-//      remote ! x
-//      println ("I have a message: " + x)
-//      out ! ("I have received your message " + x)
+    // TODO separate actors for data from server and from ui
+    // TODO handle errors
+    // TODO Implement responses
+
+    case x: String =>
+      val request = Json.parse(x).validate[JsonrpcRequest]
+      val command = request.getOrElse(throw new Exception("Invalid Request")).toCommand()
+      println ("sending command to server: " + command)
+      server ! command
+    case x: EventTypeUpdate       => sendResponse("EventTypeUpdate", Json.toJson(x.data).as[JsObject])
+    case x: EventUpdate           => sendResponse("EventUpdate", Json.toJson(x.data).as[JsObject])
+    case x: MarketCatalogueUpdate => sendResponse("MarketCatalogueUpdate", Json.toJson(x.data).as[JsObject])
+    case x: MarketBookUpdate      =>
+      sendResponse("MarketBookUpdate", Json.obj(
+        "data" -> Json.toJson(x.data).as[JsObject],
+        "runners" -> Json.toJson(x.runners).as[JsObject]
+      ))
+    case x: NavigationDataUpdate  =>
+      sendResponse("NavigationDataUpdate", Json.obj(
+        "navData" -> Json.toJson(x.data).as[JsObject],
+        "competitions" -> Json.toJson(x.competitions).as[JsObject]
+      ))
   }
 
-  override def postStop() = {
-    // close down functions
-    println ("I am closing down")
-  }
 }
 
 object WebSocketActor {

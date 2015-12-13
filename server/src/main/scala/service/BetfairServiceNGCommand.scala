@@ -1,8 +1,10 @@
 package service
 
 import akka.actor.ActorSystem
-import server.Configuration
 import domain._
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClientBuilder
+import server.Configuration
 import spray.client.pipelining._
 import spray.http.{HttpResponse, StatusCodes}
 import spray.httpx.encoding.{Deflate, Gzip}
@@ -37,7 +39,6 @@ class BetfairServiceNGCommand(val config: Configuration)
     pipeline {
       Post(config.isoUrl + "/login?username=" + request.username + "&password=" + request.password)
     }
-
   }
 
   def makeLogoutRequest(sessionToken: String)(implicit unmarshaller: FromResponseUnmarshaller[LogoutResponse]) {
@@ -55,8 +56,23 @@ class BetfairServiceNGCommand(val config: Configuration)
     pipeline {
       Post(config.isoUrl + "/logout")
     }
-
   }
+
+  def makeNavigationDataRequest(sessionToken: String): Future[String] = Future[String] {
+    val httpGet = new HttpGet(config.navUrl)
+    // set the desired header values
+    httpGet.setHeader("Accept", "application/json")
+    httpGet.setHeader("Accept-Charset", "UTF-8")
+    httpGet.setHeader("X-Application", config.appKey)
+    httpGet.setHeader("X-Authentication", sessionToken)
+    // execute the request
+    val response = HttpClientBuilder.create().build().execute(httpGet)
+    val inputStream = response.getEntity().getContent()
+    val output = scala.io.Source.fromInputStream(inputStream).mkString
+    inputStream.close()
+    output
+  }
+
 
   def makeAPIRequest[T](sessionToken: String, request: JsonrpcRequest)(implicit unmarshaller: FromResponseUnmarshaller[T]): Future[Option[T]] = {
 
@@ -77,7 +93,6 @@ class BetfairServiceNGCommand(val config: Configuration)
     pipeline {
       Post(config.apiUrl, request)
     }
-
   }
 
 }

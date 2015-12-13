@@ -1,77 +1,76 @@
 package core.dataModel
 
 import akka.actor.Actor
-import core.api.{MarketCatalogueUpdate, MarketBookUpdate, EventUpdate, EventTypeUpdate}
+import core.api.commands.GetNavigationData
+import core.api.output._
 import core.dataProvider.output._
-import core.eventBus.{MessageEvent, EventBus}
-import domain.{MarketCatalogue, MarketBook, EventResult, EventTypeResult}
+import core.eventBus.{EventBus, MessageEvent}
+import domain._
 
-/**
- * Created by Alcock on 08/11/2015.
- */
+import scala.collection.immutable.HashMap
 
-class DataModelActor(eventBus: EventBus) extends Actor {
+class DataModelActor(eventBus: EventBus, var dataModel: DataModel) extends Actor {
 
   // TODO get these from config
   private val OUTPUT_CHANNEL = "modelUpdates"
-
-  var dataModel: DataModel = DataModel()
 
   // TODO this code is duplicated move it into central utils lib
   def getPublishChannel(ids: Seq[String]): String = ids.foldLeft[String](OUTPUT_CHANNEL)((channel, id) => channel + "/" + id)
 
   def receive = {
-    case eventTypeData: EventTypeData =>
+    case GetNavigationData =>
+      eventBus.publish(MessageEvent(getPublishChannel(Seq("navData")), NavigationDataUpdate(dataModel.navData, dataModel.competitions)))
+    case eventTypeData: EventTypeDataUpdate =>
       this.dataModel = eventTypeData.listEventTypeResultContainer.result.foldLeft[DataModel](this.dataModel)(
         (dataModel: DataModel, eventTypeResult: EventTypeResult) => {
-          // get broadcast channel
-          val channel = getPublishChannel(Seq(eventTypeResult.eventType.id))
-          // update data model
-          val newDataModel = dataModel.updateEventType(eventTypeResult)
           // publish change to broadcast channel
-          val newEventType = newDataModel.getEventType(eventTypeResult.eventType.id)
-          eventBus.publish(MessageEvent(channel, EventTypeUpdate(newEventType)))
-          newDataModel
+          eventBus.publish(MessageEvent(
+            getPublishChannel(Seq("eventTypeResult", eventTypeResult.eventType.id)),
+            EventTypeUpdate(eventTypeResult)
+          ))
+          // update data model
+          dataModel.updateEventTypeResult(eventTypeResult)
         }
       )
-    case eventData: EventData =>
+    case eventData: EventDataUpdate =>
       this.dataModel = eventData.listEventResultContainer.result.foldLeft[DataModel](this.dataModel)(
         (dataModel: DataModel, eventResult: EventResult) => {
-          // get broadcast channel
-          val channel = getPublishChannel(Seq(eventData.eventTypeId, eventResult.event.id))
-          // update data model
-          val newDataModel = dataModel.updateEvent(eventData.eventTypeId, eventResult)
           // publish change to broadcast channel
-          val newEvent = newDataModel.getEvent(eventData.eventTypeId, eventResult.event.id)
-          eventBus.publish(MessageEvent(channel, EventUpdate(newEvent)))
-          newDataModel
+          eventBus.publish(MessageEvent(
+            getPublishChannel(Seq("eventResult", eventResult.event.id)),
+            EventUpdate(eventResult)
+          ))
+          // update data model
+          dataModel.updateEventResult(eventResult)
         }
       )
-    case marketData: MarketData =>
-      this.dataModel = marketData.listMarketBookContainer.result.foldLeft[DataModel](this.dataModel)(
+    case marketDataUpdate: MarketDataUpdate =>
+      this.dataModel = marketDataUpdate.listMarketBookContainer.result.foldLeft[DataModel](this.dataModel)(
         (dataModel: DataModel, marketBook: MarketBook) => {
-          // get broadcast channel
-          val channel = getPublishChannel(Seq(marketData.eventTypeId, marketData.eventId, marketBook.marketId))
-          // update data model
-          val newDataModel = dataModel.updateMarket(marketData.eventTypeId, marketData.eventId, marketBook)
           // publish change to broadcast channel
-          val newMarket = newDataModel.getMarket(marketData.eventTypeId, marketData.eventId, marketBook.marketId)
-          eventBus.publish(MessageEvent(channel, MarketBookUpdate(newMarket)))
-          newDataModel
+          eventBus.publish(MessageEvent(
+            getPublishChannel(Seq("marketBook", marketBook.marketId)),
+            // sort the runners here
+            MarketBookUpdate(
+              marketBook,
+              marketBook.runners.map(x =>
+                (x.selectionId.toString + "-" + x.handicap.toString) -> x)(collection.breakOut): HashMap[String, Runner]
+            )
+          ))
+          // update data model
+          dataModel.updateMarketBook(marketBook)
         }
       )
-    // TODO think about how to differ between marketCatalogue update and marketUpdate
-    case marketCatalogueUpdate: MarketCatalogueData =>
-      this.dataModel = marketCatalogueUpdate.listMarketCatalogueContainer.result.foldLeft[DataModel](this.dataModel)(
+    case marketCatalogueData: MarketCatalogueDataUpdate =>
+      this.dataModel = marketCatalogueData.listMarketCatalogueContainer.result.foldLeft[DataModel](this.dataModel)(
         (dataModel: DataModel, marketCatalogue: MarketCatalogue) => {
-          // get broadcast channel
-          val channel = getPublishChannel(Seq(marketCatalogueUpdate.eventTypeId, marketCatalogue.event.id, marketCatalogue.marketId))
-          // update data model
-          val newDataModel = dataModel.updateMarketCatalogue(marketCatalogueUpdate.eventTypeId, marketCatalogue)
           // publish change to broadcast channel
-          val newMarket = newDataModel.getMarket(marketCatalogueUpdate.eventTypeId, marketCatalogue.event.id, marketCatalogue.marketId)
-          eventBus.publish(MessageEvent(channel, MarketCatalogueUpdate(newMarket)))
-          newDataModel
+          eventBus.publish(MessageEvent(
+            getPublishChannel(Seq("marketBook", marketCatalogue.marketId)),
+            MarketCatalogueUpdate(marketCatalogue)
+          ))
+          // update data model
+          dataModel.updateMarketCatalogue(marketCatalogue)
         }
       )
   }

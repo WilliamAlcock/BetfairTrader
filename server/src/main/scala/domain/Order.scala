@@ -21,15 +21,7 @@ case class Order(betId: String,
                  sizeRemaining: Double,
                  sizeLapsed: Double,
                  sizeCancelled: Double,
-                 sizeVoided: Double) {
-
-  override def hashCode = this.betId.hashCode
-
-  override def equals(o: Any): Boolean = o match {
-    case that: Order => that.betId equals this.betId
-    case _ => false
-  }
-}
+                 sizeVoided: Double)
 
 object Order {
   implicit val formatOrder = Json.format[Order]

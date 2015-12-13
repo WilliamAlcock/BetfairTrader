@@ -1,0 +1,28 @@
+<div class="row runner price-row" ng-class="{true:'last'}[last]">
+    <div class="col-xs-6 price-label" ng-click="openLadder()">{{::catalogue.runnerName}}
+    </div>
+    <div class="col-xs-1 price-square outline-left" ng-class="{'SUSPENDED':'suspended'}[bookData[id].status]">
+        <div class="price">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToBack[2].price}}</div>
+        <div class="size">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToBack[2].size | sizeFilter}}</div>
+    </div>
+    <div class="col-xs-1 price-square outline-left" ng-class="{'SUSPENDED':'suspended'}[bookData[id].status]">
+        <div class="price">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToBack[1].price}}</div>
+        <div class="size">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToBack[1].size | sizeFilter}}</div>
+    </div>
+    <div class="col-xs-1 price-square bf-back-color" ng-class="{'SUSPENDED':'suspended'}[bookData[id].status]">
+        <div class="price">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToBack[0].price}}</div>
+        <div class="size">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToBack[0].size | sizeFilter}}</div>
+    </div>
+    <div class="col-xs-1 price-square bf-lay-color" ng-class="{'SUSPENDED':'suspended'}[bookData[id].status]">
+        <div class="price">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToLay[0].price}}</div>
+        <div class="size">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToLay[0].size | sizeFilter}}</div>
+    </div>
+    <div class="col-xs-1 price-square outline-right" ng-class="{'SUSPENDED':'suspended'}[bookData[id].status]">
+        <div class="price">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToLay[1].price}}</div>
+        <div class="size">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToLay[1].size | sizeFilter}}</div>
+    </div>
+    <div class="col-xs-1 price-square outline-right" ng-class="{'SUSPENDED':'suspended'}[bookData[id].status]">
+        <div class="price">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToLay[2].price}}</div>
+        <div class="size">{{bookData[id].runnersMap[catalogue.uniqueId].ex.availableToLay[2].size | sizeFilter}}</div>
+    </div>
+</div>

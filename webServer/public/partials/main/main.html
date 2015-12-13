@@ -1,0 +1,16 @@
+<!-- Nav bar -->
+<div class="row">
+    <uib-tabset justified="true">
+        <uib-tab ng-repeat="eventType in main.navigationData.root.children track by eventType.id"
+                 ng-if="main.showEventType(eventType.id)" heading="{{eventType.name}} ({{eventType.numberOfMarkets}})"
+                 active="main.visibleTabs[eventType.id].active" disabled="main.visibleTabs[eventType.id].disabled"
+                     select="main.onTabSelected(eventType.id)" style="cursor:pointer">
+        </uib-tab>
+    </uib-tabset>
+</div>
+<!-- Content -->
+<div class="row">
+    <div class="col-xs-3" ui-view="navigation"></div>
+    <div class="col-xs-6" ui-view="detail"></div>
+    <div class="col-xs-3" ui-view="position"></div>
+</div>

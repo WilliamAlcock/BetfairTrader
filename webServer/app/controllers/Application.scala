@@ -17,10 +17,12 @@ import play.api.mvc._
 @Singleton
 class Application @Inject() (uuidGenerator: UUIDGenerator) extends Controller {
 
-  private final val logger: Logger = LoggerFactory.getLogger(classOf[Application])
 
-  def index = Action {
-    logger.info("Serving index page...")
+  private final val logger: Logger = LoggerFactory.getLogger(classOf[Application])
+  logger.info("APPLICATION IS BEING CREATED")
+
+  def index(any: String) = Action {
+    logger.info("Serving index page..." + any)
 
     val javascripts = {
       if (Play.isDev) {
@@ -37,8 +39,8 @@ class Application @Inject() (uuidGenerator: UUIDGenerator) extends Controller {
     Ok(views.html.index(javascripts))
   }
 
-  def ladder = Action {
-    logger.info("Serving ladder page...")
+  def ladder(any: String) = Action {
+    logger.info("Serving ladder page..." + any)
 
     val javascripts = {
       if (Play.isDev) {

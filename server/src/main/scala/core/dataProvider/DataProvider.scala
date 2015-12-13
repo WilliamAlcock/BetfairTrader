@@ -1,32 +1,22 @@
 package core.dataProvider
 
-import akka.actor.{Actor, ActorRef, Props}
-
-import core.api._
-import core.dataProvider.MarketPoller._
-import core.dataProvider.output.{MarketCatalogueData, EventData, EventTypeData}
-import core.eventBus.{MessageEvent, EventBus}
-import domain.{MarketProjection, MarketSort, MarketFilter}
+import akka.actor.{Actor, ActorRef, Cancellable, Props}
+import akka.routing.RoundRobinGroup
+import core.api.commands._
+import core.dataProvider.DataProvider.Tick
+import core.dataProvider.commands.{StartPollingMarkets, StopPollingMarkets, UnSubscribe}
+import core.dataProvider.output.{EventDataUpdate, EventTypeDataUpdate, MarketCatalogueDataUpdate}
+import core.dataProvider.polling.MarketPoller.Poll
+import core.dataProvider.polling.{MarketPoller, PollingGroup, PollingGroups}
+import core.eventBus.{EventBus, MessageEvent}
+import domain.{MatchProjection, OrderProjection, _}
+import org.joda.time.DateTime
 import server.Configuration
 import service.BetfairServiceNG
 
-import scala.collection.immutable.HashMap
+import scala.concurrent.duration._
+import scala.language.postfixOps
 import scala.util.{Failure, Success}
-
-sealed case class MarketActorCounter(count: Int, actor: ActorRef) {
-  def increment: MarketActorCounter = {
-    if (this.count == 0) this.actor ! StartPolling
-    this.copy(count = this.count + 1)
-  }
-  def decrement: MarketActorCounter = {
-    if (this.count == 1) this.actor ! StopPolling
-    this.copy(count = Math.max(0, this.count - 1))    // count should never be negative
-  }
-  def stop: MarketActorCounter = {
-    if (this.count > 0) this.actor ! StopPolling
-    this.copy(count = 0)
-  }
-}
 
 // TODO use config to shape calls to betfairServiceNG
 class DataProvider(config: Configuration,
@@ -36,77 +26,110 @@ class DataProvider(config: Configuration,
 
   import context._
 
+  // TODO implement update navigation data
   // TODO get these from config
   private val DATA_PROVIDER_OUTPUT_CHANNEL = "dataProviderOutput"
+  private val MAX_MARKET_CATALOGUE = 200
+  val ORDER_PROJECTION = OrderProjection.EXECUTABLE
+  val MATCH_PROJECTION = MatchProjection.ROLLED_UP_BY_PRICE
 
-  var marketActors: HashMap[String, MarketActorCounter] = HashMap[String, MarketActorCounter]()
+  val workers: Seq[ActorRef] = List[ActorRef](
+    context.actorOf(MarketPoller.props(config, sessionToken, betfairServiceNG, eventBus), "pollingWorker1"),
+    context.actorOf(MarketPoller.props(config, sessionToken, betfairServiceNG, eventBus), "pollingWorker2"),
+    context.actorOf(MarketPoller.props(config, sessionToken, betfairServiceNG, eventBus), "pollingWorker3"),
+    context.actorOf(MarketPoller.props(config, sessionToken, betfairServiceNG, eventBus), "pollingWorker4")
+  )
 
-  private def getNewMarketActorCounter(eventTypeId: String, eventId: String, marketId: String): MarketActorCounter = {
-    val newMarketPoller = new MarketPoller(
-      config,
+  var pollingRouter: ActorRef = context.actorOf(RoundRobinGroup(workers.map {x=> x.path.toString}.toList).props(), "router")
+  var pollingGroups = PollingGroups()
+  var cancelPolling: Cancellable = _
+  var isPolling: Boolean = false
+
+  // Split the markets into sets of 40 and action them
+  def sendToRouter(markets: Set[String], maxMarkets: Int, action: (Set[String]) => Unit): Unit = markets.size match {
+    case x if x > maxMarkets =>
+      val (a, b) = markets splitAt maxMarkets
+      sendToRouter(a, maxMarkets, action)
+      sendToRouter(b, maxMarkets, action)
+    case x =>
+      action(markets)
+  }
+
+  def tick() = {
+    pollingGroups.pollingGroups.foreach{ case (pollingGroup: PollingGroup, markets: Set[String]) =>
+      sendToRouter(markets, pollingGroup.maxMarkets, (m: Set[String]) =>
+        pollingRouter ! Poll(m, pollingGroup.getPriceProjection(), ORDER_PROJECTION, MATCH_PROJECTION)
+      )}
+    pollingGroups.pollingGroups.size match {
+      case x if x == 0 =>
+        println(DateTime.now().toString + " ticking no markets")
+        cancelPolling.cancel()
+        isPolling = false
+      case x =>
+        cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)
+        isPolling = true
+    }
+  }
+
+  def listMarketCatalogue(marketIds: Set[String]):Unit = {
+    betfairServiceNG.listMarketCatalogue(
       sessionToken,
-      betfairServiceNG,
-      eventBus,
-      eventTypeId,
-      eventId,
-      marketId
-    )
-    MarketActorCounter(0, context.actorOf(Props(newMarketPoller)))
+      new MarketFilter(marketIds = marketIds),
+      List(
+        MarketProjection.MARKET_START_TIME,
+        //MarketProjection.RUNNER_METADATA, // TODO need to get a json reader working for runner metadata
+        MarketProjection.RUNNER_DESCRIPTION,
+        MarketProjection.EVENT_TYPE,
+        MarketProjection.EVENT,
+        MarketProjection.COMPETITION
+      ),
+      MarketSort.FIRST_TO_START,
+      200
+    ) onComplete {
+      case Success(Some(listMarketCatalogueContainer)) =>
+        eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, MarketCatalogueDataUpdate(listMarketCatalogueContainer)))
+      case Success(None) =>
+      // TODO handle event where betfair returns empty response
+      case Failure(error) => throw new DataProviderException("call to listMarketCatalogue failed")
+    }
   }
 
   def receive = {
-    case ListEventTypes() =>
+    case ListEventTypes =>
       betfairServiceNG.listEventTypes(sessionToken, new MarketFilter()) onComplete {
         case Success(Some(listEventTypeResultContainer)) =>
-          eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, EventTypeData(listEventTypeResultContainer)))
+          eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, EventTypeDataUpdate(listEventTypeResultContainer)))
         case Success(None) =>
           // TODO handle event where betfair returns empty response
         case Failure(error) => throw new DataProviderException("call to listEventTypes failed")
       }
     case ListEvents(eventTypeId) =>
-      betfairServiceNG.listEvents(sessionToken, new MarketFilter(eventTypeIds = Set(eventTypeId.toInt))) onComplete {
+      betfairServiceNG.listEvents(sessionToken, new MarketFilter(eventTypeIds = Set(eventTypeId))) onComplete {
         case Success(Some(listEventResultContainer)) =>
-          eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, EventData(eventTypeId, listEventResultContainer)))
+          eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, EventDataUpdate(listEventResultContainer)))
         case Success(None) =>
           // TODO handle event where betfair returns empty response
         case Failure(error) => throw new DataProviderException("call to listEvents failed")
       }
-    case ListMarketCatalogue(eventTypeId, eventId) =>
-      // Get all the markets
-      betfairServiceNG.listMarketCatalogue(
-        sessionToken,
-        new MarketFilter(eventTypeIds = Set(eventTypeId.toInt), eventIds = Set(eventId.toInt)),
-        List(
-          MarketProjection.MARKET_START_TIME,
-          //MarketProjection.RUNNER_METADATA, // TODO need to get a json reader working for runner metadata
-          MarketProjection.RUNNER_DESCRIPTION,
-          MarketProjection.EVENT_TYPE,
-          MarketProjection.EVENT,
-          MarketProjection.COMPETITION
-        ),
-        MarketSort.FIRST_TO_START,
-        200
-      ) onComplete {
-        case Success(Some(listMarketCatalogueContainer)) =>
-          eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, MarketCatalogueData(eventTypeId, listMarketCatalogueContainer)))
-        case Success(None) =>
-          // TODO handle event where betfair returns empty response
-        case Failure(error) => throw new DataProviderException("call to listMarketCatalogue failed")
+    case ListMarketCatalogue(marketIds) => sendToRouter(marketIds, MAX_MARKET_CATALOGUE, listMarketCatalogue)
+    case StartPollingMarkets(marketIds, subscriber, pollingGroup) =>
+      marketIds.foreach(x => pollingGroups = pollingGroups.addSubscriber(x, subscriber, pollingGroup))
+      if (!isPolling) {
+        cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)
+        isPolling = true
       }
-    case StartPollingMarket(eventTypeId: String, eventId: String, marketId: String) =>
-      this.marketActors.get(marketId) match {
-        case Some(x: MarketActorCounter) => marketActors = marketActors + (marketId -> x.increment)
-        case None =>
-          marketActors = marketActors + (marketId -> getNewMarketActorCounter(eventTypeId, eventId, marketId).increment)
-      }
-    case StopPollingMarket(eventTypeId: String, eventId: String, marketId: String) =>
-      this.marketActors.get(marketId) match {
-        case Some(x: MarketActorCounter) => marketActors = marketActors + (marketId -> x.decrement)
-        case None => throw new DataProviderException("cannot stop polling market that has not been started " + marketId)
-      }
-    case StopPollingAllMarkets() =>
-      // for each market actor stopPollingMarket
-      this.marketActors = marketActors.map {case(id: String, counter: MarketActorCounter) => id -> counter.stop}
+    case StopPollingMarkets(marketIds, subscriber, pollingGroup) =>
+      marketIds.foreach(x => pollingGroups = pollingGroups.removeSubscriber(x, subscriber, pollingGroup))
+    case UnSubscribe(subscriber) => pollingGroups = pollingGroups.removeSubscriber(subscriber)
+    case StopPollingAllMarkets => pollingGroups = pollingGroups.removeAllSubscribers()
+    case Tick => tick()
     case _ => throw new DataProviderException("unknown call to data provider")
   }
+}
+
+object DataProvider {
+  def props(config: Configuration, sessionToken: String, betfairService: BetfairServiceNG, eventBus: EventBus) =
+    Props(new DataProvider(config, sessionToken, betfairService, eventBus))
+
+  case object Tick
 }

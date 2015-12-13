@@ -1,7 +1,6 @@
 package service
 
 import akka.actor.ActorSystem
-import server.Configuration
 import domain.BetStatus.BetStatus
 import domain.GroupBy.GroupBy
 import domain.MarketProjection.MarketProjection
@@ -13,6 +12,7 @@ import domain.Side.Side
 import domain.SortDir.SortDir
 import domain.TimeGranularity.TimeGranularity
 import domain._
+import server.Configuration
 
 import scala.collection.mutable.HashMap
 import scala.concurrent._
@@ -36,6 +36,8 @@ class BetfairServiceNG(val config: Configuration, command: BetfairServiceNGComma
 
     command.makeLogoutRequest(sessionToken)
   }
+
+  def getNavigationData(sessionToken: String): Future[String] = command.makeNavigationDataRequest(sessionToken)
 
   def listCompetitions(sessionToken: String, marketFilter: MarketFilter): Future[Option[ListCompetitionsContainer]] = {
 

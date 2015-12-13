@@ -1,0 +1,11 @@
+<div class="row detail-panel">
+    <div class="col-xs-12" style="padding-top:10px">
+        <div class="row">
+            <div class="col-xs-12 main-heading">{{detail.viewData.name}}</div>
+        </div>
+        <group ng-if="detail.viewData.type == 'GROUP'" item="detail.viewData" hide-heading="true"
+               on-event-clicked="detail.selectEvent({eventId:eventId})"></group>
+        <event ng-if="detail.viewData.type == 'EVENT'" item="detail.viewData" hide-heading="true"
+               on-event-clicked="detail.selectEvent({eventId:eventId})" list-all-markets="true"></event>
+    </div>
+</div>

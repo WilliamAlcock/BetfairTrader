@@ -1,0 +1,15 @@
+<div class="row detail-panel">
+    <div class="col-xs-12" style="padding-top:10px">
+        <uib-accordion close-others="oneAtATime">
+            <uib-accordion-group is-open="detail.isOpen[data.id]"
+                                 ng-repeat="data in detail.viewData.children track by data.id"
+                                 ng-if="detail.isSelected[data.marketType] && detail.bookData[data.id].status != 'CLOSED'">
+                <uib-accordion-heading>
+                    <i class="pull-right glyphicon" ng-class="{true:'glyphicon-triangle-bottom', false:'glyphicon-triangle-top'}[detail.isOpen[data.id]]"></i>
+                    &nbsp{{::data.name}}
+                </uib-accordion-heading>
+                <market item="data" on-runner-clicked="detail.selectRunner({runnerId:runnerId})"></market>
+            </uib-accordion-group>
+        </uib-accordion>
+    </div>
+</div>

@@ -10,7 +10,9 @@ case class PlaceInstruction(orderType: OrderType,
                             side: Side,
                             limitOrder: Option[LimitOrder] = None,
                             limitOnCloseOrder: Option[LimitOnCloseOrder] = None,
-                            marketOnCloseOrder: Option[MarketOnCloseOrder] = None)
+                            marketOnCloseOrder: Option[MarketOnCloseOrder] = None) {
+  val uniqueId:String = selectionId.toString + "-" + handicap.toString
+}
 
 object PlaceInstruction {
   implicit val formatPlaceInstruction = Json.format[PlaceInstruction]

@@ -35,8 +35,6 @@ lazy val serverDependencies = Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "com.github.nscala-time" %% "nscala-time" % "1.4.0",
   "com.typesafe.play" %% "play-json" % "2.4.3",
-  "org.reactivemongo" %% "reactivemongo" % "0.11.7",
-  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.7.play24",
   "com.github.tomakehurst" % "wiremock" % "1.46" % "test",
   "org.scalatest" %% "scalatest" % "2.2.4" % "provided",
   "org.mockito" % "mockito-all" % "1.9.5" % "provided",
@@ -54,6 +52,7 @@ lazy val webServerDependencies = Seq(
   "org.webjars" % "angularjs" % "1.3.15",
   "org.webjars" % "angular-ui-bootstrap" % "0.14.3",
   "org.webjars" % "angular-ui-router" % "0.2.15",
+  "org.webjars.npm" % "ui-select" % "0.13.2",
   "org.mockito" % "mockito-core" % "1.10.19" % "test"
 )
 

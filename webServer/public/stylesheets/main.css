@@ -9,17 +9,81 @@ ul.nav.nav-tabs.nav-justified {
     padding-bottom: 10px;
 }
 
-.event-item {
-    border-top: solid rgb(224, 230, 230) 1px;
-    cursor: pointer;
+.bf-back-color {
+    background: #72bbef;
 }
 
-.event-item-bottom-border {
-    border-bottom: solid rgb(224, 230, 230) 1px;
+.bf-lay-color {
+    background: #faa9ba
+}
+
+.price-row {
+    border-top: solid rgb(224, 230, 230) 1px;
+    cursor: pointer;
+    min-height: 41px;
+    max-height: 41px;
 }
 
 .price-label {
     color: #2789ce;
+}
+
+.event-item .match-odds-placeholder {
+    line-height: 40px
+}
+
+.event-item .others-heading {
+    border-bottom: solid rgb(224, 230, 230) 1px;
+}
+
+.event-item .time {
+    color: rgb(39, 58, 71)
+}
+
+.runner {
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.runner .outline-left {
+    border-left: solid rgb(224, 230, 230) 1px;
+}
+
+.runner .outline-right {
+    border-right: solid rgb(224, 230, 230) 1px;
+}
+
+.runner.last .price-square {
+    border-bottom: solid rgb(224, 230, 230) 1px;
+}
+
+.price-square .price {
+    font-size:medium;
+    line-height:24px;
+}
+
+.price-square .size {
+    font-weight: normal;
+    font-size: small;
+    line-height:12px
+}
+
+.price-square {
+    border-left: solid white 1px;
+    border-right: solid white 1px;
+    padding-left: 0px;
+    padding-right: 0px;
+    text-align: center;
+    line-height: 20px;
+    font-weight: bold;
+    min-height: 40px;
+    max-height: 40px;
+}
+
+
+.group-item .heading {
+    padding-left:10px;
+    padding-right:10px;
 }
 
 .bf-price {
@@ -28,26 +92,15 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .bf-ladder-square {
-    width: 60px;
+    /*width: 60px;*/
+    min-height: 30px;
+    max-height: 30px;
     border-left: solid rgb(224, 230, 230) 1px;
     border-right: solid rgb(224, 230, 230) 1px;
     padding-left: 0px;
     padding-right: 0px;
     text-align: center;
     line-height: 30px;
-}
-
-.bf-event-price-square {
-    border-left: solid white 1px;
-    border-right: solid white 1px;
-    padding-left: 0px;
-    padding-right: 0px;
-    text-align: center;
-    line-height: 30px;
-}
-
-.bf-price-font {
-    font-weight: bold;
 }
 
 .bf-market-price-filled-square {
@@ -68,30 +121,21 @@ ul.nav.nav-tabs.nav-justified {
     cursor: pointer;
 }
 
-.bf-runner-description {
-    border-top: solid rgb(224, 230, 230) 1px;
-    height: 41px;
-}
-
-.bf-runner-description-bottom {
-    border-bottom: solid rgb(224, 230, 230) 1px;
-    height: 42px;
-}
-
-.bf-back-color {
-    background: #72bbef;
-}
-
-.bf-lay-color {
-    background: #faa9ba
-}
-
-.panel-group .panel-default {
+.detail-panel .panel-group .panel-default {
     border-top-left-radius: 0px;
     border-top-right-radius: 0px;
 }
 
-.panel-group .panel-default .panel-heading {
+.selected-item {
+    background-color: rgb(39,58,71);
+    color: white;
+    margin-left: -5px;
+    margin-right: -5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.detail-panel .panel-group .panel-default .panel-heading {
     height: 26px;
     padding-top: 0px;
     padding-bottom: 0px;
@@ -102,21 +146,128 @@ ul.nav.nav-tabs.nav-justified {
     border-top-right-radius: 0px;
 }
 
-.panel-group .panel-default .panel-heading .panel-title {
-    font-size:13px;
+.detail-panel .panel-group .panel-default .panel-heading .panel-title {
+    font-size:14px;
     line-height: 26px;
 }
 
-.panel-group .panel-default .panel-heading .panel-title i {
+.detail-panel .panel-group .panel-default .panel-heading .panel-title i {
     line-height: inherit;
 }
 
-.panel-group .panel-default .panel-heading a:focus {
+.detail-panel .panel-group .panel-default .panel-heading a:focus {
+    text-decoration: none;
+    outline: none;
+}
+
+.detail-panel .panel-group .panel-default .panel-heading a:hover {
     text-decoration: none;
 }
 
-.panel-group .panel-default .panel-heading a:hover {
+.detail-panel .main-heading {
+    background-color: #c9ced1;
+    color: rgb(39, 58, 71);
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+.navigation-panel {
+    margin-left:0px;
+    margin-right:0px
+}
+
+.navigation-panel .heading {
+    background-color: #c9ced1;
+    color: rgb(39, 58, 71)
+}
+
+.navigation-panel .entry {
+    cursor:pointer;
+    color: rgb(39, 137, 206);
+    border-bottom: solid 1px #c9ced1;
+}
+
+.navigation-panel .panel-group {
+    margin-left: -15px;
+    margin-right: -15px;
+    margin-bottom: 0px;
+    line-height: 20px;
+}
+
+.navigation-panel .panel.panel-default {
+    line-height: 20px;
+    border: none;
+    background-color: white;
+    box-shadow: none;
+    border: none;
+}
+
+.navigation-panel .panel.panel-default.panel-open .panel-heading{
+    border-top: solid 1px #c9ced1;
+}
+
+.navigation-panel .panel-group .panel-default .panel-heading {
+    height: 20px !important;
+    padding:0px !important;
+    background-color: white !important;
+    background-image: none;
+    color: rgb(39, 137, 206) !important;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.navigation-panel .panel-title {
+    line-height: 20px !important;
+    height: 20px !important;
+    padding-left:11px;
+    padding-right:15px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 14px !important;
+    font-weight:400
+}
+
+.navigation-panel .panel-body {
+    padding: 0px;
+    border-bottom:none;
+}
+
+.navigation-panel .panel-group .panel-default .panel-heading a:focus {
     text-decoration: none;
+    outline:none
+}
+
+.navigation-panel .panel-group .panel-default .panel-heading a:hover {
+    text-decoration: none;
+}
+
+.navigation-panel .entry-item {
+    border-bottom: solid 1px #c9ced1;
+    padding-left:23px;
+    padding-right:15px;
+}
+
+.suspended {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.inplay {
+    color: #009900;
+}
+
+.bf-btn {
+    background-color: #c9ced1;
+    min-height: 16px;
+    max-height: 16px;
+    line-height: 0px;
+    color:gray;
+    font-size:x-small;
+    opacity:0.8;
+}
+
+.last-price-traded {
+    background-color:yellow;
+    opacity:0.5;
 }
 
 footer {

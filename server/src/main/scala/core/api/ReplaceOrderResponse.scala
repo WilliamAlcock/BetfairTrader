@@ -1,5 +1,0 @@
-package core.api
-
-import domain.ReplaceExecutionReportContainer
-
-case class ReplaceOrderResponse(replaceExecutionReportContainer: ReplaceExecutionReportContainer) extends Output

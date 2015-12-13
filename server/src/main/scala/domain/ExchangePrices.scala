@@ -2,9 +2,9 @@ package domain
 
 import play.api.libs.json.Json
 
-case class ExchangePrices(availableToBack: Set[PriceSize],
-                          availableToLay: Set[PriceSize],
-                          tradedVolume: Set[PriceSize])
+case class ExchangePrices(availableToBack: List[PriceSize],
+                          availableToLay: List[PriceSize],
+                          tradedVolume: List[PriceSize])
 
 object ExchangePrices {
   implicit val formatExchangePrices = Json.format[ExchangePrices]

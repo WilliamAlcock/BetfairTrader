@@ -1,13 +1,10 @@
 package service
 
-import _root_.service.UnitSpec
-import _root_.service.WireMockFixture
 import akka.actor.ActorSystem
-import com.betfair.Configuration
-import com.betfair.domain.{JsonrpcRequest, ListEventResultContainer, MarketFilter}
-import com.betfair.service.BetfairServiceNGCommand
+import domain.{JsonrpcRequest, ListEventResultContainer, MarketFilter}
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.time.{Second, Span}
+import server.Configuration
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,7 +21,8 @@ class BetfairServiceNGCommandSpec extends UnitSpec with WireMockFixture {
     username = "testUsername",
     password = "testPassword",
     apiUrl = "http://localhost:8080/",
-    isoUrl = "http://localhost:8080/"
+    isoUrl = "http://localhost:8080/",
+    navUrl = "http://localhost:8080/"
   )
 
   val service = new BetfairServiceNGCommand(testConfig)

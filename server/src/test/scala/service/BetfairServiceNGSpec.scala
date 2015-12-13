@@ -1,13 +1,12 @@
 package service
 
 import akka.actor.ActorSystem
-import com.betfair.Configuration
-import com.betfair.domain._
-import com.betfair.service.BetfairServiceNGCommand
+import domain._
 import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.concurrent._
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, ShouldMatchers}
+import server.Configuration
 import spray.httpx.unmarshalling._
 
 import scala.collection.mutable
@@ -24,7 +23,8 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     username = "testUsername",
     password = "testPassword",
     apiUrl = "localhost",
-    isoUrl = "localhost"
+    isoUrl = "localhost",
+    navUrl = "localhost"
   )
   class MockCommand extends BetfairServiceNGCommand(testConfig)
 

@@ -215,7 +215,7 @@ object JsonConversionSpec extends Properties("") {
     availableToBack <- genPriceSize
     availableToLay <- genPriceSize
     tradedVolume <- genPriceSize
-  } yield ExchangePrices(Set(availableToBack), Set(availableToBack), Set(tradedVolume))
+  } yield ExchangePrices(List(availableToBack), List(availableToBack), List(tradedVolume))
 
   property("ExchangePrices") = forAll(genExchangePrices) { (a: ExchangePrices) =>
     Json.toJson(a).validate[ExchangePrices].get equals a
@@ -494,12 +494,12 @@ object JsonConversionSpec extends Properties("") {
 
   val genMarketFilter: Gen[MarketFilter] = for {
     textQuery <- Gen.option(Arbitrary.arbitrary[String])
-    exchangeIds <- Arbitrary.arbitrary[Int]
-    eventTypeIds <- Arbitrary.arbitrary[Int]
-    marketIds <- Arbitrary.arbitrary[Int]
+    exchangeIds <- Arbitrary.arbitrary[String]
+    eventTypeIds <- Arbitrary.arbitrary[String]
+    marketIds <- Arbitrary.arbitrary[String]
     inPlayOnly <- Gen.option(Arbitrary.arbitrary[Boolean])
-    eventIds <- Arbitrary.arbitrary[Int]
-    competitionIds <- Arbitrary.arbitrary[Int]
+    eventIds <- Arbitrary.arbitrary[String]
+    competitionIds <- Arbitrary.arbitrary[String]
     venues <- Arbitrary.arbitrary[String]
     bspOnly <- Gen.option(Arbitrary.arbitrary[Boolean])
     turnInPlayEnabled <- Gen.option(Arbitrary.arbitrary[Boolean])

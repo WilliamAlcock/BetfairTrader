@@ -7,12 +7,12 @@ import play.api.libs.json.{JsNull, Json, JsValue, Writes}
 // TODO why are these variables ints not string
 
 case class MarketFilter(textQuery: Option[String] = None,
-                        exchangeIds: Set[Int] = Set.empty,
-                        eventTypeIds: Set[Int] = Set.empty,
-                        marketIds: Set[Int] = Set.empty,
+                        exchangeIds: Set[String] = Set.empty,
+                        eventTypeIds: Set[String] = Set.empty,
+                        marketIds: Set[String] = Set.empty,
                         inPlayOnly: Option[Boolean] = None,
-                        eventIds: Set[Int] = Set.empty,
-                        competitionIds: Set[Int] = Set.empty,
+                        eventIds: Set[String] = Set.empty,
+                        competitionIds: Set[String] = Set.empty,
                         venues: Set[String] = Set.empty,
                         bspOnly: Option[Boolean] = None,
                         turnInPlayEnabled: Option[Boolean] = None,

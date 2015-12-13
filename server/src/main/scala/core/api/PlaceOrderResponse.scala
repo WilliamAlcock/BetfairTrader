@@ -1,5 +1,0 @@
-package core.api
-
-import domain.PlaceExecutionReportContainer
-
-case class PlaceOrderResponse(placeExecutionReportContainer: PlaceExecutionReportContainer) extends Output
