@@ -37,15 +37,30 @@ class PriceService
   getPriceAbove: (price, ticks) -> @getPriceDelta(price, ticks, @incrementPrice)
 
   filterAndSort: (data, min, max) ->
-    data = data.filter (x) => max >= x.price >= min
-    data.sort((a,b) -> b.price - a.price)
+    (data.filter (x) => max >= x.price >= min).sort((a,b) -> b.price - a.price)
 
-  mergeRow: (data, tradedVol, price) ->
+  getOrderVolume: (data) ->
+    output = {}
+    for order in data when order.status == "EXECUTABLE"
+      if angular.isUndefined(output[order.price]) then output[order.price] = {}
+      if angular.isUndefined(output[order.price][order.side])
+        output[order.price][order.side] = order.size
+      else
+        output[order.price][order.side] += order.size
+    ({price:parseFloat(key), back: val.BACK, lay: val.LAY} for key, val of output)
+
+  mergeRow: (data, tradedVol, orders, price) ->
     output = if data.length > 0 && price == data[0].price then data.shift() else {sizeToBack: 0, price: price, sizeToLay: 0}
     output.tradedVol = if tradedVol.length > 0 && price == tradedVol[0].price then tradedVol.shift().size else 0
+    order = if orders.length > 0 && price == orders[0].price then orders.shift() else {back: 0, lay: 0}
+    console.log "ORDER", order
+    output.ordersToBack = if angular.isUndefined(order.back) then 0 else order.back
+    output.ordersToLay = if angular.isUndefined(order.lay) then 0 else order.lay
     output
 
-  getPriceData: (availableToBack, availableToLay, tradedVolume, center, depth) ->
+  getPriceData: (availableToBack, availableToLay, tradedVolume, orders, center, depth) ->
+    if (orders == null) then orders = []
+    console.log "Orders", orders
     maxPrice = @getPriceAbove(center, depth + 1)
     minPrice = @getPriceBelow(center, depth)
     data = (availableToBack.map (x) -> {sizeToBack: x.size, price: x.price, sizeToLay: 0}).concat(
@@ -53,11 +68,12 @@ class PriceService
 
     data = @filterAndSort(data, minPrice, maxPrice)
     tradedVol = @filterAndSort(tradedVolume, minPrice, maxPrice)
+    ordersByPrice = @filterAndSort(@getOrderVolume(orders), minPrice, maxPrice)
     prices = (@getPriceBelow(maxPrice, x) for x in [0...((depth + 1) * 2)])
-
+    console.log
     output = []
     while prices.length > 0
-      output.push(@mergeRow(data, tradedVol, prices.shift()))
+      output.push(@mergeRow(data, tradedVol, ordersByPrice, prices.shift()))
 
     output
 

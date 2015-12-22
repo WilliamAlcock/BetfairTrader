@@ -10,7 +10,7 @@ object InstructionReportErrorCode extends Enumeration {
   INVALID_BACK_LAY_COMBINATION, ERROR_IN_ORDER, INVALID_BID_TYPE, INVALID_BET_ID,
   CANCELLED_NOT_PLACED, RELATED_ACTION_FAILED, NO_ACTION_REQUIRED = Value
 
-  implicit val enumReads: Reads[InstructionReportErrorCode] = EnumUtils.enumReads(InstructionReportErrorCode)
+  implicit def enumReads: Reads[InstructionReportErrorCode] = EnumUtils.enumReads(InstructionReportErrorCode)
 
   implicit def enumWrites: Writes[InstructionReportErrorCode] = EnumUtils.enumWrites
 }

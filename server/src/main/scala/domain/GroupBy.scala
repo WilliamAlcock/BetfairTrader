@@ -10,7 +10,7 @@ object GroupBy extends Enumeration {
   type GroupBy = Value
   val EVENT_TYPE, EVENT, MARKET, SIDE, BET = Value
 
-  implicit val enumReads: Reads[GroupBy] = EnumUtils.enumReads(GroupBy)
+  implicit def enumReads: Reads[GroupBy] = EnumUtils.enumReads(GroupBy)
 
   implicit def enumWrites: Writes[GroupBy] = EnumUtils.enumWrites
 }

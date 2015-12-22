@@ -23,21 +23,21 @@
         <div class="row">
             <div class="col-xs-12">
                 <div class="row" style="border-top: solid rgb(224, 230, 230) 1px" ng-repeat="data in ladder.prices track by data.price">
-                    <div class="col-xs-2 bf-ladder-square">
-                        <div class="bf-price-font"></div>
+                    <div class="col-xs-2 bf-ladder-square" ng-click="ladder.cancelBuy(data.price)">
+                        <div class="bf-price-font">{{data.ordersToLay}}</div>
                     </div>
-                    <div class="col-xs-2 bf-ladder-square bf-back-color">
+                    <div class="col-xs-2 bf-ladder-square bf-back-color" ng-click="ladder.buy(data.price)">
                         <div class="bf-price-font">{{data.sizeToBack | sizeFilter}}</div>
                     </div>
                     <div class="col-xs-2 bf-ladder-square"
                          ng-class="{true: 'last-price-traded'}[ladder.book.lastPriceTraded == data.price]">
                         <div class="bf-price-font">{{data.price}}</div>
                     </div>
-                    <div class="col-xs-2 bf-ladder-square bf-lay-color">
+                    <div class="col-xs-2 bf-ladder-square bf-lay-color" ng-click="ladder.sell(data.price)">
                         <div class="bf-price-font">{{data.sizeToLay  | sizeFilter}}</div>
                     </div>
-                    <div class="col-xs-2 bf-ladder-square">
-                        <div class="bf-price-font"></div>
+                    <div class="col-xs-2 bf-ladder-square" ng-click="ladder.cancelSell(data.price)">
+                        <div class="bf-price-font">{{data.ordersToBack}}</div>
                     </div>
                     <div class="col-xs-2 bf-ladder-square">
                         <div class="bf-price-font">{{data.tradedVol | sizeFilter}}</div>

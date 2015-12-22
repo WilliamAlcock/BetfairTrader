@@ -12,7 +12,7 @@ import core.eventBus.{EventBus, MessageEvent}
 import domain.{MatchProjection, OrderProjection, _}
 import org.joda.time.DateTime
 import server.Configuration
-import service.BetfairServiceNG
+import service.BetfairService
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
 // TODO use config to shape calls to betfairServiceNG
 class DataProvider(config: Configuration,
                    sessionToken: String,
-                   betfairServiceNG: BetfairServiceNG,
+                   betfairService: BetfairService,
                    eventBus: EventBus) extends Actor {
 
   import context._
@@ -34,10 +34,10 @@ class DataProvider(config: Configuration,
   val MATCH_PROJECTION = MatchProjection.ROLLED_UP_BY_PRICE
 
   val workers: Seq[ActorRef] = List[ActorRef](
-    context.actorOf(MarketPoller.props(config, sessionToken, betfairServiceNG, eventBus), "pollingWorker1"),
-    context.actorOf(MarketPoller.props(config, sessionToken, betfairServiceNG, eventBus), "pollingWorker2"),
-    context.actorOf(MarketPoller.props(config, sessionToken, betfairServiceNG, eventBus), "pollingWorker3"),
-    context.actorOf(MarketPoller.props(config, sessionToken, betfairServiceNG, eventBus), "pollingWorker4")
+    context.actorOf(MarketPoller.props(config, sessionToken, betfairService, eventBus), "pollingWorker1"),
+    context.actorOf(MarketPoller.props(config, sessionToken, betfairService, eventBus), "pollingWorker2"),
+    context.actorOf(MarketPoller.props(config, sessionToken, betfairService, eventBus), "pollingWorker3"),
+    context.actorOf(MarketPoller.props(config, sessionToken, betfairService, eventBus), "pollingWorker4")
   )
 
   var pollingRouter: ActorRef = context.actorOf(RoundRobinGroup(workers.map {x=> x.path.toString}.toList).props(), "router")
@@ -72,7 +72,7 @@ class DataProvider(config: Configuration,
   }
 
   def listMarketCatalogue(marketIds: Set[String]):Unit = {
-    betfairServiceNG.listMarketCatalogue(
+    betfairService.listMarketCatalogue(
       sessionToken,
       new MarketFilter(marketIds = marketIds),
       List(
@@ -96,7 +96,7 @@ class DataProvider(config: Configuration,
 
   def receive = {
     case ListEventTypes =>
-      betfairServiceNG.listEventTypes(sessionToken, new MarketFilter()) onComplete {
+      betfairService.listEventTypes(sessionToken, new MarketFilter()) onComplete {
         case Success(Some(listEventTypeResultContainer)) =>
           eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, EventTypeDataUpdate(listEventTypeResultContainer)))
         case Success(None) =>
@@ -104,7 +104,7 @@ class DataProvider(config: Configuration,
         case Failure(error) => throw new DataProviderException("call to listEventTypes failed")
       }
     case ListEvents(eventTypeId) =>
-      betfairServiceNG.listEvents(sessionToken, new MarketFilter(eventTypeIds = Set(eventTypeId))) onComplete {
+      betfairService.listEvents(sessionToken, new MarketFilter(eventTypeIds = Set(eventTypeId))) onComplete {
         case Success(Some(listEventResultContainer)) =>
           eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, EventDataUpdate(listEventResultContainer)))
         case Success(None) =>
@@ -128,7 +128,7 @@ class DataProvider(config: Configuration,
 }
 
 object DataProvider {
-  def props(config: Configuration, sessionToken: String, betfairService: BetfairServiceNG, eventBus: EventBus) =
+  def props(config: Configuration, sessionToken: String, betfairService: BetfairService, eventBus: EventBus) =
     Props(new DataProvider(config, sessionToken, betfairService, eventBus))
 
   case object Tick

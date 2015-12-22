@@ -1,11 +1,11 @@
-package service.newTestService
+package service.simService
 
 import domain._
 import org.joda.time.DateTimeUtils
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FlatSpec, Matchers}
-import service.newTestService.TestHelpers._
+import service.simService.TestHelpers._
 
 
 class RunnerOrderBookSpec extends FlatSpec with Matchers with MockFactory with BeforeAndAfterEach with BeforeAndAfterAll {
@@ -145,12 +145,55 @@ class RunnerOrderBookSpec extends FlatSpec with Matchers with MockFactory with B
     output.layOrderBook should be (returnedLayOrderBook)
   }
 
-  //  "RunnerOrderBook" should "hasBetId" in {
-  //
-  //  }
+  val hasBetIdScenarios = Table(
+    ("bacKOrderBookHasBetId", "layOrderBookHasBetId", "throws",   "expectedResult"),
 
-  //  "RunnerOrderBook" should "getOrders" in {
-//
-//  }
+    (true,                    false,                  false,      true),
+    (false,                   true,                   false,      true),
+    (false,                   false,                  false,      false),
+    (true,                    true,                   true,       false)           // This should throw an error as the betId cannot exist in both books
+  )
+
+  "RunnerOrderBook" should "hasBetId" in {
+    val betId = "TEST_ID"
+
+    forAll(hasBetIdScenarios) { (backOrderBookHasBetId: Boolean, layOrderBookHasBetId: Boolean, throws: Boolean, expectedResult: Boolean) =>
+
+      (backOrderBook.hasBetId _).expects(betId).returns(backOrderBookHasBetId)
+      (layOrderBook.hasBetId _).expects(betId).returns(layOrderBookHasBetId)
+
+      val orderBook = RunnerOrderBook(backOrderBook, layOrderBook)
+
+      try {
+        orderBook.hasBetId(betId) should be (expectedResult)
+        if (throws) fail()
+      }
+      catch {
+        case _: IllegalArgumentException => if (!throws) fail()// Expected, so continue
+        case _: Throwable => if (throws) fail()
+      }
+    }
+  }
+
+  "RunnerOrderBook" should "getOrders from both orderbooks" in {
+    val mockBackOrder = mock[MockBackOrder]
+    val mockLayOrder = mock[MockLayOrder]
+
+    (backOrderBook.getOrders _).expects().returns(List(mockBackOrder))
+    (layOrderBook.getOrders _).expects().returns(List(mockLayOrder))
+
+    RunnerOrderBook(backOrderBook, layOrderBook).getOrders() should be (Set(mockBackOrder, mockLayOrder))
+  }
+
+  "RunnerOrderBook" should "getMatches from both orderbooks" in {
+    val backMatch = Match(None, None, Side.BACK, 0, 0, None)
+    val layMatch = Match(None, None, Side.LAY, 0, 0, None)
+
+    (backOrderBook.getMatches _).expects().returns(List(backMatch))
+    (layOrderBook.getMatches _).expects().returns(List(layMatch))
+
+    RunnerOrderBook(backOrderBook, layOrderBook).getMatches() should be (Set(backMatch, layMatch))
+  }
+
 }
 

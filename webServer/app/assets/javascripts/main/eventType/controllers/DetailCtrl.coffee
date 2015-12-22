@@ -17,9 +17,17 @@ class DetailCtrl
     @$log.log "updating view data"
     if angular.isDefined(@data.root.children)
       @viewData = if @$stateParams.groupId == 'Today'
-        @DataModelService.getTodaysEvents(@data.root)
+        data = @DataModelService.getEventType(@data.root, @$stateParams.id.toString())
+        @$log.log "I AM HERE MO FO", data
+        todaysData = @DataModelService.getTodaysEvents(data)
+        @$log.log todaysData
+        todaysData
       else if @$stateParams.groupId == 'Tomorrow'
-        @DataModelService.getTomorrowsEvents(@data.root)
+        data = @DataModelService.getEventType(@data.root, @$stateParams.id.toString())
+        @$log.log "I AM TOMORROW MO FO", data
+        todaysData = @DataModelService.getTomorrowsEvents(data)
+        @$log.log todaysData
+        todaysData
       else
         @DataModelService.getGroup(@data.root, @$stateParams.groupId)
 

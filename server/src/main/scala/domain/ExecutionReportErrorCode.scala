@@ -10,7 +10,7 @@ object ExecutionReportErrorCode extends Enumeration {
   PERMISSION_DENIED, DUPLICATE_BETIDS, NO_ACTION_REQUIRED, SERVICE_UNAVAILABLE,
   REJECTED_BY_REGULATOR = Value
 
-  implicit val enumReads: Reads[ExecutionReportErrorCode] = EnumUtils.enumReads(ExecutionReportErrorCode)
+  implicit def enumReads: Reads[ExecutionReportErrorCode] = EnumUtils.enumReads(ExecutionReportErrorCode)
 
   implicit def enumWrites: Writes[ExecutionReportErrorCode] = EnumUtils.enumWrites
 }

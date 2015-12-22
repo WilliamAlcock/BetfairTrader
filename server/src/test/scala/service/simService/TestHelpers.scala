@@ -1,4 +1,4 @@
-package service.newTestService
+package service.simService
 
 import domain.OrderStatus.OrderStatus
 import domain.PersistenceType.PersistenceType
@@ -6,14 +6,28 @@ import domain.Side.Side
 import domain._
 import org.joda.time.DateTime
 
+class MockBackOrder extends Order("TEST_ID",OrderType.LIMIT,OrderStatus.EXECUTABLE, PersistenceType.LAPSE, Side.BACK,
+  1.0, 1.0, 1.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+class MockLayOrder extends Order("TEST_ID",OrderType.LIMIT,OrderStatus.EXECUTABLE, PersistenceType.LAPSE, Side.LAY,
+  1.0, 1.0, 1.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+
+class MockOrderFactory extends OrderFactory {}
+class MockReportFactory extends ReportFactory {}
+class MockUtils extends Utils {}
+
 class MockBackOrderBook extends OrderBook(Side.BACK)
 class MockLayOrderBook extends OrderBook(Side.LAY)
-class MockRunnerOrderBook extends RunnerOrderBook()
+class MockRunnerBook extends RunnerOrderBook()
+class MockMarketOrderBook extends MarketOrderBook()
 
 class MockPlaceInstructionReport extends PlaceInstructionReport(InstructionReportStatus.SUCCESS, None, TestHelpers.generatePlaceInstruction(Side.BACK, 1, 2), None, None, None, None)
 class MockCancelInstructionReport extends CancelInstructionReport(InstructionReportStatus.SUCCESS, None, CancelInstruction("TestBetId", None), None, None)
 class MockUpdateInstructionReport extends UpdateInstructionReport(InstructionReportStatus.SUCCESS, None, UpdateInstruction("TestBetId", PersistenceType.LAPSE))
 
+class MockPlaceExecutionReportContainer extends PlaceExecutionReportContainer(PlaceExecutionReport(ExecutionReportStatus.SUCCESS, "", None, Set(), None))
+class MockCancelExecutionReportContainer extends CancelExecutionReportContainer(CancelExecutionReport(ExecutionReportStatus.SUCCESS, "", None, Set(), None))
+class MockUpdateExecutionReportContainer extends UpdateExecutionReportContainer(UpdateExecutionReport(ExecutionReportStatus.SUCCESS, "", None, Set(), None))
+class MockReplaceExecutionReportContainer extends ReplaceExecutionReportContainer(ReplaceExecutionReport(None, ExecutionReportStatus.SUCCESS, None, "", Set()))
 
 object TestHelpers {
   // Helper function to generate orders
@@ -86,6 +100,6 @@ object TestHelpers {
 
   val lapse = PersistenceType.LAPSE
   val persist = PersistenceType.PERSIST
-  val marketOnClose =PersistenceType.MARKET_ON_CLOSE
+  val marketOnClose = PersistenceType.MARKET_ON_CLOSE
 }
 

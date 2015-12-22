@@ -5,11 +5,11 @@ import domain.InstructionReportStatus.InstructionReportStatus
 import org.joda.time.DateTime
 import play.api.libs.json.{Json, Writes, Reads}
 
-case class CancelInstructionReport(override val status: InstructionReportStatus,
-                                   override val errorCode: Option[InstructionReportErrorCode],
+case class CancelInstructionReport(status: InstructionReportStatus,
+                                   errorCode: Option[InstructionReportErrorCode],
                                    instruction: CancelInstruction,
                                    sizeCancelled: Option[Double],
-                                   cancelledDate: Option[DateTime]) extends InstructionReport(status, errorCode)
+                                   cancelledDate: Option[DateTime])
 
 object CancelInstructionReport {
   val dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"

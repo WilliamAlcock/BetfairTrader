@@ -568,7 +568,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testPlaceInstructionReport = new PlaceInstructionReport(InstructionReportStatus.SUCCESS, Some(InstructionReportErrorCode.BET_IN_PROGRESS),
       testPlaceInstruction, Some("testBetId"), Some(new DateTime()), Some(1), Some(2))
     val testReplaceInstructionReport = new ReplaceInstructionReport(InstructionReportStatus.FAILURE, Some(InstructionReportErrorCode.BET_IN_PROGRESS),
-      testCancelInstructionReport, testPlaceInstructionReport)
+      Some(testCancelInstructionReport), Some(testPlaceInstructionReport))
     val testReplaceExecutionReport = new ReplaceExecutionReport(testCustomerRef, ExecutionReportStatus.SUCCESS, Some(ExecutionReportErrorCode.BET_ACTION_ERROR),
       "testMarketId", Set(testReplaceInstructionReport))
     val testReplaceExecutionReportContainer = new ReplaceExecutionReportContainer(testReplaceExecutionReport)

@@ -9,7 +9,7 @@ import domain.MatchProjection.MatchProjection
 import domain.OrderProjection.OrderProjection
 import domain.PriceProjection
 import server.Configuration
-import service.BetfairServiceNG
+import service.BetfairService
 
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 
 class MarketPoller(config: Configuration,
                    sessionToken: String,
-                   betfairService: BetfairServiceNG,
+                   betfairService: BetfairService,
                    eventBus: EventBus) extends Actor {
 
   // TODO get these from config
@@ -30,7 +30,7 @@ class MarketPoller(config: Configuration,
 
   override def receive = {
     case Poll(marketIds, priceProjection, orderProjection, matchProjection) =>
-      println("     Polling " + marketIds.size + " markets")
+//      println("     Polling " + marketIds.size + " markets")
       betfairService.listMarketBook(
         sessionToken,
         marketIds,
@@ -39,7 +39,7 @@ class MarketPoller(config: Configuration,
         matchProjection = Some(("matchProjection", matchProjection))
       ) onComplete {
         case Success(Some(listMarketBookContainer)) =>
-          println (listMarketBookContainer.result.head.runners.head.ex.get.availableToBack)
+//          println (listMarketBookContainer.result.head.runners.head.ex.get.availableToBack)
           eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, MarketDataUpdate(listMarketBookContainer)))
         case Success(None) =>
           // TODO handle event where betfair returns empty response
@@ -50,7 +50,7 @@ class MarketPoller(config: Configuration,
 }
 
 object MarketPoller {
-  def props(config: Configuration, sessionToken: String, betfairService: BetfairServiceNG, eventBus: EventBus) =
+  def props(config: Configuration, sessionToken: String, betfairService: BetfairService, eventBus: EventBus) =
     Props(new MarketPoller(config, sessionToken, betfairService, eventBus))
 
   case class Poll(marketIds: Set[String], priceProjection: PriceProjection, orderProjection: OrderProjection, matchProjection: MatchProjection)

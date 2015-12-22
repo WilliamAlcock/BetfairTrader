@@ -1,4 +1,4 @@
-package service.newTestService
+package service.simService
 
 import domain._
 import org.joda.time.DateTime
@@ -8,7 +8,7 @@ trait OrderFactory {
 
   private def getBetId(): String = {
     betId += 1
-    "SimBet_" + betId.toString
+    "SimBet_" + betId.toString()
   }
 
   private def createLimitOrder(instruction: PlaceInstruction): Order = {

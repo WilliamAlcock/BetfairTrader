@@ -101,6 +101,7 @@ ul.nav.nav-tabs.nav-justified {
     padding-right: 0px;
     text-align: center;
     line-height: 30px;
+    cursor:pointer;
 }
 
 .bf-market-price-filled-square {

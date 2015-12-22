@@ -4,12 +4,12 @@ import domain.Side.Side
 import org.joda.time.DateTime
 import play.api.libs.json.{Json, Writes, Reads}
 
-case class Match(betId: String,
-                 matchId: String,
+case class Match(betId: Option[String],
+                 matchId: Option[String],
                  side: Side,
                  price: Double,
                  size: Double,
-                 matchDate: DateTime)
+                 matchDate: Option[DateTime])
 
 object Match {
   val dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"

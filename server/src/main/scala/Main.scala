@@ -9,6 +9,7 @@ import core.orderManager.OrderManager
 import domain.{ListCompetitionsContainer, MarketFilter}
 import play.api.libs.json.Json
 import server.Configuration
+import service.simService.{SimService, SimOrderBook}
 import service.{BetfairServiceNG, BetfairServiceNGCommand, BetfairServiceNGException}
 
 import scala.concurrent.Await
@@ -41,24 +42,27 @@ object Main {
 
     // create command, api and event bus objects
     val betfairServiceNGCommand = new BetfairServiceNGCommand(config)
-    val betfairServiceNG = new BetfairServiceNG(config, betfairServiceNGCommand)
+    //val betfairService = new BetfairServiceNG(config, betfairServiceNGCommand)
+    // create simService
+    val simOrderBook = system.actorOf(SimOrderBook.props(), "simOrderBook")
+    val betfairService = new SimService(config, new BetfairServiceNG(config, betfairServiceNGCommand), simOrderBook)
 
     // Login
-    val sessionTokenFuture = betfairServiceNG.login.map {
+    val sessionTokenFuture = betfairService.login.map {
       case Some(loginResponse) => loginResponse.token
       case _ => throw new BetfairServiceNGException("no session token")
     }
     val sessionToken = Await.result(sessionTokenFuture, 10 seconds)
 
     // Get Navigation data
-    val navDataFuture = betfairServiceNG.getNavigationData(sessionToken).map {
+    val navDataFuture = betfairService.getNavigationData(sessionToken).map {
       case x: String => x
       case _ => throw new BetfairServiceNGException("no navigation data")
     }
     val navData: NavData = Json.parse(Await.result(navDataFuture, 20 seconds)).validate[NavData].get
 
     // Get Competitions data
-    val competitionsFuture = betfairServiceNG.listCompetitions(sessionToken, new MarketFilter(eventTypeIds = Set("1"))).map {
+    val competitionsFuture = betfairService.listCompetitions(sessionToken, new MarketFilter(eventTypeIds = Set("1"))).map {
       case Some(x) => x
       case _ => throw new BetfairServiceNGException("no competitions data")
     }
@@ -67,9 +71,9 @@ object Main {
     // Start Actors
     val eventBus = new EventBus
     val dataModel: DataModel = DataModel(navData = navData, competitions = competitions)
-    val dataModelActor = system.actorOf(Props(new DataModelActor(eventBus, dataModel)), "dataModel")
-    val dataProvider = system.actorOf(DataProvider.props(config, sessionToken, betfairServiceNG, eventBus), "dataProvider")
-    val orderManager = system.actorOf(Props(new OrderManager(config, sessionToken, betfairServiceNG, eventBus)), "orderManager")
+    val dataModelActor = system.actorOf(DataModelActor.props(config, eventBus, dataModel), "dataModel")
+    val dataProvider = system.actorOf(DataProvider.props(config, sessionToken, betfairService, eventBus), "dataProvider")
+    val orderManager = system.actorOf(OrderManager.props(config, sessionToken, betfairService, eventBus), "orderManager")
 
     // Subscribe to event bus
     eventBus.subscribe(dataModelActor, DATA_PROVIDER_OUTPUT_CHANNEL)

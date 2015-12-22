@@ -1,15 +1,16 @@
 package core.dataModel
 
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 import core.api.commands.GetNavigationData
 import core.api.output._
 import core.dataProvider.output._
 import core.eventBus.{EventBus, MessageEvent}
 import domain._
+import server.Configuration
 
 import scala.collection.immutable.HashMap
 
-class DataModelActor(eventBus: EventBus, var dataModel: DataModel) extends Actor {
+class DataModelActor(config: Configuration, eventBus: EventBus, var dataModel: DataModel) extends Actor {
 
   // TODO get these from config
   private val OUTPUT_CHANNEL = "modelUpdates"
@@ -74,4 +75,8 @@ class DataModelActor(eventBus: EventBus, var dataModel: DataModel) extends Actor
         }
       )
   }
+}
+
+object DataModelActor {
+  def props(config: Configuration, eventBus: EventBus, dataModel: DataModel) = Props(new DataModelActor(config, eventBus, dataModel))
 }

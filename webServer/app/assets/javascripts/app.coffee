@@ -85,7 +85,7 @@ angular.module('myApp.routeConfig', ['ui.router'])
           .state('init.main.eventType', {
             url: "/eventType",
             params: {                                 # TODO These defaults should come from config
-              id: {value: 1},                         # Soccer
+              id: {value: 1},                       # Soccer
               groupId: {value: "Today"}               # Today
             },
             views: {

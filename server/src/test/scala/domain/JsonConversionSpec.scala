@@ -340,12 +340,12 @@ object JsonConversionSpec extends Properties("") {
   }
 
   val genMatch: Gen[Match] = for {
-    betId <- Arbitrary.arbitrary[String]
-    matchId <- Arbitrary.arbitrary[String]
+    betId <- Gen.option(Arbitrary.arbitrary[String])
+    matchId <- Gen.option(Arbitrary.arbitrary[String])
     side <- Gen.oneOf(Side.values.toSeq)
     price <- Arbitrary.arbitrary[Double]
     size <- Arbitrary.arbitrary[Double]
-    matchDate <- genDateTime
+    matchDate <- Gen.option(genDateTime)
   } yield Match(betId, matchId, side, price, size, matchDate)
 
   property("Match") = forAll(genMatch) { (a: Match) =>
@@ -658,8 +658,8 @@ object JsonConversionSpec extends Properties("") {
   val genReplaceInstructionReport: Gen[ReplaceInstructionReport] = for {
     status <- Gen.oneOf(InstructionReportStatus.values.toSeq)
     errorCode <- Gen.option(Gen.oneOf(InstructionReportErrorCode.values.toSeq))
-    cancelInstructionReport <- genCancelInstructionReport
-    placeInstructionReport <- genPlaceInstructionReport
+    cancelInstructionReport <- Gen.option(genCancelInstructionReport)
+    placeInstructionReport <- Gen.option(genPlaceInstructionReport)
   } yield ReplaceInstructionReport(status, errorCode, cancelInstructionReport, placeInstructionReport)
 
   property("ReplaceInstructionReport") = forAll(genReplaceInstructionReport) { (a: ReplaceInstructionReport) =>

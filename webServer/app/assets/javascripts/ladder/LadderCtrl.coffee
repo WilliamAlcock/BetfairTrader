@@ -20,6 +20,32 @@ class LadderCtrl
 
     @$scope.$on 'market-' + @$stateParams.marketId, @applyPrices
 
+  placeOrder: (side, price) =>
+    @WebSocketService.placeOrders(
+      @$stateParams.marketId,
+      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].selectionId,
+      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].handicap,
+      side,
+      price,
+      2,
+      "TEST_ORDER"
+    )
+
+  cancelOrders: (side, price) =>
+    @WebSocketService.cancelOrders(
+      @$stateParams.marketId,
+      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].orders.filter (x) -> x.price == price && x.side == side,
+      "TEST_CANCEL_ORDER"
+    )
+
+  sell: (price) => @placeOrder("BACK", price)
+
+  cancelSell: (price) => @cancelOrders("BACK", price)
+
+  buy: (price) => @placeOrder("LAY", price)
+
+  cancelBuy: (price) => @cancelOrders("LAY", price)
+
   scrollUp: () =>
     @center = @PriceService.incrementPrice(@center)
     @getPrices()
@@ -45,9 +71,10 @@ class LadderCtrl
     if angular.isDefined(@catalogueData[@$stateParams.marketId]) && @catalogue == undefined
       @catalogue = x for x in @catalogueData[@$stateParams.marketId].runners when x.uniqueId == @$stateParams.selectionId
     @prices = @PriceService.getPriceData(
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.availableToBack.slice(),
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.availableToLay.slice(),
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.tradedVolume.slice(),
+      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.availableToBack,
+      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.availableToLay,
+      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.tradedVolume,
+      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].orders,
       @center,
       10
     )

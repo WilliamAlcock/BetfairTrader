@@ -90,8 +90,15 @@ class WebSocketService
 #  stopPollingAllMarkets: () ->
 #    @sendJsonrpcMessage({method: "stopPollingAllMarkets", params: {}})
 #
-#  placeOrders: (marketId, instructions, customerRef) ->
-#    @sendJsonrpcMessage({method: "placeOrders", params: {marketId: marketId, instructions: instructions, customerRef: customerRef}})
+  placeOrders: (marketId, selectionId, handicap, side, price, size, customerRef) ->
+    instruction = {
+      orderType: "LIMIT",
+      selectionId: selectionId,
+      handicap: handicap,
+      side: side,
+      limitOrder: {size: size, price: price, persistenceType: "LAPSE"}
+    }
+    @sendJsonrpcMessage({method: "placeOrders", params: {marketId: marketId, instructions: [instruction], customerRef: customerRef}})
 #
 #  replaceOrders: (marketId, instructions, customerRef) ->
 #    @sendJsonrpcMessage({method: "replaceOrders", params: {marketId: marketId, instructions: instructions, customerRef: customerRef}})
@@ -99,7 +106,9 @@ class WebSocketService
 #  updateOrders: (marketId, instructions, customerRef) ->
 #    @sendJsonrpcMessage({method: "updateOrders",  params: {marketId: marketId, instructions: instructions, customerRef: customerRef}})
 #
-#  cancelOrders: (marketId, instructions, customerRef) ->
-#    @sendJsonrpcMessage({method: "cancelOrders",  params: {marketId: marketId, instructions: instructions, customerRef: customerRef}})
+
+  cancelOrders: (marketId, orders, customerRef) ->
+    instructions = orders.map (x) -> {betId:x.betId}
+    @sendJsonrpcMessage({method: "cancelOrders",  params: {marketId: marketId, instructions: instructions, customerRef: customerRef}})
 
 servicesModule.service('WebSocketService', ['$log', '$q', '$rootScope', 'DataModelService', WebSocketService])

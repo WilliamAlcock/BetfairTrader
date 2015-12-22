@@ -1,10 +1,14 @@
-package service.newTestService
+package service.simService
 
 import domain.Side.Side
 import domain._
-import org.joda.time.DateTime
 
-case class OrderBook(side: Side, orders: List[Order] = List.empty, orderFactory: OrderFactory = OrderFactory) {
+case class OrderBook(side: Side,
+                     orders: List[Order] = List.empty,
+                     matches: List[Match] = List.empty,
+                     orderFactory: OrderFactory = OrderFactory,
+                     reportFactory: ReportFactory = ReportFactory,
+                     utils: Utils = Utils) {
 
   private def p(newOrderPrice: Double, listOrderPrice: Double): Boolean = side match {
     case Side.LAY  => newOrderPrice > listOrderPrice
@@ -45,10 +49,7 @@ case class OrderBook(side: Side, orders: List[Order] = List.empty, orderFactory:
     val order = orderFactory.createOrder(instruction)
     PlaceOrderResponse(
       this.copy(orders = insert(orders, order)),
-      PlaceInstructionReport(
-        InstructionReportStatus.SUCCESS, None, instruction,
-        Some(order.betId), Some(order.placedDate), Some(order.avgPriceMatched), Some(order.sizeMatched)
-      )
+      reportFactory.getPlaceInstructionReport(instruction, order)
     )
   }
 
@@ -62,23 +63,11 @@ case class OrderBook(side: Side, orders: List[Order] = List.empty, orderFactory:
         val sizeToCancel = Math.min(x.sizeRemaining, instruction.sizeReduction.getOrElse(x.sizeRemaining))
         CancelOrderResponse(
           this.copy(orders = orders.map(x => if (x.betId == instruction.betId && x.status == OrderStatus.EXECUTABLE) _cancelOrder(x, sizeToCancel) else x)),
-          CancelInstructionReport(
-            InstructionReportStatus.SUCCESS,
-            None,
-            instruction,
-            Some(sizeToCancel),
-            Some(DateTime.now())
-          )
+          reportFactory.getCancelInstructionReport(InstructionReportStatus.SUCCESS, None, instruction, Some(sizeToCancel))
         )
       case None => CancelOrderResponse(
         this,
-        CancelInstructionReport(
-          InstructionReportStatus.FAILURE,
-          Some(InstructionReportErrorCode.INVALID_BET_ID),
-          instruction,
-          None,
-          None
-        )
+        reportFactory.getCancelInstructionReport(InstructionReportStatus.FAILURE, Some(InstructionReportErrorCode.INVALID_BET_ID), instruction, None)
       )   // Invalid BetId
     }
   }
@@ -89,30 +78,25 @@ case class OrderBook(side: Side, orders: List[Order] = List.empty, orderFactory:
     orders.find(x => x.betId == instruction.betId) match {
       case Some(x) => UpdateOrderResponse(
         this.copy(orders = orders.map(x => if (x.betId == instruction.betId) x.copy(persistenceType = instruction.newPersistenceType) else x)),
-        UpdateInstructionReport(
-          InstructionReportStatus.SUCCESS,
-          None,
-          instruction
-        )
+        reportFactory.getUpdateInstructionReport(InstructionReportStatus.SUCCESS, None, instruction)
       )
       case None => UpdateOrderResponse(
         this,
-        UpdateInstructionReport(
-          InstructionReportStatus.FAILURE,
-          Some(InstructionReportErrorCode.INVALID_BET_ID),
-          instruction
-        )
+        reportFactory.getUpdateInstructionReport(InstructionReportStatus.FAILURE, Some(InstructionReportErrorCode.INVALID_BET_ID), instruction)
       )   // Invalid BetId
     }
   }
 
   def matchOrders(price: Double): OrderBook = {
-    this.copy(orders = orders.map(x => if (x.status == OrderStatus.EXECUTABLE && isMatched(price, x.price)) _matchOrder(x) else x))
+    val updatedOrders = orders.map(x => if (x.status == OrderStatus.EXECUTABLE && isMatched(price, x.price)) _matchOrder(x) else x)
+    this.copy(orders = updatedOrders, matches = if (updatedOrders == orders) matches else List(utils.getMatchFromOrders(updatedOrders, side)))
   }
 
   def hasBetId(betId: String):Boolean = orders.find(x => x.betId == betId).size > 0
 
   def getOrders(): List[Order] = orders
+
+  def getMatches(): List[Match] = matches
 
   def getSide(): Side = side
 }

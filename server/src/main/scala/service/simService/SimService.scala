@@ -1,33 +1,42 @@
-package service.testService
+package service.simService
 
-import akka.actor.{ActorSystem, ActorRef}
+import akka.actor.{ActorRef, ActorSystem}
+import akka.pattern.ask
 import akka.util.Timeout
 import domain.BetStatus.BetStatus
 import domain.GroupBy.GroupBy
+import domain.MarketProjection._
+import domain.MarketSort._
 import domain.MatchProjection.MatchProjection
 import domain.OrderBy.OrderBy
 import domain.OrderProjection.OrderProjection
 import domain.Side.Side
 import domain.SortDir.SortDir
+import domain.TimeGranularity._
 import domain._
 import server.Configuration
-import service.{BetfairServiceNG, BetfairServiceNGCommand}
+import service.simService.SimOrderBook._
+import service.{BetfairService, BetfairServiceNG}
 
-import scala.concurrent.{Future, ExecutionContext}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.language.postfixOps
+import scala.util.Success
 
 /**
  * Created by Alcock on 23/10/2015.
  */
 
-class BetfairServiceNGTest(config: Configuration, command: BetfairServiceNGCommand, orderBook: ActorRef)
-                          (implicit executionContext: ExecutionContext, system: ActorSystem)
-  extends BetfairServiceNG(config, command) {
+class SimService(config: Configuration, service: BetfairServiceNG, orderBook: ActorRef)
+                          (implicit executionContext: ExecutionContext, system: ActorSystem) extends BetfairService {
 
   implicit val timeout = Timeout(5 seconds)
 
-  // ***** Override functions *****
+  override def login() = service.login()
+  override def logout(sessionToken: String) = service.logout(sessionToken)
+  override def getNavigationData(sessionToken: String) = service.getNavigationData(sessionToken)
+  override def listCompetitions(sessionToken: String, marketFilter: MarketFilter) = service.listCompetitions(sessionToken, marketFilter)
+  override def listCountries(sessionToken: String, marketFilter: MarketFilter) = service.listCountries(sessionToken, marketFilter)
 
   override def listCurrentOrders(sessionToken: String,
                         betIds: Option[(String, Set[String])] = None,
@@ -64,6 +73,11 @@ class BetfairServiceNGTest(config: Configuration, command: BetfairServiceNGComma
     throw new NotImplementedError()
   }
 
+  override def listEvents(sessionToken: String, marketFilter: MarketFilter) = service.listEvents(sessionToken, marketFilter)
+
+  override def listEventTypes(sessionToken: String, marketFilter: MarketFilter) = service.listEventTypes(sessionToken, marketFilter)
+
+
   override def listMarketBook(sessionToken: String,
                               marketIds: Set[String],
                               priceProjection: Option[(String, PriceProjection)] = None,
@@ -71,28 +85,20 @@ class BetfairServiceNGTest(config: Configuration, command: BetfairServiceNGComma
                               matchProjection: Option[(String, MatchProjection)] = None,
                               currencyCode: Option[(String, String)] = None): Future[Option[ListMarketBookContainer]] = {
 
-//    val promise = Promise[Option[ListMarketBookContainer]]()
-//
-//    // 1. call listMarketBook on parent object
-//    super.listMarketBook(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode) onComplete {
-//      case Success(Some(listMarketBookContainer: ListMarketBookContainer)) =>
-//        orderBook ? fillOrders(listMarketBookContainer.result) onComplete {
-//          case Success(marketBooks) =>
-//            promise.success(Some(new ListMarketBookContainer(marketBooks.asInstanceOf[List[MarketBook]])))
-//          case Failure(error) =>
-//            promise.failure(error)
-//          case _ =>
-//            promise.failure(new BetfairServiceNGException("Unknown failure"))
-//        }
-//      case Failure(error) =>
-//        promise.failure(error)
-//      case _ =>
-//        promise.failure(new BetfairServiceNGException("Unknown failure"))
-//    }
-//
-//    return promise.future
-    throw new NotImplementedError()
+    val promise = Promise[Option[ListMarketBookContainer]]
+    service.listMarketBook(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode) onComplete {
+      case Success(Some(x: ListMarketBookContainer)) => promise.completeWith(ask(orderBook, MatchOrders(x)).mapTo[Option[ListMarketBookContainer]])
+      case _ => promise.failure(SimException("listMarketBook to BetfairService failed"))
+    }
+    promise.future
   }
+
+  override def listMarketCatalogue(sessionToken: String,
+                                  marketFilter: MarketFilter,
+                                  marketProjection: List[MarketProjection],
+                                  sort: MarketSort,
+                                  maxResults: Integer) = service.listMarketCatalogue(sessionToken, marketFilter, marketProjection, sort, maxResults)
+
 
   override def listMarketProfitAndLoss(sessionToken: String,
                                        marketIds: Set[String],
@@ -106,25 +112,18 @@ class BetfairServiceNGTest(config: Configuration, command: BetfairServiceNGComma
     throw new NotImplementedError()
   }
 
-  override def placeOrders(sessionToken: String,
-                           marketId: String,
-                           instructions: Set[PlaceInstruction],
-                           customerRef: Option[String] = None): Future[Option[PlaceExecutionReportContainer]] = {
+  override def listMarketTypes(sessionToken: String, marketFilter: MarketFilter) = service.listMarketTypes(sessionToken, marketFilter)
 
-//    // Create a new promise to return as the promise returned from orderBook actor is of type Future[Any]
-//    val promise = Promise[Option[PlaceExecutionReportContainer]]()
-//
-//    orderBook ? BetfairServiceNGOrderBook.placeOrders(marketId, instructions, customerRef) onComplete {
-//      case Success(placeExecutionReport: PlaceExecutionReport) =>
-//        promise.success(Some(new PlaceExecutionReportContainer(placeExecutionReport)))
-//      case Failure(error) =>
-//        promise.failure(error)
-//      case _ =>
-//        promise.failure(new BetfairServiceNGException("Unknown failure"))
-//    }
-//
-//    return promise.future
-    throw new NotImplementedError()
+  override def listTimeRanges(sessionToken: String, marketFilter: MarketFilter, granularity: TimeGranularity) = service.listTimeRanges(sessionToken, marketFilter, granularity)
+
+  override def listVenues(sessionToken: String, marketFilter: MarketFilter) = service.listVenues(sessionToken, marketFilter)
+
+  override def placeOrders(sessionToken: String,
+                         marketId: String,
+                         instructions: Set[PlaceInstruction],
+                         customerRef: Option[String] = None): Future[Option[PlaceExecutionReportContainer]] = {
+
+    (orderBook ? PlaceOrders(marketId, instructions, customerRef)).map{case x: PlaceExecutionReportContainer => Some(x)}
   }
 
   override def cancelOrders(sessionToken: String,
@@ -132,39 +131,14 @@ class BetfairServiceNGTest(config: Configuration, command: BetfairServiceNGComma
                             instructions: Set[CancelInstruction],
                             customerRef: Option[String] = None): Future[Option[CancelExecutionReportContainer]] = {
 
-//    val promise = Promise[Option[CancelExecutionReportContainer]]()
-//
-//    orderBook ? testService.BetfairServiceNGOrderBook.cancelOrders(marketId, instructions, customerRef) onComplete {
-//      case Success(cancelExecutionReport: CancelExecutionReport) =>
-//        promise.success(Some(new CancelExecutionReportContainer(cancelExecutionReport)))
-//      case Failure(error) =>
-//        promise.failure(error)
-//      case _ =>
-//        promise.failure(new BetfairServiceNGException("Unknown failure"))
-//    }
-//
-//    return promise.future
-    throw new NotImplementedError()
+    (orderBook ? CancelOrders(marketId, instructions, customerRef)).map{case x: CancelExecutionReportContainer => Some(x)}
   }
 
   override def replaceOrders(sessionToken: String,
                              marketId: String,
                              instructions: Set[ReplaceInstruction],
                              customerRef: Option[String]): Future[Option[ReplaceExecutionReportContainer]] = {
-
-//    val promise = Promise[Option[ReplaceExecutionReportContainer]]()
-//
-//    orderBook ? testService.BetfairServiceNGOrderBook.replaceOrders(marketId, instructions, customerRef) onComplete {
-//      case Success(replaceExecutionReport: ReplaceExecutionReport) =>
-//        promise.success(Some(new ReplaceExecutionReportContainer(replaceExecutionReport)))
-//      case Failure(error) =>
-//        promise.failure(error)
-//      case _ =>
-//        promise.failure(new BetfairServiceNGException("Unknown failure"))
-//    }
-//
-//    return promise.future
-    throw new NotImplementedError()
+    (orderBook ? ReplaceOrders(marketId, instructions, customerRef)).map{case x: ReplaceExecutionReportContainer => Some(x)}
   }
 
   override def updateOrders(sessionToken: String,
@@ -172,7 +146,6 @@ class BetfairServiceNGTest(config: Configuration, command: BetfairServiceNGComma
                             instructions: Set[UpdateInstruction],
                             customerRef: Option[String]): Future[Option[UpdateExecutionReportContainer]] = {
 
-    // TODO add implementation
-    throw new NotImplementedError()
+    (orderBook ? UpdateOrders(marketId, instructions, customerRef)).map{case x: UpdateExecutionReportContainer => Some(x)}
   }
 }
