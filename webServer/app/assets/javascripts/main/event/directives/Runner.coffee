@@ -6,7 +6,6 @@ directivesModule.directive('runner',  ['$log', '$window', 'DataModelService', ($
     last: '='
   }
   link: (scope, iElement, iAttrs) ->
-    options = 'height=310, width=300,menubar=no, resizable=no, scrollbars=no'
     url = 'ladder/' + scope.id + '/' + scope.catalogue.uniqueId
 
     scope.openLadder = () ->

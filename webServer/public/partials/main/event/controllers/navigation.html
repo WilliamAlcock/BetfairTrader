@@ -2,7 +2,7 @@
     <div class="col-xs-12 heading">
         Markets
     </div>
-    <div ng-repeat="market in nav.viewData.children track by market.id" ng-if="nav.bookData[market.id].status != 'CLOSED'" class="col-xs-12 entry">
+    <div ng-repeat="market in nav.viewData.children" class="col-xs-12 entry">
         <div ng-click="nav.selectMarket(market.marketType, $event)">{{market.name}}
             <i ng-if="nav.isSelected[market.marketType]" class="pull-right glyphicon glyphicon-ok"></i>
         </div>

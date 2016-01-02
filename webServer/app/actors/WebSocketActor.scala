@@ -3,7 +3,7 @@ package actors
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import core.api.output._
 import play.api.libs.json.{JsObject, Json}
-import services.{JsonrpcRequest, JsonrpcResponse, JsonrpcResponseResult}
+import services._
 
 class WebSocketActor(out: ActorRef) extends Actor with ActorLogging {
   // TODO get this from config
@@ -28,16 +28,8 @@ class WebSocketActor(out: ActorRef) extends Actor with ActorLogging {
     case x: EventTypeUpdate       => sendResponse("EventTypeUpdate", Json.toJson(x.data).as[JsObject])
     case x: EventUpdate           => sendResponse("EventUpdate", Json.toJson(x.data).as[JsObject])
     case x: MarketCatalogueUpdate => sendResponse("MarketCatalogueUpdate", Json.toJson(x.data).as[JsObject])
-    case x: MarketBookUpdate      =>
-      sendResponse("MarketBookUpdate", Json.obj(
-        "data" -> Json.toJson(x.data).as[JsObject],
-        "runners" -> Json.toJson(x.runners).as[JsObject]
-      ))
-    case x: NavigationDataUpdate  =>
-      sendResponse("NavigationDataUpdate", Json.obj(
-        "navData" -> Json.toJson(x.data).as[JsObject],
-        "competitions" -> Json.toJson(x.competitions).as[JsObject]
-      ))
+    case x: MarketBookUpdate      => sendResponse("MarketBookUpdate", Json.toJson(UIMarketBook(x.data)).as[JsObject])
+    case x: NavigationDataUpdate  => sendResponse("NavigationDataUpdate", Json.toJson(x.data).as[JsObject])
   }
 
 }

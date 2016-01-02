@@ -29,6 +29,7 @@ class NavigationCtrl
 
   sortByMarkets: (x,y) -> y.numberOfMarkets - x.numberOfMarkets
 
+  # TODO clean this function up !
   getCountryGroups: (data) =>
     countryGroups = {}
     # get countries with marketCount

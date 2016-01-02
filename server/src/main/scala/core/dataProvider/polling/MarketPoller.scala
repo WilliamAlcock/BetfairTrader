@@ -30,7 +30,7 @@ class MarketPoller(config: Configuration,
 
   override def receive = {
     case Poll(marketIds, priceProjection, orderProjection, matchProjection) =>
-//      println("     Polling " + marketIds.size + " markets")
+      println("     Polling " + marketIds.size + " markets")
       betfairService.listMarketBook(
         sessionToken,
         marketIds,
@@ -39,9 +39,8 @@ class MarketPoller(config: Configuration,
         matchProjection = Some(("matchProjection", matchProjection))
       ) onComplete {
         case Success(Some(listMarketBookContainer)) =>
-//          println (listMarketBookContainer.result.head.runners.head.ex.get.availableToBack)
           eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, MarketDataUpdate(listMarketBookContainer)))
-        case Success(None) =>
+        case Success(None) => println("call to service failed to return data")
           // TODO handle event where betfair returns empty response
         case Failure(error) => throw new DataProviderException("call to listMarketBook failed " + error)
       }

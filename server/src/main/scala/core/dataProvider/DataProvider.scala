@@ -30,7 +30,7 @@ class DataProvider(config: Configuration,
   // TODO get these from config
   private val DATA_PROVIDER_OUTPUT_CHANNEL = "dataProviderOutput"
   private val MAX_MARKET_CATALOGUE = 200
-  val ORDER_PROJECTION = OrderProjection.EXECUTABLE
+  val ORDER_PROJECTION = OrderProjection.ALL
   val MATCH_PROJECTION = MatchProjection.ROLLED_UP_BY_PRICE
 
   val workers: Seq[ActorRef] = List[ActorRef](

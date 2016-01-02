@@ -20,14 +20,14 @@ trait OrderFactory {
       instruction.side,                                 // side
       instruction.limitOrder.get.price,                 // price
       instruction.limitOrder.get.size,                  // size
-      0,                                                // bsp liability
+      0.0,                                              // bsp liability
       DateTime.now(),                                   // placed Date
-      0,                                                // avg Price Matched
-      0,                                                // size Matched
+      0.0,                                              // avg Price Matched
+      0.0,                                              // size Matched
       instruction.limitOrder.get.size,                  // size Remaining
-      0,                                                // size Lapsed
-      0,                                                // size Cancelled
-      0                                                 // size Voided
+      0.0,                                              // size Lapsed
+      0.0,                                              // size Cancelled
+      0.0                                               // size Voided
     )
   }
 
@@ -41,14 +41,14 @@ trait OrderFactory {
       instruction.side,                                 // side
       instruction.limitOnCloseOrder.get.price,          // price
       instruction.limitOnCloseOrder.get.liability,      // size
-      instruction.limitOnCloseOrder.get.liability,      // bsp liability
+      0.0,                                              // bsp liability
       DateTime.now(),                                   // placed Date
-      0,                                                // avg Price Matched
-      0,                                                // size Matched
+      0.0,                                              // avg Price Matched
+      0.0,                                              // size Matched
       instruction.limitOnCloseOrder.get.liability,      // size Remaining
-      0,                                                // size Lapsed
-      0,                                                // size Cancelled
-      0                                                 // size Voided
+      0.0,                                              // size Lapsed
+      0.0,                                              // size Cancelled
+      0.0                                               // size Voided
     )
   }
 
@@ -62,14 +62,14 @@ trait OrderFactory {
       instruction.side,                                 // side
       0,                                                // price
       instruction.marketOnCloseOrder.get.liability,     // size
-      instruction.marketOnCloseOrder.get.liability,     // bsp liability
+      0.0,                                              // bsp liability
       DateTime.now(),                                   // placed Date
-      0,                                                // avg Price Matched
-      0,                                                // size Matched
+      0.0,                                              // avg Price Matched
+      0.0,                                              // size Matched
       instruction.limitOnCloseOrder.get.liability,      // size Remaining
-      0,                                                // size Lapsed
-      0,                                                // size Cancelled
-      0                                                 // size Voided
+      0.0,                                              // size Lapsed
+      0.0,                                              // size Cancelled
+      0.0                                               // size Voided
     )
   }
 

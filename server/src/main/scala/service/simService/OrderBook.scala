@@ -39,7 +39,7 @@ case class OrderBook(side: Side,
     order.copy(
       status = OrderStatus.EXECUTION_COMPLETE,
       sizeMatched = order.sizeRemaining,
-      sizeRemaining = 0
+      sizeRemaining = 0.0
     )
   }
 

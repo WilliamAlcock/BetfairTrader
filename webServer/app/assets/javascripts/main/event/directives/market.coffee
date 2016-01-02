@@ -13,5 +13,8 @@ directivesModule.directive('market',  ['$log', 'DataModelService', 'WebSocketSer
     scope.$on '$destroy', () ->
       WebSocketService.unSubscribeFromMarkets([scope.item.id], "BEST")
 
+    scope.getBookData = () =>
+      if angular.isDefined(DataModelService.marketBookData[scope.item.id]) then DataModelService.marketBookData[scope.item.id] else {}
+
     scope.catalogueData = DataModelService.marketCatalogueData
 ])

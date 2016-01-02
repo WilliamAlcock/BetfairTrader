@@ -1,6 +1,6 @@
 <div class="row">
-    <div class="col-xs-12" ng-repeat="runner in catalogueData[item.id].runners track by runner.uniqueId">
-        <runner id="item.id" catalogue="runner" last="$last"></runner>
-    </div>
+    <div class="col-xs-12">{{getBookData().overround}} :: {{getBookData().hedge}}</div>
+    <runner class="col-xs-12" ng-repeat="runner in catalogueData[item.id].runners | orderBy:'sortPriority' track by runner.uniqueId"
+            id="item.id" catalogue="runner" last="$last"></runner>
 </div>
 

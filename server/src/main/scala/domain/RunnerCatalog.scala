@@ -7,7 +7,7 @@ case class RunnerCatalog(selectionId: Long,
                          handicap: Double,
                          sortPriority: Option[Int] = None,
                          metadata: Option[Map[String, String]] = None) {
-  def uniqueId:String = selectionId.toString + "-" + handicap.toString
+  val uniqueId:String = selectionId.toString + "-" + handicap.toString
 }
 
 object RunnerCatalog {

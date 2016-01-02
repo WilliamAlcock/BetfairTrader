@@ -7,9 +7,9 @@ import domain._
 import org.joda.time.DateTime
 
 class MockBackOrder extends Order("TEST_ID",OrderType.LIMIT,OrderStatus.EXECUTABLE, PersistenceType.LAPSE, Side.BACK,
-  1.0, 1.0, 1.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+  1.0, 1.0, 0.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 class MockLayOrder extends Order("TEST_ID",OrderType.LIMIT,OrderStatus.EXECUTABLE, PersistenceType.LAPSE, Side.LAY,
-  1.0, 1.0, 1.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+  1.0, 1.0, 0.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 
 class MockOrderFactory extends OrderFactory {}
 class MockReportFactory extends ReportFactory {}
@@ -50,14 +50,14 @@ object TestHelpers {
       side,                                         // side
       price,                                        // price
       size,                                         // size
-      0,                                            // bspLiability
+      0.0,                                          // bspLiability
       placedDate,                                   // placedDate
-      0,                                            // avgPriceMatched
+      0.0,                                          // avgPriceMatched
       sizeMatched,                                  // sizeMatched
       sizeRemaining.getOrElse(size),                // sizeRemaining
-      0,                                            // sizeLapsed
+      0.0,                                          // sizeLapsed
       sizeCancelled,                                // sizeCancelled
-      0                                             // sizeVoided
+      0.0                                           // sizeVoided
     )
   }
 

@@ -4,7 +4,6 @@ class NavigationCtrl
     @$log.debug "Event Navigation Controller"
 
     @data = @DataModelService.navData
-    @bookData = @DataModelService.marketBookData
     @viewData = {}
 
     @$scope.$watch 'data.root', @updateData

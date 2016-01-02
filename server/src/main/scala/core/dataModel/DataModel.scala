@@ -5,12 +5,11 @@ import domain._
 
 import scala.collection.immutable.HashMap
 
-case class DataModel(eventTypeResults: HashMap[String, EventTypeResult] = HashMap[String, EventTypeResult](),
-                     eventResults: HashMap[String, EventResult] = HashMap[String, EventResult](),
-                     marketBooks: HashMap[String, MarketBook] = HashMap[String, MarketBook](),
-                     marketCatalogues: HashMap[String, MarketCatalogue] = HashMap[String, MarketCatalogue](),
-                     navData: NavData,
-                     competitions: ListCompetitionsContainer) {
+case class DataModel(eventTypeResults: HashMap[String, EventTypeResult] = HashMap.empty,
+                     eventResults: HashMap[String, EventResult] = HashMap.empty,
+                     marketBooks: HashMap[String, MarketBook] = HashMap.empty,
+                     marketCatalogues: HashMap[String, MarketCatalogue] = HashMap.empty,
+                     navData: NavData) {
 
   def getEventType(eventTypeId: String): Option[EventTypeResult] = eventTypeResults.get(eventTypeId)
 

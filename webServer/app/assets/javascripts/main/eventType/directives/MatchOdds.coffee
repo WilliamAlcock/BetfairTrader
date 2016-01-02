@@ -13,6 +13,10 @@ directivesModule.directive('matchOdds',  ['$log', 'WebSocketService', 'DataModel
     scope.$on '$destroy', () ->
       WebSocketService.unSubscribeFromMarkets([scope.item.id], "BEST")
 
-    scope.bookData = DataModelService.marketBookData
-    scope.catalogueData = DataModelService.catalogueData
+    scope.getRunner = (id) =>
+      if angular.isDefined(DataModelService.marketBookData[scope.item.id])
+        DataModelService.marketBookData[scope.item.id].runners[id]
+
+    scope.catalogueData = DataModelService.marketCatalogueData
+    $log.log "catData", scope.catalogueData[scope.item.id], scope.item
 ])

@@ -2,7 +2,7 @@ package core.dataModel.navData
 
 import org.joda.time.DateTime
 
-case class Market(exchangeId: String,
+case class Market(override val exchangeId: String,
                   override val id: String,
                   marketStartTime: DateTime,
                   marketType: String,

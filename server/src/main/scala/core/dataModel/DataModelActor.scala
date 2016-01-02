@@ -1,14 +1,12 @@
 package core.dataModel
 
-import akka.actor.{Props, Actor}
+import akka.actor.{Actor, Props}
 import core.api.commands.GetNavigationData
 import core.api.output._
 import core.dataProvider.output._
 import core.eventBus.{EventBus, MessageEvent}
 import domain._
 import server.Configuration
-
-import scala.collection.immutable.HashMap
 
 class DataModelActor(config: Configuration, eventBus: EventBus, var dataModel: DataModel) extends Actor {
 
@@ -20,7 +18,7 @@ class DataModelActor(config: Configuration, eventBus: EventBus, var dataModel: D
 
   def receive = {
     case GetNavigationData =>
-      eventBus.publish(MessageEvent(getPublishChannel(Seq("navData")), NavigationDataUpdate(dataModel.navData, dataModel.competitions)))
+      eventBus.publish(MessageEvent(getPublishChannel(Seq("navData")), NavigationDataUpdate(dataModel.navData)))
     case eventTypeData: EventTypeDataUpdate =>
       this.dataModel = eventTypeData.listEventTypeResultContainer.result.foldLeft[DataModel](this.dataModel)(
         (dataModel: DataModel, eventTypeResult: EventTypeResult) => {
@@ -52,11 +50,7 @@ class DataModelActor(config: Configuration, eventBus: EventBus, var dataModel: D
           eventBus.publish(MessageEvent(
             getPublishChannel(Seq("marketBook", marketBook.marketId)),
             // sort the runners here
-            MarketBookUpdate(
-              marketBook,
-              marketBook.runners.map(x =>
-                (x.selectionId.toString + "-" + x.handicap.toString) -> x)(collection.breakOut): HashMap[String, Runner]
-            )
+            MarketBookUpdate(marketBook)
           ))
           // update data model
           dataModel.updateMarketBook(marketBook)

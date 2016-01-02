@@ -36,20 +36,41 @@ class UtilsSpec extends FlatSpec with Matchers {
   }
 
 
+
+
   "getMatchFromOrders" should "get the average price and size matched for the given side (BACK/LAY)" in {
     val orders = List(
-      generateOrder("order1", 2, 100, Side.LAY, sizeMatched = 10),
-      generateOrder("order2", 3, 200, Side.LAY, sizeMatched = 10),
-      generateOrder("order3", 4, 300, Side.LAY, sizeMatched = 10),
-      generateOrder("order4", 5, 100, Side.BACK, sizeMatched = 10),
-      generateOrder("order5", 6, 200, Side.BACK, sizeMatched = 10),
-      generateOrder("order6", 7, 300, Side.BACK, sizeMatched = 10)
+      List(
+        generateOrder("order1", 2, 100, Side.LAY, sizeMatched = 10),
+        generateOrder("order2", 3, 200, Side.LAY, sizeMatched = 10),
+        generateOrder("order3", 4, 300, Side.LAY, sizeMatched = 10),
+        generateOrder("order4", 5, 100, Side.BACK, sizeMatched = 10),
+        generateOrder("order5", 6, 200, Side.BACK, sizeMatched = 10),
+        generateOrder("order6", 7, 300, Side.BACK, sizeMatched = 10)
+      ),
+      List(
+        generateOrder("", 1.19, 2.0, Side.LAY, sizeMatched = 2.0),
+        generateOrder("", 1.18, 2.0, Side.BACK, sizeMatched = 2.0),
+        generateOrder("", 1.19, 2.0, Side.LAY, sizeMatched = 2.0),
+        generateOrder("", 1.19, 2.0, Side.LAY, sizeMatched = 2.0),
+        generateOrder("", 1.19, 2.0, Side.LAY, sizeMatched = 2.0),
+        generateOrder("", 1.18, 2.0, Side.BACK, sizeMatched = 2.0),
+        generateOrder("", 1.18, 2.0, Side.BACK, sizeMatched = 2.0),
+        generateOrder("", 1.18, 2.0, Side.BACK, sizeMatched = 2.0),
+        generateOrder("", 1.19, 2.0, Side.LAY, sizeMatched = 2.0),
+        generateOrder("", 1.19, 2.0, Side.LAY, sizeMatched = 2.0),
+        generateOrder("", 1.2, 2.0, Side.LAY, sizeMatched = 2.0),
+        generateOrder("", 1.18, 2.0, Side.BACK, sizeMatched = 2.0),
+        generateOrder("", 1.18, 2.0, Side.BACK, sizeMatched = 2.0),
+        generateOrder("", 1.18, 2.0, Side.BACK, sizeMatched = 2.0),
+        generateOrder("", 1.19, 2.0, Side.LAY, sizeMatched = 2.0)
+      )
     )
 
     val matchScenarios = Table(
       ("Side",      "Orders",   "Match"),
-      (Side.BACK,   orders,     Match(None, None, Side.BACK, 6, 30, None)),
-      (Side.LAY,    orders,     Match(None, None, Side.LAY, 3, 30, None)),
+      (Side.BACK,   orders(0),  Match(None, None, Side.BACK, 6, 30, None)),
+      (Side.LAY,    orders(0),  Match(None, None, Side.LAY, 3, 30, None)),
       (Side.BACK,   List.empty, Match(None, None, Side.BACK, 0, 0, None)),
       (Side.LAY,    List.empty, Match(None, None, Side.LAY, 0, 0, None))
     )

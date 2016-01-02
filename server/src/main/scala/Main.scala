@@ -1,15 +1,13 @@
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import core.Controller
-import core.dataModel.{DataModel, DataModelActor}
 import core.dataModel.navData.NavData
+import core.dataModel.{DataModel, DataModelActor}
 import core.dataProvider.DataProvider
 import core.eventBus.EventBus
 import core.orderManager.OrderManager
-import domain.{ListCompetitionsContainer, MarketFilter}
 import play.api.libs.json.Json
 import server.Configuration
-import service.simService.{SimService, SimOrderBook}
 import service.{BetfairServiceNG, BetfairServiceNGCommand, BetfairServiceNGException}
 
 import scala.concurrent.Await
@@ -42,10 +40,10 @@ object Main {
 
     // create command, api and event bus objects
     val betfairServiceNGCommand = new BetfairServiceNGCommand(config)
-    //val betfairService = new BetfairServiceNG(config, betfairServiceNGCommand)
+    val betfairService = new BetfairServiceNG(config, betfairServiceNGCommand)
     // create simService
-    val simOrderBook = system.actorOf(SimOrderBook.props(), "simOrderBook")
-    val betfairService = new SimService(config, new BetfairServiceNG(config, betfairServiceNGCommand), simOrderBook)
+//    val simOrderBook = system.actorOf(SimOrderBook.props(), "simOrderBook")
+//    val betfairService = new SimService(config, new BetfairServiceNG(config, betfairServiceNGCommand), simOrderBook)
 
     // Login
     val sessionTokenFuture = betfairService.login.map {
@@ -59,18 +57,13 @@ object Main {
       case x: String => x
       case _ => throw new BetfairServiceNGException("no navigation data")
     }
-    val navData: NavData = Json.parse(Await.result(navDataFuture, 20 seconds)).validate[NavData].get
 
-    // Get Competitions data
-    val competitionsFuture = betfairService.listCompetitions(sessionToken, new MarketFilter(eventTypeIds = Set("1"))).map {
-      case Some(x) => x
-      case _ => throw new BetfairServiceNGException("no competitions data")
-    }
-    val competitions: ListCompetitionsContainer = Await.result(competitionsFuture, 10 seconds)
+    // TODO get exchange id from config
+    val navData: NavData = NavData.restrictToExchange(Json.parse(Await.result(navDataFuture, 20 seconds)).validate[NavData].get, Set("1", "Multiple"))
 
     // Start Actors
     val eventBus = new EventBus
-    val dataModel: DataModel = DataModel(navData = navData, competitions = competitions)
+    val dataModel: DataModel = DataModel(navData = navData)
     val dataModelActor = system.actorOf(DataModelActor.props(config, eventBus, dataModel), "dataModel")
     val dataProvider = system.actorOf(DataProvider.props(config, sessionToken, betfairService, eventBus), "dataProvider")
     val orderManager = system.actorOf(OrderManager.props(config, sessionToken, betfairService, eventBus), "orderManager")

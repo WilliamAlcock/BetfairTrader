@@ -5,6 +5,7 @@ import play.api.libs.json._
 
 trait NavData {
   def getType: String
+  val exchangeId: String
   val name: String
   val id: String
   val hasChildren: Boolean
@@ -92,6 +93,14 @@ object NavData {
         case x: JsNumber => x.toString
       }
     else ""
+  }
+
+  def restrictToExchange(navData: NavData, exchangeIds: Set[String]): NavData = navData match {
+    case x: EventType => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
+    case x: Group => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
+    case x: Event => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
+    case x: Race => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
+    case x: Market => x
   }
 
   private def getChildren(data: JsValue): List[NavData] = (data \ "children").as[JsArray].value.map(x => convertData(x)).toList

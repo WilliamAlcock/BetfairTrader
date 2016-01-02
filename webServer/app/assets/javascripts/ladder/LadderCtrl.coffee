@@ -1,83 +1,65 @@
 class LadderCtrl
 
   constructor: (@$log, @$stateParams, @$scope, @WebSocketService, @DataModelService, @PriceService) ->
-    @bookData = @DataModelService.marketBookData
+    @depth = 10
+
     @catalogueData = @DataModelService.marketCatalogueData
 
+    @orderSize = 2
     @prices = []
-
-    @center = undefined
     @catalogue = undefined
-    @book = {}
 
     @$log.log "Ladder Controller", @$stateParams, @DataModelService
 
     @WebSocketService.subscribeToMarkets([@$stateParams.marketId], "ALL_AND_TRADED")
     @WebSocketService.listMarketCatalogue([@$stateParams.marketId])
 
-    @$scope.$on '$destroy', () ->
-      @WebSocketService.unSubscribeFromMarkets([@$stateParams.marketId], "ALL_AND_TRADED")
+    @$scope.$on '$destroy', () -> @WebSocketService.unSubscribeFromMarkets([@$stateParams.marketId], "ALL_AND_TRADED")
 
-    @$scope.$on 'market-' + @$stateParams.marketId, @applyPrices
+    @cancel = @$scope.$on 'market-' + @$stateParams.marketId, @updateRunner
 
-  placeOrder: (side, price) =>
+  getRunner: () =>
+    if angular.isDefined(@DataModelService.marketBookData[@$stateParams.marketId])
+      @DataModelService.marketBookData[@$stateParams.marketId].runners[@$stateParams.selectionId]
+    else {}
+
+  placeOrder: (side, price, size) =>
     @WebSocketService.placeOrders(
       @$stateParams.marketId,
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].selectionId,
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].handicap,
+      @getRunner().selectionId,
+      @getRunner().handicap,
       side,
       price,
-      2,
-      "TEST_ORDER"
+      size
     )
 
   cancelOrders: (side, price) =>
     @WebSocketService.cancelOrders(
       @$stateParams.marketId,
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].orders.filter (x) -> x.price == price && x.side == side,
-      "TEST_CANCEL_ORDER"
+      @getRunner().orders.filter (x) -> x.price == price && x.side == side
     )
 
-  sell: (price) => @placeOrder("BACK", price)
+  setOrderSize: (size) => @orderSize = size
 
-  cancelSell: (price) => @cancelOrders("BACK", price)
+  sell: (price, size) => @placeOrder("BACK", Number(price), size)
 
-  buy: (price) => @placeOrder("LAY", price)
+  cancelSell: (price) => @cancelOrders("BACK", Number(price))
 
-  cancelBuy: (price) => @cancelOrders("LAY", price)
+  buy: (price, size) => @placeOrder("LAY", Number(price), size)
 
-  scrollUp: () =>
-    @center = @PriceService.incrementPrice(@center)
-    @getPrices()
+  cancelBuy: (price) => @cancelOrders("LAY", Number(price))
 
-  scrollDown: () =>
-    @center = @PriceService.decrementPrice(@center)
-    @getPrices()
+  scrollUp: () => @prices = @PriceService.scrollUp(@prices)
 
-  snapToBid: () =>
-    @center = @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.availableToBack[0].price
-    @getPrices()
+  scrollDown: () => @prices = @PriceService.scrollDown(@prices)
 
-  snapToOffer: () =>
-    @center = @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.availableToLay[0].price
-    @getPrices()
+  snapToBid: () => @prices = @PriceService.getLadderPrices(@getRunner().ex.availableToBack[0].price, @depth)
 
-  applyPrices: () =>
-    @$scope.$apply(@getPrices())
+  snapToOffer: () => @prices = @PriceService.getLadderPrices(@getRunner().ex.availableToLay[0].price, @depth)
 
-  getPrices: () =>
-    if angular.isDefined(@bookData[@$stateParams.marketId]) && @center == undefined
-      @center = @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.availableToBack[0].price
-    if angular.isDefined(@catalogueData[@$stateParams.marketId]) && @catalogue == undefined
-      @catalogue = x for x in @catalogueData[@$stateParams.marketId].runners when x.uniqueId == @$stateParams.selectionId
-    @prices = @PriceService.getPriceData(
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.availableToBack,
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.availableToLay,
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].ex.tradedVolume,
-      @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId].orders,
-      @center,
-      10
-    )
-    @book = @bookData[@$stateParams.marketId].runnersMap[@$stateParams.selectionId]
+  updateRunner: () =>
+    @catalogue = x for x in @catalogueData[@$stateParams.marketId].runners when x.uniqueId == @$stateParams.selectionId
+    @snapToBid()
+    @cancel()
 
 controllersModule.controller('LadderCtrl', ['$log', '$stateParams', '$scope', 'WebSocketService', 'DataModelService', 'PriceService', LadderCtrl])

@@ -62,7 +62,7 @@ class SimOrderBook(var markets: HashMap[String, MarketOrderBook] = HashMap.empty
         )
         case OrderType.LIMIT_ON_CLOSE => PlaceInstruction(
           order.orderType, selectionId, handicap, side,
-          None, Some(LimitOnCloseOrder(order.bspLiability, instruction.newPrice)), None
+          None, Some(LimitOnCloseOrder(0.0, instruction.newPrice)), None // TODO fix bspLiability - should not always be 0.0 !!
         )
         case _ => throw new SimException("Cannot replace order of this type")
       }

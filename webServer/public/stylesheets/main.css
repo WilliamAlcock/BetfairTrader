@@ -13,8 +13,16 @@ ul.nav.nav-tabs.nav-justified {
     background: #72bbef;
 }
 
+.bf-back-header {
+    border-bottom: 2px solid #72bbef;
+}
+
 .bf-lay-color {
     background: #faa9ba
+}
+
+.bf-lay-header {
+    border-bottom: 2px solid #faa9ba;
 }
 
 .price-row {
@@ -93,14 +101,14 @@ ul.nav.nav-tabs.nav-justified {
 
 .bf-ladder-square {
     /*width: 60px;*/
-    min-height: 30px;
-    max-height: 30px;
+    min-height: 25px;
+    max-height: 25px;
     border-left: solid rgb(224, 230, 230) 1px;
     border-right: solid rgb(224, 230, 230) 1px;
     padding-left: 0px;
     padding-right: 0px;
     text-align: center;
-    line-height: 30px;
+    line-height: 25px;
     cursor:pointer;
 }
 
@@ -257,13 +265,14 @@ ul.nav.nav-tabs.nav-justified {
 }
 
 .bf-btn {
-    background-color: #c9ced1;
-    min-height: 16px;
-    max-height: 16px;
+    /*background-color: #c9ced1;*/
+    min-height: 25px;
+    max-height: 25px;
     line-height: 0px;
-    color:gray;
-    font-size:x-small;
-    opacity:0.8;
+    padding: 1px 1px 1px 1px;
+    /*color:gray;*/
+    /*font-size:x-small;*/
+    /*opacity:0.8;*/
 }
 
 .last-price-traded {

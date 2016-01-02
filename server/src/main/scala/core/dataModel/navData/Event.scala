@@ -14,4 +14,11 @@ case class Event(children: List[NavData],
   override lazy val startTime: DateTime = children.foldLeft[DateTime](null)((acc: DateTime, x: NavData) =>
     if (acc == null || x.startTime.getMillis() < acc.getMillis()) x.startTime else acc
   )
+  override val exchangeId: String = children.foldLeft[String](null)((acc: String, x: NavData) =>
+    if (acc == null)
+      x.exchangeId
+    else if (acc == "Multiple" || acc == x.exchangeId)
+      acc
+    else "Multiple"
+  )
 }

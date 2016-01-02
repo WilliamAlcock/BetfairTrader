@@ -1,37 +1,15 @@
 <div class="match-odds">
-    <div class="col-lg-2 col-xs-3 col-lg-offset-0 col-xs-offset-3">
-        <div class="row bf-price">
-            <div class="col-xs-6 price-square bf-back-color" ng-class="{'SUSPENDED':'suspended'}[bookData[item.id].status]">
-                <div class="price">{{bookData[item.id].runners[0].ex.availableToBack[0].price}}</div>
-                <div class="size">{{bookData[item.id].runners[0].ex.availableToBack[0].size | sizeFilter}}</div>
-            </div>
-            <div class="col-xs-6 price-square bf-lay-color" ng-class="{'SUSPENDED':'suspended'}[bookData[item.id].status]">
-                <div class="price">{{bookData[item.id].runners[0].ex.availableToLay[0].price}}</div>
-                <div class="size">{{bookData[item.id].runners[0].ex.availableToLay[0].size | sizeFilter}}</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-2 col-xs-3">
-        <div class="row bf-price">
-            <div class="col-xs-6 price-square bf-back-color" ng-class="{'SUSPENDED':'suspended'}[bookData[item.id].status]">
-                <div class="price">{{bookData[item.id].runners[2].ex.availableToBack[0].price}}</div>
-                <div class="size">{{bookData[item.id].runners[2].ex.availableToBack[0].size | sizeFilter}}</div>
-            </div>
-            <div class="col-xs-6 price-square bf-lay-color" ng-class="{'SUSPENDED':'suspended'}[bookData[item.id].status]">
-                <div class="price">{{bookData[item.id].runners[2].ex.availableToLay[0].price}}</div>
-                <div class="size">{{bookData[item.id].runners[2].ex.availableToLay[0].size | sizeFilter}}</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-2 col-xs-3">
-        <div class="row bf-price">
-            <div class="col-xs-6 price-square bf-back-color" ng-class="{'SUSPENDED':'suspended'}[bookData[item.id].status]">
-                <div class="price">{{bookData[item.id].runners[1].ex.availableToBack[0].price}}</div>
-                <div class="size">{{bookData[item.id].runners[1].ex.availableToBack[0].size | sizeFilter}}</div>
-            </div>
-            <div class="col-xs-6 price-square bf-lay-color" ng-class="{'SUSPENDED':'suspended'}[bookData[item.id].status]">
-                <div class="price">{{bookData[item.id].runners[1].ex.availableToLay[0].price}}</div>
-                <div class="size">{{bookData[item.id].runners[1].ex.availableToLay[0].size | sizeFilter}}</div>
+    <div class="col-lg-offset-0 col-xs-offset-3">
+        <div ng-repeat="runner in catalogueData[item.id].runners track by runner.uniqueId" class="col-lg-2 col-xs-3">
+            <div class="row bf-price">
+                <div class="col-xs-6 price-square bf-back-color" ng-class="{'SUSPENDED':'suspended'}['']">
+                    <div class="price">{{getRunner(runner.uniqueId).ex.availableToBack[0].price}}</div>
+                    <div class="size">{{getRunner(runner.uniqueId).ex.availableToBack[0].size | sizeFilter}}</div>
+                </div>
+                <div class="col-xs-6 price-square bf-lay-color" ng-class="{'SUSPENDED':'suspended'}['']">
+                    <div class="price">{{getRunner(runner.uniqueId).ex.availableToLay[0].price}}</div>
+                    <div class="size">{{getRunner(runner.uniqueId).ex.availableToLay[0].size | sizeFilter}}</div>
+                </div>
             </div>
         </div>
     </div>

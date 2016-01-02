@@ -4,7 +4,6 @@ class DetailCtrl
     @$log.debug "Event Detail Controller"
 
     @data = @DataModelService.navData
-    @bookData = @DataModelService.marketBookData
     @viewData = {}
     @isOpen = {}
 

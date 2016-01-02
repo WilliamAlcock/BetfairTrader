@@ -21,7 +21,7 @@ directivesModule.directive('event',  ['$log', '$compile', 'DataModelService', ($
 
     scope.startTime = new Date(scope.item.startTime).toTimeString().substr(0,5)
 
-#    | dateFilter:bookData[matchOdds.id].status:bookData[matchOdds.id].inplay
+    $log.log "matchOdds", scope.matchOdds
 
     template = [
       '<div class="row event-item price-row" ng-if="bookData[matchOdds[0].id].status != \'CLOSED\'">'

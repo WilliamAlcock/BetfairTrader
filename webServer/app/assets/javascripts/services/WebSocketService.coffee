@@ -52,12 +52,11 @@ class WebSocketService
         when "MarketCatalogueUpdate"
           @$rootScope.$apply(@DataModel.marketCatalogueData[message.result.result.marketId] = message.result.result)
         when "MarketBookUpdate"
-          message.result.result.data.runnersMap = message.result.result.runners
-          @$rootScope.$apply(@DataModel.setMarketBookData(message.result.result.data))
-          @$rootScope.$broadcast('market-' + message.result.result.data.marketId, message.result.result.data)
+          @$rootScope.$apply(@DataModel.marketBookData[message.result.result.marketId] = message.result.result)
+#          @$log.log "got market book data", @DataModel.marketBookData, message.result.result.marketId
+          @$rootScope.$broadcast('market-' + message.result.result.marketId, message.result.result)
         when "NavigationDataUpdate"
-          @$log.log "NAV DATA", message.result.result
-          @$rootScope.$apply(@DataModel.setNavData(message.result.result.navData, message.result.result.competitions.result))
+          @$rootScope.$apply(@DataModel.setNavData(message.result.result))
         else null
     else if angular.isDefined(message.error)
       println "error response " + message.error
@@ -72,10 +71,10 @@ class WebSocketService
   subscribeToNavData: ->
     @sendJsonrpcMessage({method: "subscribeToNavData", params: {}})
 
-  subscribeToMarkets: (markets, pollingGroup, scope, func) ->
+  subscribeToMarkets: (markets, pollingGroup) ->
     @sendJsonrpcMessage({method: "subscribeToMarkets", params: {markets: markets, pollingGroup: {group: pollingGroup}}})
 
-  unSubscribeFromMarkets: (markets, pollingGroup, scope, func) ->
+  unSubscribeFromMarkets: (markets, pollingGroup) ->
     @sendJsonrpcMessage({method: "unSubscribeFromMarkets", params: {markets: markets, pollingGroup: {group: pollingGroup}}})
 
   listMarketCatalogue: (marketIds) ->
@@ -98,7 +97,7 @@ class WebSocketService
       side: side,
       limitOrder: {size: size, price: price, persistenceType: "LAPSE"}
     }
-    @sendJsonrpcMessage({method: "placeOrders", params: {marketId: marketId, instructions: [instruction], customerRef: customerRef}})
+    @sendJsonrpcMessage({method: "placeOrders", params: {marketId: marketId, instructions: [instruction]}})
 #
 #  replaceOrders: (marketId, instructions, customerRef) ->
 #    @sendJsonrpcMessage({method: "replaceOrders", params: {marketId: marketId, instructions: instructions, customerRef: customerRef}})
@@ -109,6 +108,6 @@ class WebSocketService
 
   cancelOrders: (marketId, orders, customerRef) ->
     instructions = orders.map (x) -> {betId:x.betId}
-    @sendJsonrpcMessage({method: "cancelOrders",  params: {marketId: marketId, instructions: instructions, customerRef: customerRef}})
+    @sendJsonrpcMessage({method: "cancelOrders",  params: {marketId: marketId, instructions: instructions}})
 
 servicesModule.service('WebSocketService', ['$log', '$q', '$rootScope', 'DataModelService', WebSocketService])

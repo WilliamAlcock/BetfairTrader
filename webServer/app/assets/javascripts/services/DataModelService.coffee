@@ -2,24 +2,13 @@ class DataModelService
 
   constructor: (@$log, @$rootScope) ->
     @navData = { root: {} }
-    @competitions = { lookup: {} }
     @marketBookData = {}
     @marketCatalogueData = {}
     @eventData = {}
     @eventTypeData = {}
     @monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-  setMarketBookData: (data) =>
-    @marketBookData[data.marketId] = data
-
-  setNavData: (navData, competitions) =>
-    @navData.root = navData
-    @competitions.lookup = {}
-    for row in competitions
-      @competitions.lookup[row.competition.id] =
-        {name: row.competition.name, region: row.competitionRegion, marketCount: row.marketCount}
-
-  isCompetition: (id) => angular.isDefined(@competitions.lookup[id])
+  setNavData: (navData) => @navData.root = navData
 
   filterForId: (data, id) -> (x for x in data when x.id == id)
 
@@ -46,15 +35,11 @@ class DataModelService
 #  TODO Clean up the duplication in the methods below
   getAllEventsForGroup: (data, groupName) =>
     _getEventsForGroup = (data, groupName) =>
-      @$log.log "recursing", data, data.hasGroupChildren
       if data.type == 'GROUP' && data.name.startsWith(groupName)
-        @$log.log "i am here 1"
         data.children
       else if data.hasGroupChildren || data.hasGroupGrandChildren
-        @$log.log "i am here 2"
         (data.children.map (x) -> _getEventsForGroup(x, groupName)).reduce((a,b) -> a.concat(b))
       else
-        @$log.log "i am here 3"
         []
 
     _getEventsForGroup(data, groupName)
