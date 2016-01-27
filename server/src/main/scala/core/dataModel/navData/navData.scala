@@ -34,29 +34,29 @@ object NavData {
   implicit val dateTimeWrites = Writes.jodaDateWrites(dateFormat)
 
   private def getBaseObject(n: NavData): JsObject = Json.obj(
-    "id" -> JsString(n.id),
-    "name" -> JsString(n.name),
-    "type" -> JsString(n.getType),
-    "countryCode" -> JsString(n.countryCode),
-    "numberOfMarkets" -> JsNumber(n.numberOfMarkets),
-    "hasGroupChildren" -> JsBoolean(n.hasGroupChildren),
+    "id"                    -> JsString(n.id),
+    "name"                  -> JsString(n.name),
+    "type"                  -> JsString(n.getType),
+    "countryCode"           -> JsString(n.countryCode),
+    "numberOfMarkets"       -> JsNumber(n.numberOfMarkets),
+    "hasGroupChildren"      -> JsBoolean(n.hasGroupChildren),
     "hasGroupGrandChildren" -> JsBoolean(n.hasGroupGrandChildren),
-    "startTime" -> JsString(n.startTime.toString)
+    "startTime"             -> JsString(n.startTime.toString)
   )
 
   private def convertNavData(n: NavData): JsObject = n match {
-    case x: EventType => getBaseObject(x) + ("children" -> Json.toJson(x.children))
-    case x: Group => getBaseObject(x) + ("children" -> Json.toJson(x.children))
-    case x: Event => getBaseObject(x) + ("children" -> Json.toJson(x.children))
-    case x: Race => getBaseObject(x) ++ Json.obj(
-      "children" -> Json.toJson(x.children),
-      "startTime" -> JsString(x.startTime.toString),
-      "venue" -> JsString(x.venue),
-      "raceNumber" -> JsString(x.raceNumber))
-    case x: Market => getBaseObject(x) ++ Json.obj(
-      "exchangeId" -> JsString(x.exchangeId),
+    case x: EventType =>  getBaseObject(x) + ("children" -> Json.toJson(x.children))
+    case x: Group =>      getBaseObject(x) + ("children" -> Json.toJson(x.children))
+    case x: Event =>      getBaseObject(x) + ("children" -> Json.toJson(x.children))
+    case x: Race =>       getBaseObject(x) ++ Json.obj(
+      "children"    -> Json.toJson(x.children),
+      "startTime"   -> JsString(x.startTime.toString),
+      "venue"       -> JsString(x.venue),
+      "raceNumber"  -> JsString(x.raceNumber))
+    case x: Market =>     getBaseObject(x) ++ Json.obj(
+      "exchangeId"      -> JsString(x.exchangeId),
       "marketStartTime" -> Json.toJson(x.marketStartTime),
-      "marketType" -> JsString(x.marketType),
+      "marketType"      -> JsString(x.marketType),
       "numberOfWinners" -> JsString(x.numberOfWinners))
   }
 
@@ -91,16 +91,17 @@ object NavData {
       prop.get match {
         case x: JsString => x.value
         case x: JsNumber => x.toString
+        case _ => ""
       }
     else ""
   }
 
   def restrictToExchange(navData: NavData, exchangeIds: Set[String]): NavData = navData match {
     case x: EventType => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
-    case x: Group => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
-    case x: Event => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
-    case x: Race => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
-    case x: Market => x
+    case x: Group     => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
+    case x: Event     => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
+    case x: Race      => x.copy(children = x.children.filter(x => exchangeIds.contains(x.exchangeId)).map(restrictToExchange(_, exchangeIds)))
+    case x: Market    => x
   }
 
   private def getChildren(data: JsValue): List[NavData] = (data \ "children").as[JsArray].value.map(x => convertData(x)).toList

@@ -15,12 +15,13 @@ case class Runner(selectionId: Long,
                   orders: Option[Set[Order]] = None,
                   matches: Option[Set[Match]] = None) {
 
-  val uniqueId: String = selectionId.toString + "-" + handicap.toString
+  lazy val uniqueId: String = Runner.getUniqueId(selectionId, handicap)
   lazy val backPrice: Option[Double] = Runner.getBackPrice(ex)
   lazy val layPrice: Option[Double] = Runner.getLayPrice(ex)
   lazy val position: Position = Runner.getPosition(orders)
   lazy val hedgeStake: Double = Runner.getHedgeStake(position.backReturn - position.layLiability, layPrice, backPrice)
   lazy val hedge: Double = Runner.getHedge(hedgeStake, position.sumBacked, position.sumLaid)
+
 //  lazy val weightOfMoney: WeightOfMoney = Runner.getWeightOfMoney(ex)
 }
 
@@ -88,12 +89,14 @@ object Runner {
   }
 
   def getPosition(orders: Option[Set[Order]]): Position = orders match {
-    case Some(x) => x.foldLeft[Position](Position(0,0,0,0))((acc, y) =>
+    case Some(x) => x.foldLeft[Position](Position(0, 0, 0, 0))((acc, y) =>
       if (y.side == Side.BACK) {
         acc.copy(sumBacked = acc.sumBacked + y.sizeMatched, backReturn = acc.backReturn + (y.sizeMatched * y.price))
       } else {
         acc.copy(sumLaid = acc.sumLaid + y.sizeMatched, layLiability = acc.layLiability + (y.sizeMatched * y.price))
       })
-    case None => Position(0,0,0,0)
+    case None => Position(0, 0, 0, 0)
   }
+
+  def getUniqueId(selectionId: Long, handicap: Double): String = selectionId.toString + "-" + handicap.toString
 }

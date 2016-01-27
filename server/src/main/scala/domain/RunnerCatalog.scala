@@ -7,7 +7,7 @@ case class RunnerCatalog(selectionId: Long,
                          handicap: Double,
                          sortPriority: Option[Int] = None,
                          metadata: Option[Map[String, String]] = None) {
-  val uniqueId:String = selectionId.toString + "-" + handicap.toString
+  val uniqueId = Runner.getUniqueId(selectionId, handicap)
 }
 
 object RunnerCatalog {

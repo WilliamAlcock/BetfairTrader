@@ -104,7 +104,7 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
       val priceProjection = Some(("priceProjection", PriceProjection(Set.empty)))
       val orderProjection = Some(("orderProjection", OrderProjection.EXECUTABLE))           // TODO implement functionality
       val matchProjection = Some(("matchProjection", MatchProjection.NO_ROLLUP))            // TODO implement functionality
-      val currencyCode = Some("currencyCode", "TEST_CODE")
+      val currencyCode = Some(("currencyCode", "TEST_CODE"))
 
       val returnedMarketBook = MarketBook("1", false, "TEST_STATUS", 0, false, false, false, 1, 1, 1, None, 0, 0, false, false, 1, Set.empty)
       val updatedMarketBook =  MarketBook("2", false, "TEST_STATUS", 0, false, false, false, 1, 1, 1, None, 0, 0, false, false, 1, Set.empty)

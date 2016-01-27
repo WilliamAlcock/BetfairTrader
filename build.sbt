@@ -32,6 +32,8 @@ lazy val serverDependencies = Seq(
   "com.typesafe.akka" %% "akka-actor" % akkaV,
   "com.typesafe.akka" %% "akka-testkit" % akkaV,
   "com.typesafe.akka" %% "akka-remote" % akkaV,
+  "org.reactivemongo" %% "reactivemongo" % "0.11.9",
+  "org.reactivemongo" %% "play2-reactivemongo" % "0.11.2.play24",
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "com.github.nscala-time" %% "nscala-time" % "1.4.0",
   "com.typesafe.play" %% "play-json" % "2.4.3",

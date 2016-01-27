@@ -25,7 +25,7 @@ class BetfairServiceNGCommand(val config: Configuration)
           try {
             val output = Some(unmarshal[T](unmarshaller)(res))
           } catch {
-            case x =>
+            case x: Throwable =>
               println(x)
           }
           Some(unmarshal[T](unmarshaller)(res))
