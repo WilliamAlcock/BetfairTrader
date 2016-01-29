@@ -1,4 +1,6 @@
 package core.api.commands
 
-case object StopPollingAllMarkets extends Command
+import akka.actor.ActorRef
+
+case class StopPollingAllMarkets(sender: ActorRef) extends Command
 

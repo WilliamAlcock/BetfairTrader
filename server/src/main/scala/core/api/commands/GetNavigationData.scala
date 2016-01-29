@@ -1,3 +1,5 @@
 package core.api.commands
 
-case object GetNavigationData extends Command
+import akka.actor.ActorRef
+
+case class GetNavigationData(sender: ActorRef) extends Command

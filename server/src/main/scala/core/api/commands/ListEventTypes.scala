@@ -1,3 +1,6 @@
 package core.api.commands
 
-case object ListEventTypes extends Command
+import akka.actor.ActorRef
+import domain.MarketFilter
+
+case class ListEventTypes(marketFilter: MarketFilter, sender: ActorRef) extends Command

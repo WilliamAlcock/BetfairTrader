@@ -1,8 +1,6 @@
 package core.api.output
 
-import core.dataModel.indicators.TickData
 import domain.MarketBook
+import org.joda.time.DateTime
 
-import scala.collection.immutable.HashMap
-
-case class MarketBookUpdate(data: MarketBook, tickData: HashMap[String, List[TickData]]) extends Output
+case class MarketBookUpdate(timestamp: DateTime, data: MarketBook) extends Output

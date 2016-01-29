@@ -29,7 +29,7 @@ class OrderManager(config: Configuration,
   private def getOutputChannel(marketId: String): String = ORDER_MANAGER_OUTPUT_CHANNEL + "/" + marketId
 
   def receive = {
-    case PlaceOrders(marketId, instructions, customerRef) =>
+    case PlaceOrders(marketId, instructions, customerRef, subscriber) =>
       // Send orders to exchange for test purposes assume they are placed
       betfairService.placeOrders(sessionToken, marketId, instructions, customerRef) onComplete {
         case x => println("message ", x)
@@ -39,21 +39,21 @@ class OrderManager(config: Configuration,
 //
 //        case _ => throw new OrderManagerException("Market " + marketId + " placeOrders failed!")
       }
-    case CancelOrders(marketId, instructions, customerRef) =>
+    case CancelOrders(marketId, instructions, customerRef, subscriber) =>
       betfairService.cancelOrders(sessionToken, marketId, instructions, customerRef) onComplete {
         case Success(Some(x)) =>
           // TODO update the state of this object
           eventBus.publish(MessageEvent(getOutputChannel(marketId), CancelOrderResponse(x)))
         case _ => throw new OrderManagerException("Market " + marketId + " cancelOrders failed!")
       }
-    case ReplaceOrders(marketId, instructions, customerRef) =>
+    case ReplaceOrders(marketId, instructions, customerRef, subscriber) =>
       betfairService.replaceOrders(sessionToken, marketId, instructions, customerRef) onComplete {
         case Success(Some(x)) =>
           // TODO update the state of this object
           eventBus.publish(MessageEvent(getOutputChannel(marketId), ReplaceOrderResponse(x)))
         case _ => throw new OrderManagerException("Market " + marketId + " replaceOrders failed!")
       }
-    case UpdateOrders(marketId, instructions, customerRef) =>
+    case UpdateOrders(marketId, instructions, customerRef, subscriber) =>
       betfairService.updateOrders(sessionToken, marketId, instructions, customerRef) onComplete {
         case Success(Some(x)) =>
           // TODO update the state of this object

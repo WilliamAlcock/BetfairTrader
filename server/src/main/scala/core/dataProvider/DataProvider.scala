@@ -4,11 +4,10 @@ import akka.actor.{Actor, ActorRef, Cancellable, Props}
 import akka.routing.RoundRobinGroup
 import core.api.commands._
 import core.dataProvider.DataProvider.Tick
-import core.dataProvider.commands.{StartPollingMarkets, StopPollingMarkets, UnSubscribe}
-import core.dataProvider.output.{EventDataUpdate, EventTypeDataUpdate, MarketCatalogueDataUpdate}
 import core.dataProvider.polling.MarketPoller.Poll
 import core.dataProvider.polling.{MarketPoller, PollingGroup, PollingGroups}
-import core.eventBus.{EventBus, MessageEvent}
+import core.eventBus.EventBus
+import domain.MarketSort.MarketSort
 import domain.{MatchProjection, OrderProjection, _}
 import org.joda.time.DateTime
 import server.Configuration
@@ -27,9 +26,6 @@ class DataProvider(config: Configuration,
   import context._
 
   // TODO implement update navigation data
-  // TODO get these from config
-  private val DATA_PROVIDER_OUTPUT_CHANNEL = "dataProviderOutput"
-  private val MAX_MARKET_CATALOGUE = 200
   val ORDER_PROJECTION = OrderProjection.ALL
   val MATCH_PROJECTION = MatchProjection.ROLLED_UP_BY_PRICE
 
@@ -71,58 +67,60 @@ class DataProvider(config: Configuration,
     }
   }
 
-  def listMarketCatalogue(marketIds: Set[String]):Unit = {
+  private def listEventTypes(marketFilter: MarketFilter, subscriber: ActorRef) = betfairService.listEventTypes(sessionToken, marketFilter) onComplete {
+    case Success(Some(listEventTypeResultContainer)) => subscriber ! listEventTypeResultContainer
+    case Success(None) => // TODO handle event where betfair returns empty response
+    case Failure(error) => throw new DataProviderException("call to listEventTypes failed")
+  }
+
+  private def listEvents(marketFilter: MarketFilter, subscriber: ActorRef) = betfairService.listEvents(sessionToken, marketFilter) onComplete {
+    case Success(Some(listEventResultContainer)) => sender ! listEventResultContainer
+    case Success(None) => // TODO handle event where betfair returns empty response
+    case Failure(error) => throw new DataProviderException("call to listEvents failed")
+  }
+
+  private def listMarketCatalogue(marketFilter: MarketFilter, sort: MarketSort, subscriber: ActorRef):Unit = {
     betfairService.listMarketCatalogue(
       sessionToken,
-      new MarketFilter(marketIds = marketIds),
+      marketFilter,
       List(
         MarketProjection.MARKET_START_TIME,
         //MarketProjection.RUNNER_METADATA, // TODO need to get a json reader working for runner metadata
+        MarketProjection.MARKET_DESCRIPTION,
         MarketProjection.RUNNER_DESCRIPTION,
         MarketProjection.EVENT_TYPE,
         MarketProjection.EVENT,
         MarketProjection.COMPETITION
       ),
-      MarketSort.FIRST_TO_START,
+      sort,
       200
     ) onComplete {
-      case Success(Some(listMarketCatalogueContainer)) =>
-        eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, MarketCatalogueDataUpdate(listMarketCatalogueContainer)))
-      case Success(None) =>
-      // TODO handle event where betfair returns empty response
+      case Success(Some(listMarketCatalogueContainer)) => subscriber ! listMarketCatalogueContainer
+      case Success(None) => // TODO handle event where betfair returns empty response
       case Failure(error) => throw new DataProviderException("call to listMarketCatalogue failed")
     }
   }
 
+  private def subscribeToMarkets(markets: Set[String], pollingGroup: PollingGroup, subscriber: ActorRef) = {
+    markets.foreach(x => pollingGroups = pollingGroups.addSubscriber(x, subscriber.toString(), pollingGroup))
+    if (!isPolling) {
+      cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)
+      isPolling = true
+    }
+  }
+
+  private def unSubscribeFromMarkets(markets: Set[String], pollingGroup: PollingGroup, subscriber: ActorRef) =
+    markets.foreach(x => pollingGroups = pollingGroups.removeSubscriber(x, subscriber.toString(), pollingGroup))
+
   def receive = {
-    case ListEventTypes =>
-      betfairService.listEventTypes(sessionToken, new MarketFilter()) onComplete {
-        case Success(Some(listEventTypeResultContainer)) =>
-          eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, EventTypeDataUpdate(listEventTypeResultContainer)))
-        case Success(None) =>
-          // TODO handle event where betfair returns empty response
-        case Failure(error) => throw new DataProviderException("call to listEventTypes failed")
-      }
-    case ListEvents(eventTypeId) =>
-      betfairService.listEvents(sessionToken, new MarketFilter(eventTypeIds = Set(eventTypeId))) onComplete {
-        case Success(Some(listEventResultContainer)) =>
-          eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, EventDataUpdate(listEventResultContainer)))
-        case Success(None) =>
-          // TODO handle event where betfair returns empty response
-        case Failure(error) => throw new DataProviderException("call to listEvents failed")
-      }
-    case ListMarketCatalogue(marketIds) => sendToRouter(marketIds, MAX_MARKET_CATALOGUE, listMarketCatalogue)
-    case StartPollingMarkets(marketIds, subscriber, pollingGroup) =>
-      marketIds.foreach(x => pollingGroups = pollingGroups.addSubscriber(x, subscriber, pollingGroup))
-      if (!isPolling) {
-        cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)
-        isPolling = true
-      }
-    case StopPollingMarkets(marketIds, subscriber, pollingGroup) =>
-      marketIds.foreach(x => pollingGroups = pollingGroups.removeSubscriber(x, subscriber, pollingGroup))
-    case UnSubscribe(subscriber) => pollingGroups = pollingGroups.removeSubscriber(subscriber)
-    case StopPollingAllMarkets => pollingGroups = pollingGroups.removeAllSubscribers()
-    case Tick => tick()
+    case ListEventTypes(marketFilter, subscriber)                   => listEventTypes(marketFilter, subscriber)
+    case ListEvents(marketFilter, subscriber)                       => listEvents(marketFilter, subscriber)
+    case ListMarketCatalogue(marketFilter, sort, subscriber)        => listMarketCatalogue(marketFilter, sort, subscriber)
+    case SubscribeToMarkets(markets, pollingGroup, subscriber)      => subscribeToMarkets(markets, pollingGroup, subscriber)
+    case UnSubscribeFromMarkets(markets, pollingGroup, subscriber)  => unSubscribeFromMarkets(markets, pollingGroup, subscriber)
+    case UnSubscribe(subscriber)                                    => pollingGroups = pollingGroups.removeSubscriber(subscriber.toString())
+    case StopPollingAllMarkets                                      => pollingGroups = pollingGroups.removeAllSubscribers()
+    case Tick                                                       => tick()
     case _ => throw new DataProviderException("unknown call to data provider")
   }
 }

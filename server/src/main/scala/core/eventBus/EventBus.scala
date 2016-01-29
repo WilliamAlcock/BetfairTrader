@@ -19,11 +19,12 @@ class EventBus extends akka.event.EventBus with SubchannelClassification {
 
   override protected def subclassification = new Subclassification[Classifier] {
     override def isEqual(x: Classifier, y: Classifier) = x == y
-    override def isSubclass(x: Classifier, y: Classifier) = {
-      val xClasses = x.split("/")
-      val yClasses = y.split("/")
-      xClasses.size == yClasses.size &&
-      (xClasses zip yClasses).map {case (a, b) => a == b || a == "*" || b == "*"}.foldLeft(true)((a, b) => a && b)
+    // is y subclass of x ?
+    override def isSubclass(x: Classifier, y: Classifier) = (y.split("/"), x.split("/")) match {
+      case (_y, _x) if _y.size > _x.size => false
+      case (_y, _x) =>
+        (_y zip _x).map {case (a, b) => a == b || a == "*" || b == "*"}.forall(x => x)
+      case _ => false
     }
   }
 }

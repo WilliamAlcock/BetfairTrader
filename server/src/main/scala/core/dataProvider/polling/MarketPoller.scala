@@ -1,30 +1,24 @@
 package core.dataProvider.polling
 
 import akka.actor.{Actor, Props}
+import core.api.output.MarketBookUpdate
 import core.dataProvider.DataProviderException
-import core.dataProvider.output.MarketDataUpdate
 import core.dataProvider.polling.MarketPoller.Poll
 import core.eventBus.{EventBus, MessageEvent}
 import domain.MatchProjection.MatchProjection
 import domain.OrderProjection.OrderProjection
 import domain.PriceProjection
+import org.joda.time.DateTime
 import server.Configuration
 import service.BetfairService
 
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
 
-/**
- * Created by Alcock on 18/10/2015.
- */
-
 class MarketPoller(config: Configuration,
                    sessionToken: String,
                    betfairService: BetfairService,
                    eventBus: EventBus) extends Actor {
-
-  // TODO get these from config
-  private val DATA_PROVIDER_OUTPUT_CHANNEL = "dataProviderOutput"
 
   import context._
 
@@ -38,8 +32,8 @@ class MarketPoller(config: Configuration,
         orderProjection = Some(("orderProjection", orderProjection)),
         matchProjection = Some(("matchProjection", matchProjection))
       ) onComplete {
-        case Success(Some(listMarketBookContainer)) =>
-          eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL, MarketDataUpdate(listMarketBookContainer)))
+        case Success(Some(listMarketBookContainer)) => listMarketBookContainer.result.foreach(x =>
+          eventBus.publish(MessageEvent(config.dataModelInstructions, MarketBookUpdate(DateTime.now(), x))))
         case Success(None) => println("call to service failed to return data")
           // TODO handle event where betfair returns empty response
         case Failure(error) => throw new DataProviderException("call to listMarketBook failed " + error)

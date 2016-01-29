@@ -4,7 +4,6 @@ import core.Controller
 import core.dataModel.navData.NavData
 import core.dataModel.{DataModel, DataModelActor}
 import core.dataProvider.DataProvider
-import core.dataStore.DataStoreWriter
 import core.eventBus.EventBus
 import core.orderManager.OrderManager
 import play.api.libs.json.Json
@@ -68,14 +67,15 @@ object Main {
     val dataModelActor = system.actorOf(DataModelActor.props(config, eventBus, dataModel), "dataModel")
     val dataProvider = system.actorOf(DataProvider.props(config, sessionToken, betfairService, eventBus), "dataProvider")
     val orderManager = system.actorOf(OrderManager.props(config, sessionToken, betfairService, eventBus), "orderManager")
-    val dataStoreWriter = system.actorOf(DataStoreWriter.props(config), "dataStoreWriter")
 
     // Subscribe to event bus
     eventBus.subscribe(dataModelActor, DATA_PROVIDER_OUTPUT_CHANNEL)
-    eventBus.subscribe(dataStoreWriter, DATA_PROVIDER_OUTPUT_CHANNEL)
     eventBus.subscribe(dataProvider, DATA_PROVIDER_CHANNEL)
     eventBus.subscribe(orderManager, ORDER_MANAGER_CHANNEL)
 
-    system.actorOf(Props(new Controller(config, eventBus)), "controller")
+    val controller = system.actorOf(Props(new Controller(config, eventBus)), "controller")
+
+    // DataStoreWriter
+//    system.actorOf(DataStoreWriter.props(config, controller), "dataStoreWriter")
   }
 }

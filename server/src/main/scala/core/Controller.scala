@@ -2,7 +2,6 @@ package core
 
 import akka.actor.{ActorRef, Terminated, Actor}
 import core.api.commands._
-import core.dataProvider.commands.{UnSubscribe, StopPollingMarkets, StartPollingMarkets}
 import core.eventBus.{EventBus, MessageEvent}
 import server.Configuration
 
@@ -10,24 +9,15 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
 
   import context._
 
-  // TODO get these from config
-  private val ORDER_MANAGER_CHANNEL = "orderManagerInstructions"
-  private val DATA_PROVIDER_CHANNEL = "dataProviderInstructions"
-  private val DATA_PROVIDER_OUTPUT_CHANNEL = "dataProviderOutput"       // TODO using this to send commands is bad
-  private val MODEL_UPDATE_CHANNEL = "modelUpdates"
-
-  // TODO this line of code is duplicated move it into central lib
-  private def getPublishChannel(ids: Seq[String]): String = ids.foldLeft[String](MODEL_UPDATE_CHANNEL)((channel, id) => channel + "/" + id)
-
   private def getCommandChannel(x: Command): String = x match {
-    case ListEventTypes           => DATA_PROVIDER_CHANNEL
-    case x: ListEvents            => DATA_PROVIDER_CHANNEL
-    case x: ListMarketCatalogue   => DATA_PROVIDER_CHANNEL
-    case StopPollingAllMarkets    => DATA_PROVIDER_CHANNEL
-    case x: PlaceOrders           => ORDER_MANAGER_CHANNEL
-    case x: CancelOrders          => ORDER_MANAGER_CHANNEL
-    case x: ReplaceOrders         => ORDER_MANAGER_CHANNEL
-    case x: UpdateOrders          => ORDER_MANAGER_CHANNEL
+    case x: ListEventTypes        => config.dataProviderInstructions
+    case x: ListEvents            => config.dataProviderInstructions
+    case x: ListMarketCatalogue   => config.dataProviderInstructions
+    case x: StopPollingAllMarkets => config.dataProviderInstructions
+    case x: PlaceOrders           => config.orderManagerInstructions
+    case x: CancelOrders          => config.orderManagerInstructions
+    case x: ReplaceOrders         => config.orderManagerInstructions
+    case x: UpdateOrders          => config.orderManagerInstructions
   }
 
   var subscribers = Set.empty[ActorRef]
@@ -44,35 +34,33 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
   def receive = {
     case Terminated(subscriber) =>
       subscribers -= subscriber
-      eventBus.unsubscribe(subscriber)
-      eventBus.publish(MessageEvent(DATA_PROVIDER_CHANNEL, UnSubscribe(subscriber.toString)))
+      eventBus.unsubscribe(subscriber)                                                              // UnSubscribe from eventBus
+      eventBus.publish(MessageEvent(config.dataProviderInstructions, UnSubscribe(subscriber)))      // UnSubscribe from dataProvider
       system.log.info("UnSubscribing " + subscriber)
-    case x: String =>
-      system.log.info("I have your message: " + x)
-    case SubscribeToMarkets(marketIds, pollingGroup) =>
-      watch(sender)
+    case SubscribeToMarkets(marketIds, pollingGroup, subscriber) =>
+      if (!sender().equals(subscriber)) println("WARNING !!! Subscriber != Sender")
+      watch(subscriber)
       marketIds.foreach(x => {
-        val channel:String = getPublishChannel(Seq("marketBook", x))
-        eventBus.subscribe(sender, channel)
-        system.log.info("Subscribing " + sender + " to " + channel)
+        val channel = config.getPublishChannel(Seq(x))
+        eventBus.subscribe(subscriber, channel)
+        system.log.info("Subscribing " + subscriber + " to " + channel)
       })
-      eventBus.publish(MessageEvent(DATA_PROVIDER_CHANNEL, StartPollingMarkets(marketIds, sender.toString, pollingGroup)))
-    case UnSubscribeFromMarkets(marketIds, pollingGroup) =>
+      eventBus.publish(MessageEvent(config.dataProviderInstructions, SubscribeToMarkets(marketIds, pollingGroup, subscriber)))
+    case UnSubscribeFromMarkets(marketIds, pollingGroup, subscriber) =>
+      if (!sender().equals(subscriber)) println("WARNING !!! Subscriber != Sender")
       marketIds.foreach(x => {
-        val channel = getPublishChannel(Seq("marketBook", x))
-        eventBus.unsubscribe(sender, channel)
+        val channel = config.getPublishChannel(Seq(x))
+        eventBus.unsubscribe(sender(), channel)
         system.log.info("UnSubscribing " + sender + " from " + channel)
       })
-      eventBus.publish(MessageEvent(DATA_PROVIDER_CHANNEL, StopPollingMarkets(marketIds, sender.toString, pollingGroup)))
-    case SubscribeToNavData =>
-      watch(sender)
-      val channel = getPublishChannel(Seq("navData"))
-      eventBus.subscribe(sender, channel)
-      eventBus.publish(MessageEvent(DATA_PROVIDER_OUTPUT_CHANNEL , GetNavigationData))
-      system.log.info("Subscribing " + sender + " to navData")
+      eventBus.publish(MessageEvent(config.dataProviderInstructions, UnSubscribeFromMarkets(marketIds, pollingGroup, subscriber)))
+    case x: GetNavigationData => eventBus.publish(MessageEvent(config.dataModelInstructions, x))
     case x: Command =>
-      watch(sender)
+      if (!sender().equals(x.sender)) println("WARNING !!! Subscriber != Sender")
+      watch(x.sender)
       eventBus.publish(MessageEvent(getCommandChannel(x), x))
-      system.log.info("actioning command: " + x + " from: " + sender)
+      system.log.info("Actioning command: " + x)
+    case x: String =>
+      system.log.info("I have your message: " + x)
   }
 }

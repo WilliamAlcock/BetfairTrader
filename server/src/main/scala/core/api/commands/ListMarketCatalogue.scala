@@ -1,9 +1,7 @@
 package core.api.commands
 
-import play.api.libs.json.Json
+import akka.actor.ActorRef
+import domain.MarketFilter
+import domain.MarketSort.MarketSort
 
-case class ListMarketCatalogue(marketIds: Set[String]) extends Command
-
-object ListMarketCatalogue {
-  implicit val formatListMarketCatalogue = Json.format[ListMarketCatalogue]
-}
+case class ListMarketCatalogue(marketFilter: MarketFilter, sort: MarketSort, sender: ActorRef) extends Command
