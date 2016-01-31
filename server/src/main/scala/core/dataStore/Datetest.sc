@@ -1,6 +1,6 @@
-import org.joda.time.DateTime
+import org.joda.time.{Interval, DateTime}
 
-val marketStartTime = DateTime.now().plusMinutes(20)
+val marketStartTime = DateTime.now().plusMinutes(120)
 
 val minutesToStart = new DateTime(marketStartTime.getMillis() - DateTime.now().getMillis())
 
@@ -15,3 +15,5 @@ minutesToStart.getDayOfMonth
 minutesToStart.getHourOfDay
 
 minutesToStart.getMinuteOfHour
+
+new Interval(marketStartTime, marketStartTime).toPeriod().toStandardMinutes.getMinutes

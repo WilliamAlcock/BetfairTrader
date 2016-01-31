@@ -110,8 +110,8 @@ class CSVDataSpec extends FlatSpec with Matchers with MockFactory {
   // TODO this would be a good case for quickCheck test
   "CSVData.toRunner" should "convert a CSVData case class to a Runner case class" in {
     val marketId = "TEST_ID"
-    val marketStartTime = DateTime.parse("2014-09-14T18:00:00.000", dateFormat)
-    val timestamp = DateTime.parse("2014-09-14T17:10:00.000", dateFormat)
+    val marketStartTime = DateTime.parse("2014-09-1418:00:00.000", dateFormat)
+    val timestamp = DateTime.parse("2014-09-1417:10:00.000", dateFormat)
     val selectionId = 100
     val name = "TEST_RUNNER"
     val status = "TEST_STATUS"
