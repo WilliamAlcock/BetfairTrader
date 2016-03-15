@@ -1,4 +1,3 @@
-
 dependencies = [
     'ui.bootstrap',
     'myApp.filters',
@@ -64,16 +63,13 @@ angular.module('myApp.routeConfig', ['ui.router'])
           requireBase: false
         })
 
-        $urlRouterProvider.otherwise('/eventType')
+        $urlRouterProvider.otherwise('/soccer')
 
         $stateProvider
           .state('init', {
             abstract: true,
             resolve: {
-              webSocket: (WebSocketService) ->
-                WebSocketService.init()
-              countryNames: (CountryNameService) ->
-                CountryNameService.init()
+              webSocket: (WebSocketService) -> WebSocketService.init()
             },
             template: '<ui-view></ui-view>'
           })
@@ -82,32 +78,33 @@ angular.module('myApp.routeConfig', ['ui.router'])
             templateUrl: '/assets/partials/main/main.html'
             controller: 'MainCtrl as main'
           })
-          .state('init.main.eventType', {
-            url: "/eventType",
-            params: {                                 # TODO These defaults should come from config
-              id: {value: 1},                       # Soccer
-              groupId: {value: "Today"}               # Today
-            },
+          .state('init.main.soccer', {
+            url: "/soccer",
+            onEnter: (WebSocketService) -> WebSocketService.getNavigationData("1")
             views: {
               'navigation@init.main': {
-                templateUrl: '/assets/partials/main/eventType/controllers/navigation.html',
-                controller: 'eventTypeNavigationCtrl as nav'
-              },
-              'detail@init.main': {
-                templateUrl: '/assets/partials/main/eventType/controllers/detail.html',
-                controller: 'eventTypeDetailCtrl as detail'
+                templateUrl: '/assets/partials/main/soccer/navigation.html',
+                controller: 'soccerNavigationCtrl as nav'
               },
               'position@init.main': {
-                templateUrl: '/assets/partials/main/eventType/controllers/position.html',
-                controller: 'eventTypePositionCtrl as position'
+                templateUrl: '/assets/partials/main/soccer/position.html',
+                controller: 'soccerPositionCtrl as position'
               }
             },
           })
-          .state('init.main.event', {
-            url: "/event",
-            resolve: {
-              # TODO get this from config
-              isSelected: () -> {
+          .state('init.main.soccer.coupon', {
+            url: "/:coupon",
+            views: {
+              'detail@init.main': {
+                templateUrl: '/assets/partials/main/soccer/coupon/detail.html',
+                controller: 'soccerCouponDetailCtrl as detail'
+              },
+            },
+          })
+          .state('init.main.soccer.coupon.event', {
+            url: "/:event",
+            data: {
+              isSelected: {                       # TODO get this from config
                 MATCH_ODDS:           true,
                 CORRECT_SCORE:        false,
                 OVER_UNDER_05:        true,
@@ -119,30 +116,101 @@ angular.module('myApp.routeConfig', ['ui.router'])
                 OVER_UNDER_65:        true,
                 OVER_UNDER_75:        true,
                 OVER_UNDER_05:        true,
-                HALF_TIME:            false,
-                HALF_TIME_SCORE:      false,
-                HALF_TIME_FULL_TIME:  false,
-                NEXT_GOAL:            false
               }
-            },
-            params: {
-              eventId: {},
-            },
+            }
             views: {
               'navigation@init.main': {
-                templateUrl: '/assets/partials/main/event/controllers/navigation.html',
-                controller: 'eventNavigationCtrl as nav'
+                templateUrl: '/assets/partials/main/soccer/event/navigation.html',
+                controller: 'soccerEventNavigationCtrl as nav'
               },
               'detail@init.main': {
-                templateUrl: '/assets/partials/main/event/controllers/detail.html',
-                controller: 'eventDetailCtrl as detail'
+                templateUrl: '/assets/partials/main/soccer/event/detail.html',
+                controller: 'soccerEventDetailCtrl as detail'
               },
-              'position@init.main': {
-                templateUrl: '/assets/partials/main/event/controllers/position.html',
-                controller: 'eventPositionCtrl as position'
-              }
             },
           })
+
+          .state('init.main.horseRacing', {
+              url: "/horseRacing",
+              onEnter: (WebSocketService) -> WebSocketService.getNavigationData("7")
+              params: {},
+              views: {
+                'navigation@init.main': {
+                  templateUrl: '/assets/partials/main/horseRacing/navigation.html',
+                  controller: 'horseRacingNavigationCtrl as nav'
+                },
+                'detail@init.main': {
+                  templateUrl: '/assets/partials/main/horseRacing/detail.html',
+                  controller: 'horseRacingDetailCtrl as detail'
+                },
+                'position@init.main': {
+                  templateUrl: '/assets/partials/main/horseRacing/position.html',
+                  controller: 'horseRacingPositionCtrl as position'
+                }
+              },
+            })
+
+#          .state('init.main.eventType', {
+#            url: "/eventType",
+#            params: {                                 # TODO These defaults should come from config
+#              id: {value: 1},                         # Soccer
+#              groupId: {value: "Today"}               # Today
+#            },
+#            views: {
+#              'navigation@init.main': {
+#                templateUrl: '/assets/partials/main/eventType/controllers/navigation.html',
+#                controller: 'eventTypeNavigationCtrl as nav'
+#              },
+#              'detail@init.main': {
+#                templateUrl: '/assets/partials/main/eventType/controllers/detail.html',
+#                controller: 'eventTypeDetailCtrl as detail'
+#              },
+#              'position@init.main': {
+#                templateUrl: '/assets/partials/main/eventType/controllers/position.html',
+#                controller: 'eventTypePositionCtrl as position'
+#              }
+#            },
+#          })
+#          .state('init.main.event', {
+#            url: "/event",
+#            resolve: {
+#              # TODO get this from config
+#              isSelected: () -> {
+#                MATCH_ODDS:           true,
+#                CORRECT_SCORE:        false,
+#                OVER_UNDER_05:        true,
+#                OVER_UNDER_15:        true,
+#                OVER_UNDER_25:        true,
+#                OVER_UNDER_35:        true,
+#                OVER_UNDER_45:        true,
+#                OVER_UNDER_55:        true,
+#                OVER_UNDER_65:        true,
+#                OVER_UNDER_75:        true,
+#                OVER_UNDER_05:        true,
+#                HALF_TIME:            false,
+#                HALF_TIME_SCORE:      false,
+#                HALF_TIME_FULL_TIME:  false,
+#                NEXT_GOAL:            false
+#              }
+#            },
+#            params: {
+#              eventId: {},
+#            },
+#            views: {
+#              'navigation@init.main': {
+#                templateUrl: '/assets/partials/main/event/controllers/navigation.html',
+#                controller: 'eventNavigationCtrl as nav'
+#              },
+#              'detail@init.main': {
+#                templateUrl: '/assets/partials/main/event/controllers/detail.html',
+#                controller: 'eventDetailCtrl as detail'
+#              },
+#              'position@init.main': {
+#                templateUrl: '/assets/partials/main/event/controllers/position.html',
+#                controller: 'eventPositionCtrl as position'
+#              }
+#            },
+#          })
 
         $locationProvider.html5Mode(true)
     ])

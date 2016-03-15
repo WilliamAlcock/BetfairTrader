@@ -12,7 +12,7 @@ class EventBus extends akka.event.EventBus with SubchannelClassification {
   override type Subscriber = ActorRef
 
   override protected def publish(event: Event, subscriber: Subscriber): Unit = {
-    subscriber ! event.message
+    subscriber tell(event.message, event.sender)
   }
 
   override protected def classify(event: Event): Classifier = event.channel

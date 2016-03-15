@@ -1,0 +1,27 @@
+<div class="row bf-navigation-panel" ng-if="nav.menu.name == 'main'">
+    <div class="col-xs-12 heading">Time</div>
+    <div class="col-xs-12 entry" ng-click="nav.selectGroup('Today')">Today</div>
+    <div class="col-xs-12 entry" ng-click="nav.selectGroup('Tomorrow')">Tomorrow</div>
+    <div class="col-xs-12 heading">Top Countries</div>
+    <div class="col-xs-12 entry" ng-repeat="country in nav.navData.soccerData.topCountries track by country.name"
+         ng-click="nav.selectGroup('country', country.name)">{{country.name}}</div>
+    <div class="col-xs-12 heading">More</div>
+    <div class="col-xs-12 entry" ng-click="nav.selectGroup('allFootball')">All Football</div>
+</div>
+<div class="row bf-navigation-panel" ng-if="nav.menu.name == 'allFootball'">
+    <div class="col-xs-12 go-back" ng-click="nav.selectGroup('goBack')">
+        <i class="glyphicon glyphicon-triangle-left"></i>Back
+    </div>
+    <div class="col-xs-12 heading">All Football</div>
+    <div class="col-xs-12 entry" ng-repeat="country in nav.navData.soccerData.allFootball track by country.name"
+         ng-click="nav.selectGroup('country', country.name)">{{country.name}}</div>
+</div>
+<div class="row bf-navigation-panel" ng-if="nav.menu.name == 'country'">
+    <div class="col-xs-12 go-back" ng-click="nav.selectGroup('goBack')">
+        <i class="glyphicon glyphicon-triangle-left"></i>Back
+    </div>
+    <div class="col-xs-12 heading">{{nav.menu.country.name}}</div>
+    <div class="col-xs-12 entry" ng-repeat="event in nav.menu.country.navData track by event.id"
+         ng-click="nav.selectGroup('event', event.id)">{{event.name}}</div>
+</div>
+

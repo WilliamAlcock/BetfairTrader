@@ -1,0 +1,28 @@
+<div class="row bf-navigation-panel" ng-if="nav.getState() == 'main'">
+    <div class="col-xs-12 heading">Time</div>
+    <div class="col-xs-12 entry" ng-click="nav.selectGroup('Today')">Today</div>
+    <div class="col-xs-12 entry" ng-click="nav.selectGroup('Tomorrow')">Tomorrow</div>
+    <div class="col-xs-12 heading">Country</div>
+    <div class="col-xs-12 entry" ng-repeat="group in nav.getStateChildren() track by group.id"
+         ng-click="nav.selectGroup(group.type, group.id)">{{group.name}}</div>
+</div>
+<div class="row bf-navigation-panel" ng-if="nav.getState() != 'main'">
+    <div class="col-xs-12 go-back" ng-click="nav.selectGroup('goBack')">
+        <i class="glyphicon glyphicon-triangle-left"></i>Go Back
+    </div>
+    <div class="col-xs-12 heading">{{nav.getStateData().name}}</div>
+    <div class="col-xs-12 entry" ng-repeat="group in nav.getStateChildren() track by group.id | orderBy: 'group.startTime | dateFilter'"
+         ng-click="nav.selectGroup(group.type, group.id)">
+        <i ng-if="group.type == 'MARKET' && group.marketType != 'SPECIAL'">{{group.startTime | dateFilter}}: </i>
+        {{group.name}}
+    </div>
+</div>
+
+
+<!--<div class="row bf-navigation-panel" ng-if="nav.menu.name == 'event'">-->
+    <!--<div class="col-xs-12 go-back" ng-click="nav.selectGroup('group', nav.menu.group.id)">-->
+        <!--<i class="glyphicon glyphicon-triangle-left"></i>Go Back-->
+    <!--</div>-->
+    <!--<div class="col-xs-12 heading">{{nav.menu.event.name}}</div>-->
+    <!--<div class="col-xs-12 entry" ng-repeat="race in nav.menu.event.children track by race.id | orderBy: 'race.startTime | dateFilter'">{{race.startTime | dateFilter}} {{race.name}}</div>-->
+<!--</div>-->

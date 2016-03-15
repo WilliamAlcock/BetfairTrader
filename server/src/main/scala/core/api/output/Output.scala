@@ -4,3 +4,5 @@ import core.eventBus.Message
 
 trait Output extends Message
 
+case object NavDataUpdated extends Output
+

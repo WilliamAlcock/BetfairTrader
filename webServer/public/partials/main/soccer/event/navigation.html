@@ -1,0 +1,9 @@
+<div class="row bf-navigation-panel">
+    <div class="col-xs-12 heading">{{nav.navData.name}}</div>
+    <div class="col-xs-12 entry" ng-repeat="market in nav.navData.children track by market.id" ng-click="nav.selected(market.marketType)">
+        {{market.name}}
+        <i ng-if="nav.$state.current.data.isSelected[market.marketType]" class="pull-right glyphicon glyphicon-ok"></i>
+    </div>
+</div>
+
+

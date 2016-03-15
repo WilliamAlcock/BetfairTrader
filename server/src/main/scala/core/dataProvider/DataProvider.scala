@@ -62,7 +62,7 @@ class DataProvider(config: Configuration,
         cancelPolling.cancel()
         isPolling = false
       case x =>
-        cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)
+        cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)     // TODO this value should come from config
         isPolling = true
     }
   }
@@ -104,7 +104,7 @@ class DataProvider(config: Configuration,
   private def subscribeToMarkets(markets: Set[String], pollingGroup: PollingGroup, subscriber: ActorRef) = {
     markets.foreach(x => pollingGroups = pollingGroups.addSubscriber(x, subscriber.toString(), pollingGroup))
     if (!isPolling) {
-      cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)
+      cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)     // TODO this value should come from config
       isPolling = true
     }
   }
@@ -113,14 +113,14 @@ class DataProvider(config: Configuration,
     markets.foreach(x => pollingGroups = pollingGroups.removeSubscriber(x, subscriber.toString(), pollingGroup))
 
   def receive = {
-    case ListEventTypes(marketFilter, subscriber)                   => listEventTypes(marketFilter, subscriber)
-    case ListEvents(marketFilter, subscriber)                       => listEvents(marketFilter, subscriber)
-    case ListMarketCatalogue(marketFilter, sort, subscriber)        => listMarketCatalogue(marketFilter, sort, subscriber)
-    case SubscribeToMarkets(markets, pollingGroup, subscriber)      => subscribeToMarkets(markets, pollingGroup, subscriber)
-    case UnSubscribeFromMarkets(markets, pollingGroup, subscriber)  => unSubscribeFromMarkets(markets, pollingGroup, subscriber)
-    case UnSubscribe(subscriber)                                    => pollingGroups = pollingGroups.removeSubscriber(subscriber.toString())
-    case StopPollingAllMarkets                                      => pollingGroups = pollingGroups.removeAllSubscribers()
-    case Tick                                                       => tick()
+    case ListEventTypes(marketFilter)                   => listEventTypes(marketFilter, sender())
+    case ListEvents(marketFilter)                       => listEvents(marketFilter, sender())
+    case ListMarketCatalogue(marketFilter, sort)        => listMarketCatalogue(marketFilter, sort, sender())
+    case SubscribeToMarkets(markets, pollingGroup)      => subscribeToMarkets(markets, pollingGroup, sender())
+    case UnSubscribeFromMarkets(markets, pollingGroup)  => unSubscribeFromMarkets(markets, pollingGroup, sender())
+    case UnSubscribe                                    => pollingGroups = pollingGroups.removeSubscriber(sender().toString())
+    case StopPollingAllMarkets                          => pollingGroups = pollingGroups.removeAllSubscribers()
+    case Tick                                           => tick()
     case _ => throw new DataProviderException("unknown call to data provider")
   }
 }

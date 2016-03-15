@@ -1,12 +1,15 @@
 class LadderCtrl
 
   constructor: (@$log, @$stateParams, @$scope, @WebSocketService, @DataModelService, @PriceService) ->
-    @depth = 10
+
+    # TODO get these values from config
+    @depth = 5
+    @orderSize = 2
+    @prices = []
+    @isPositionOpen = true
 
     @catalogueData = @DataModelService.marketCatalogueData
 
-    @orderSize = 2
-    @prices = []
     @catalogue = undefined
 
     @$log.log "Ladder Controller", @$stateParams, @DataModelService
@@ -16,10 +19,14 @@ class LadderCtrl
 
     @$scope.$on '$destroy', () -> @WebSocketService.unSubscribeFromMarkets([@$stateParams.marketId], "ALL_AND_TRADED")
 
-    @cancel = @$scope.$on 'market-' + @$stateParams.marketId, @updateRunner
+    @cancelMarketWatch = @$scope.$on 'market-' + @$stateParams.marketId, @updateRunner
+    @cancelCatalogueWatch = @$scope.$on 'catalogue-' + @$stateParams.marketId, @updateRunner
+
+  togglePosition: () =>
+    @isPositionOpen = !@isPositionOpen
 
   getRunner: () =>
-    if angular.isDefined(@DataModelService.marketBookData[@$stateParams.marketId])
+    if (@DataModelService.marketBookData[@$stateParams.marketId]?)
       @DataModelService.marketBookData[@$stateParams.marketId].runners[@$stateParams.selectionId]
     else {}
 
@@ -53,13 +60,20 @@ class LadderCtrl
 
   scrollDown: () => @prices = @PriceService.scrollDown(@prices)
 
-  snapToBid: () => @prices = @PriceService.getLadderPrices(@getRunner().ex.availableToBack[0].price, @depth)
+  snapToBid: () =>
+    @prices = @PriceService.getLadderPrices(@getRunner().ex.availableToBack[0].price, @depth)
+    @$log.log('set prices', @prices)
 
   snapToOffer: () => @prices = @PriceService.getLadderPrices(@getRunner().ex.availableToLay[0].price, @depth)
 
   updateRunner: () =>
-    @catalogue = x for x in @catalogueData[@$stateParams.marketId].runners when x.uniqueId == @$stateParams.selectionId
-    @snapToBid()
-    @cancel()
+    @$log.log('updating runner', )
+    if (@catalogueData[@$stateParams.marketId]?)
+      @catalogue = (x for x in @catalogueData[@$stateParams.marketId].runners when x.uniqueId == @$stateParams.selectionId)[0]
+      @$log.log('got catalogue data', @catalogueData[@$stateParams.marketId], @catalogue)
+      @snapToBid()
+      @$scope.$apply()
+      @cancelMarketWatch()
+      @cancelCatalogueWatch()
 
 controllersModule.controller('LadderCtrl', ['$log', '$stateParams', '$scope', 'WebSocketService', 'DataModelService', 'PriceService', LadderCtrl])

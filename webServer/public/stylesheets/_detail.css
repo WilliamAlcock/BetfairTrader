@@ -1,0 +1,78 @@
+.bf-detail-panel {
+    margin-top:20px;
+    border: solid 1px #c9ced1;
+}
+
+.bf-detail-panel .heading {
+    background-color: #c9ced1;
+    color: rgb(39, 58, 71);
+    margin-bottom:10px;
+}
+
+.bf-detail-panel .bf-group-item .heading {
+    background:none !important;
+    padding-top:10px;
+    padding-left:10px;
+    padding-right:10px;
+}
+
+.bf-event-item .match-odds-placeholder {
+    line-height: 40px
+}
+
+.bf-event-item .others-heading {
+    border-bottom: solid rgb(224, 230, 230) 1px;
+}
+
+.bf-event-item .time {
+    color: rgb(39, 58, 71)
+}
+
+.bf-detail-panel .price-row {
+    border-top: solid rgb(224, 230, 230) 1px;
+    cursor: pointer;
+    min-height: 41px;
+    max-height: 41px;
+}
+
+.bf-detail-panel .price-label {
+    color: #2789ce;
+}
+
+.bf-detail-panel .panel-group .panel-default .panel-heading {
+    height: 26px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    background-color: rgb(39,58,71);
+    background-image: none;
+    color: white;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.bf-detail-panel .panel-group .panel-default .panel-heading .panel-title {
+    font-size:14px;
+    line-height: 26px;
+}
+
+.bf-detail-panel .panel-group .panel-default .panel-heading .panel-title i {
+    line-height: inherit;
+}
+
+.bf-detail-panel .panel-group .panel-default .panel-heading a:focus {
+    text-decoration: none;
+    outline: none;
+}
+
+.bf-detail-panel .panel-group .panel-default .panel-heading a:hover {
+    text-decoration: none;
+}
+
+.bf-detail-panel .panel-group .panel-default {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.bf-detail-panel .no-match-odds {
+    line-height: 40px;
+}

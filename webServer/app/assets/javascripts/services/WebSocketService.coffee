@@ -26,18 +26,14 @@ class WebSocketService
 
     @ws.onopen = =>
       @$log.debug "WebSocket open"
-      # TODO move this to resolve in state
-      @subscribeToNavData()
+      @subscribeToSystemAlerts()        # TODO move this to resolve in state
       deferred.resolve()
 
-    @ws.onclose = =>
-      @$log.debug "WebSocket closed"
+    @ws.onclose = => @$log.debug "WebSocket closed"
 
-    @ws.onerror = =>
-      @$log.debug "WebSocket error"
+    @ws.onerror = => @$log.debug "WebSocket error"
 
-    @ws.onmessage = (message) =>
-      @parseResponse(angular.fromJson(message.data))
+    @ws.onmessage = (message) => @parseResponse(angular.fromJson(message.data))
 
     deferred.promise
 
@@ -47,19 +43,22 @@ class WebSocketService
 
     if angular.isDefined(message.result)
       switch message.result.resultType
-#        when "EventTypeUpdate" then @DataModel.eventTypeData[message.result]
-#        when "EventUpdate" then @DataModel.eventData
         when "MarketCatalogueUpdate"
-          @$rootScope.$apply(@DataModel.marketCatalogueData[message.result.result.marketId] = message.result.result)
+          @$rootScope.$apply(@DataModel.setMarketCatalogueData(message.result.result.marketId, message.result.result))
+          @$rootScope.$broadcast('catalogue-' + message.result.result.marketId, message.result.result)
         when "MarketBookUpdate"
-          @$rootScope.$apply(@DataModel.marketBookData[message.result.result.marketId] = message.result.result)
+          @$rootScope.$apply(@DataModel.setMarketBookData(message.result.result.marketId, message.result.result))
 #          @$log.log "got market book data", @DataModel.marketBookData, message.result.result.marketId
           @$rootScope.$broadcast('market-' + message.result.result.marketId, message.result.result)
-        when "NavigationDataUpdate"
-          @$rootScope.$apply(@DataModel.setNavData(message.result.result))
+        when "SoccerData"
+          @$log.log("Soccer Data -> ", message)
+          @$rootScope.$apply(@DataModel.setSoccerData(message.result.result))
+        when "HorseRacingData"
+          @$log.log("Horse Racing Data -> ", message)
+          @$rootScope.$apply(@DataModel.setHorseRacingData(message.result.result))
         else null
     else if angular.isDefined(message.error)
-      println "error response " + message.error
+      console.log("error response " + message.error)
     else
       throw "Invalid response"
 
@@ -68,27 +67,29 @@ class WebSocketService
     message.id = ++@id
     @ws.send(JSON.stringify(message))
 
-  subscribeToNavData: ->
-    @sendJsonrpcMessage({method: "subscribeToNavData", params: {}})
+  subscribeToSystemAlerts: -> @sendJsonrpcMessage({method: "subscribeToSystemAlerts", params: {}})
 
-  subscribeToMarkets: (markets, pollingGroup) ->
-    @sendJsonrpcMessage({method: "subscribeToMarkets", params: {markets: markets, pollingGroup: {group: pollingGroup}}})
+  getNavigationData: (eventTypeId) -> @sendJsonrpcMessage({method: "getNavigationData", params: {eventTypeId: eventTypeId}})
 
-  unSubscribeFromMarkets: (markets, pollingGroup) ->
-    @sendJsonrpcMessage({method: "unSubscribeFromMarkets", params: {markets: markets, pollingGroup: {group: pollingGroup}}})
+  subscribeToMarkets: (markets, pollingGroup) -> @sendJsonrpcMessage({method: "subscribeToMarkets", params: {markets: markets, pollingGroup: {group: pollingGroup}}})
+
+  unSubscribeFromMarkets: (markets, pollingGroup) -> @sendJsonrpcMessage({method: "unSubscribeFromMarkets", params: {markets: markets, pollingGroup: {group: pollingGroup}}})
 
   listMarketCatalogue: (marketIds) ->
-    @sendJsonrpcMessage({method: "listMarketCatalogue", params: {marketIds: marketIds}})
+    marketFilter = {
+      marketIds: marketIds
+      exchangeIds: []
+      eventTypeIds: []
+      eventIds: []
+      venues: []
+      competitionIds: []
+      marketTypeCodes: []
+      marketCountries: []
+      marketBettingTypes: []
+      withOrders: []
+    }
+    @sendJsonrpcMessage({method: "listMarketCatalogue", params: {marketFilter: marketFilter, sort: 'MAXIMUM_TRADED'}})
 
-#  listEventTypes: () ->
-#    @sendJsonrpcMessage({method: "listEventTypes", params: {}})
-#
-#  listEvents: (eventTypeId) ->
-#    @sendJsonrpcMessage({method: "listEvents", params: {eventTypeId: eventTypeId}})
-#
-#  stopPollingAllMarkets: () ->
-#    @sendJsonrpcMessage({method: "stopPollingAllMarkets", params: {}})
-#
   placeOrders: (marketId, selectionId, handicap, side, price, size, customerRef) ->
     instruction = {
       orderType: "LIMIT",

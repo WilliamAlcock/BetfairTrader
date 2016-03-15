@@ -21,7 +21,6 @@ class BetfairServiceNGCommand(val config: Configuration)
       res =>
         if (res.status == StatusCodes.OK) {
           system.log.debug(res.toString)
-          println(res.entity.data)
           try {
             val output = Some(unmarshal[T](unmarshaller)(res))
           } catch {

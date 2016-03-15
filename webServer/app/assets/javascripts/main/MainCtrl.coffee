@@ -1,21 +1,17 @@
 class MainCtrl
 
-  constructor: (@$log, @$state, DataModelService) ->
+  constructor: (@$log, @$state) ->
     @$log.debug "Main Controller"
-    @navigationData = DataModelService.navData
 
-    # TODO get this from config
-    @visibleTabs = {
-      1:    {active: true,  disabled: false}         # Soccer
-      2:    {active: false, disabled: false}         # Tennis
-      7:    {active: false, disabled: false}         # Horse Racing
-      197:  {active: false, disabled: false}         # Cricket
-      4339: {active: false, disabled: false}         # Greyhound Racing
-      6231: {active: false, disabled: false}         # Financial Bets
-    }
+    @selected = @$state.current.url.split("/")[1]
 
-    @showEventType = (id) => angular.isDefined(@visibleTabs[id])
+    @tabs = [
+      {name: "soccer", display: 'Soccer', state: 'init.main.soccer'},
+      {name: "horseRacing", display: 'Horse Racing', state: 'init.main.horseRacing'}
+    ]
 
-    @onTabSelected = (key) => @$state.go('init.main.eventType', {id: key, countryCode: "GB"})
+    @select = (name, state) =>
+      @selected = name
+      @$state.go(state)
 
-controllersModule.controller('MainCtrl', ['$log', '$state', 'DataModelService', MainCtrl])
+controllersModule.controller('MainCtrl', ['$log', '$state', MainCtrl])

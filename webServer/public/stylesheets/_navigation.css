@@ -1,0 +1,38 @@
+.bf-navigation-panel {
+    margin-top:20px;
+    margin-left:0px;
+    margin-right:0px;
+}
+
+.bf-navigation-panel .go-back {
+    cursor:pointer;
+    color: black;
+    font-weight:bold;
+    margin-top:-25px;
+    margin-left:-14px;
+}
+
+.bf-navigation-panel .go-back>i {
+    color: #33ccff;
+}
+
+
+.bf-navigation-panel .heading {
+    border-right: solid 1px #c9ced1;
+    border-left: solid 1px #c9ced1;
+    background-color: #c9ced1;
+    color: rgb(39, 58, 71)
+}
+
+.bf-navigation-panel .entry {
+    cursor:pointer;
+    color: rgb(39, 137, 206);
+    border-right: solid 1px #c9ced1;
+    border-left: solid 1px #c9ced1;
+    border-bottom: solid 1px #c9ced1;
+}
+
+.bf-navigation-panel .entry:hover {
+    background-color: #c9ced1;
+}
+

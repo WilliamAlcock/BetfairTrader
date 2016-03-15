@@ -87,5 +87,4 @@ class Application @Inject() (uuidGenerator: UUIDGenerator) extends Controller {
     logger.info("calling UUIDGenerator...")
     Ok(uuidGenerator.generate.toString)
   }
-
 }

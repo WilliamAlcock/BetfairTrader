@@ -1,104 +1,92 @@
-<head>
-    <title>{{ladder.catalogueData[ladder.$stateParams.marketId].event.name}}</title>
-</head>
-
-<div class="row" style="margin-left:0px">
-
-    <div class="col-xs-5">
+<div class="row bf-ladder">
+    <div class="col-xs-12 text-center heading">{{ladder.catalogueData[ladder.$stateParams.marketId].event.name}}</div>
+    <div class="col-xs-12 text-center entry">{{ladder.catalogueData[ladder.$stateParams.marketId].marketName}}</div>
+    <div class="col-xs-12 text-center entry">
+        <div class="pull-left">
+            Start Time: {{ladder.catalogueData[ladder.$stateParams.marketId].marketStartTime | dateFilter}}
+            &nbsp
+            <span class="" ng-if="ladder.getRunner().inplay"> inplay</span>
+        </div>
+        <div class="pull-right">{{ladder.getRunner().status}}</div>
+    </div>
+    <div class="col-xs-12 text-center position entry" ng-click="ladder.togglePosition()">
         <div class="row">
-            <div class="col-xs-9">
-                <div class="row">
-                    <label class="col-xs-3">Event</label>
-                    <span class="col-xs-9">{{ladder.catalogueData[ladder.$stateParams.marketId].event.name}}</span>
-                </div>
-                <div class="row">
-                    <label class="col-xs-3">Market</label>
-                    <span class="col-xs-9">{{ladder.catalogueData[ladder.$stateParams.marketId].marketName}}</span>
-                </div>
-                <div class="row">
-                    <label class="col-xs-3">Runner</label>
-                    <span class="col-xs-9">{{ladder.catalogue.runnerName}}</span>
-                </div>
-            </div>
-            <div class="col-xs-3">
-                <div class="row">
-                    <span class="col-xs-12">{{ladder.getRunner().status}}</span>
-                </div>
-                <div class="row">
-                    <span ng-if="ladder.getRunner().inplay"> Inplay</span>
-                </div>
-
+            <div class="col-xs-3 text-left">PnL</div>
+            <div class="col-xs-4 text-left">Win: {{ladder.getRunner().position.winPnL}}</div>
+            <div class="col-xs-4 text-left">Lose: {{ladder.getRunner().position.losePnL}}</div>
+            <i class="col-xs-1 pull-right glyphicon" ng-class="{true:'glyphicon-triangle-top', false:'glyphicon-triangle-bottom'}[ladder.isPositionOpen]"></i>
+        </div>
+    </div>
+    <div ng-if="ladder.isPositionOpen">
+        <div class="col-xs-12 entry">
+            <div class="row">
+                <div class="col-xs-6 column">&nbsp</div>
+                <div class="col-xs-3 column">Vol</div>
+                <div class="col-xs-3">Price</div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-3"></div>
-            <div class="col-xs-9">
-                <div class="row">
-                    <span class="col-xs-4 text-right bf-back-header">
-                        {{ladder.getRunner().weightOfMoney.backPer | number:2}}%
-                    </span>
-                        <button type="button" ng-click="ladder.scrollUp()" style="margin-bottom:2px"
-                                class="btn btn-default bf-btn col-xs-2 glyphicon glyphicon-menu-up"></button>
-                    <span class="col-xs-4 text-left bf-lay-header">
-                        {{ladder.getRunner().weightOfMoney.layPer | number:2}}% :
-                    </span>
-                </div>
+        <div class="col-xs-12 entry">
+            <div class="row">
+                <div class="col-xs-6 column">Backed</div>
+                <div class="col-xs-3 column">{{ladder.getRunner().position.sumBacked}}</div>
+                <div class="col-xs-3">{{ladder.getRunner().position.avgPriceBacked}}</div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-3">
-                <div class="row text-center" style="padding-left:2px;padding-right:2px">
-                    <span class="col-xs-12">Backed</span>
-                    <span class="col-xs-12">{{ladder.getRunner().position.sumBacked}} @ {{ladder.getRunner().position.avgPriceBacked}}</span>
-                    <span class="col-xs-12">Laid</span>
-                    <span class="col-xs-12">{{ladder.getRunner().position.sumLaid}} @ {{ladder.getRunner().position.avgPriceLaid}}</span>
-                    <span class="PnL text-left"></span>
-                    <span class="col-xs-12">Win PnL</span>
-                    <span class="col-xs-12">{{ladder.getRunner().position.winPnL}}</span>
-                    <span class="col-xs-12">Lose PnL</span>
-                    <span class="col-xs-12">{{ladder.getRunner().position.losePnL}}</span>
-                    <span class="col-xs-12">Cash Out</span>
-                    <span class="col-xs-12">{{ladder.getRunner().hedgeStake}}</span>
-                    <span class="col-xs-12">{{ladder.getRunner().hedge}}</span>
-                    <span class="col-xs-12">Matched</span>
-                    <span class="col-xs-12">{{ladder.getRunner().totalMatched}}</span>
-                    <input type="number" ng-model="ladder.orderSize" min="0" class="text-center col-xs-12"/>
-                    <button type="button" ng-click="ladder.setOrderSize(2)" class="btn btn-default bf-btn col-xs-6">2</button>
-                    <button type="button" ng-click="ladder.setOrderSize(5)" class="btn btn-default bf-btn col-xs-6">5</button>
-                    <button type="button" ng-click="ladder.setOrderSize(10)" class="btn btn-default bf-btn col-xs-6">10</button>
-                    <button type="button" ng-click="ladder.setOrderSize(20)" class="btn btn-default bf-btn col-xs-6">20</button>
-                    <button type="button" ng-click="ladder.setOrderSize(50)" class="btn btn-default bf-btn col-xs-6">50</button>
-                    <button type="button" ng-click="ladder.setOrderSize(100)" class="btn btn-default bf-btn col-xs-6">100</button>
-                    <button type="button" ng-click="ladder.setOrderSize(0)" class="btn btn-default bf-btn col-xs-12">Clear</button>
-                </div>
+        <div class="col-xs-12 entry">
+            <div class="row">
+                <div class="col-xs-6 column">Laid</div>
+                <div class="col-xs-3 column">{{ladder.getRunner().position.sumLaid}}</div>
+                <div class="col-xs-3">{{ladder.getRunner().position.avgPriceLaid}}</div>
             </div>
-            <div class="col-xs-9">
-                <div class="row" style="border-top: solid rgb(224, 230, 230) 1px" ng-repeat="price in ladder.prices">
-                    <div class="col-xs-2 bf-ladder-square" ng-click="ladder.cancelBuy(price)">
-                        <div class="bf-price-font">{{ladder.getRunner().ladder[price].ordersToLay | orderFilter}}</div>
-                    </div>
-                    <div class="col-xs-2 bf-ladder-square bf-back-color" ng-click="ladder.buy(price, ladder.orderSize)">
-                        <div class="bf-price-font">{{ladder.getRunner().ladder[price].sizeToLay | sizeFilter}}</div>
-                    </div>
-                    <div class="col-xs-2 bf-ladder-square"
-                         ng-class="{true: 'last-price-traded'}[ladder.getRunner().lastPriceTraded == price]">
-                        <div class="bf-price-font">{{price}}</div>
-                    </div>
-                    <div class="col-xs-2 bf-ladder-square bf-lay-color" ng-click="ladder.sell(price, ladder.orderSize)">
-                        <div class="bf-price-font">{{ladder.getRunner().ladder[price].sizeToBack  | sizeFilter}}</div>
-                    </div>
-                    <div class="col-xs-2 bf-ladder-square" ng-click="ladder.cancelSell(price)">
-                        <div class="bf-price-font">{{ladder.getRunner().ladder[price].ordersToBack | orderFilter}}</div>
-                    </div>
-                    <div class="col-xs-2 bf-ladder-square">
-                        <div class="bf-price-font">{{ladder.getRunner().ladder[price].tradedVolume | sizeFilter}}</div>
-                    </div>
-                </div>
-                <div class="row" style="border-top: solid rgb(224, 230, 230) 1px">
-                    <button type="button" ng-click="ladder.scrollDown()" class="btn btn-default bf-btn col-xs-offset-4 col-xs-2 glyphicon glyphicon-menu-down"></button>
-                </div>
+        </div>
+        <div class="col-xs-12 entry">
+            <div class="row">
+                <div class="col-xs-6 column">To Cash Out</div>
+                <div class="col-xs-3 column">{{ladder.getRunner().hedgeStake}}</div>
+                <div class="col-xs-3 column">{{ladder.getRunner().hedge}}</div>
             </div>
         </div>
     </div>
+    <div class="col-xs-12 entry size">
+        <div>Size</div>
+        <input class="form-control" ng-model="ladder.orderSize" placeholder="size" id="size">
+        <label class="btn btn-default btn-xs" ng-click="ladder.setOrderSize(2)">2</label>
+        <label class="btn btn-default btn-xs" ng-click="ladder.setOrderSize(5)">5</label>
+        <label class="btn btn-default btn-xs" ng-click="ladder.setOrderSize(10)">10</label>
+        <label class="btn btn-default btn-xs" ng-click="ladder.setOrderSize(20)">20</label>
+        <label class="btn btn-default btn-xs" ng-click="ladder.setOrderSize(50)">50</label>
+        <label class="btn btn-default btn-xs" ng-click="ladder.setOrderSize(100)">100</label>
+    </div>
+    <div class="col-xs-12 ladder-scroll">
+        <span class="col-xs-4 text-right bf-back-header">{{ladder.getRunner().weightOfMoney.backPer | number:2}}%</span>
+        <label ng-click="ladder.scrollUp()" class="btn btn-default btn-xs col-xs-2 glyphicon glyphicon-menu-up"></label>
+        <span class="col-xs-4 text-left bf-lay-header">{{ladder.getRunner().weightOfMoney.layPer | number:2}}%</span>
+    </div>
+    <div class="col-xs-12 ladder-content">
+        <div class="row ladder-row" style="border-top: solid rgb(224, 230, 230) 1px" ng-repeat="price in ladder.prices">
+            <div class="col-xs-2 ladder-square" ng-click="ladder.cancelBuy(price)">
+                <div class="ladder-text">{{ladder.getRunner().ladder[price].ordersToLay | orderFilter}}</div>
+            </div>
+            <div class="col-xs-2 ladder-square bf-back-color" ng-click="ladder.buy(price, ladder.orderSize)">
+                <div class="ladder-text">{{ladder.getRunner().ladder[price].sizeToLay | sizeFilter}}</div>
+            </div>
+            <div class="col-xs-2 ladder-square"
+                 ng-class="{true: 'last-price-traded'}[ladder.getRunner().lastPriceTraded == price]">
+                <div class="ladder-text">{{price}}</div>
+            </div>
+            <div class="col-xs-2 ladder-square bf-lay-color" ng-click="ladder.sell(price, ladder.orderSize)">
+                <div class="ladder-text">{{ladder.getRunner().ladder[price].sizeToBack  | sizeFilter}}</div>
+            </div>
+            <div class="col-xs-2 ladder-square" ng-click="ladder.cancelSell(price)">
+                <div class="ladder-text">{{ladder.getRunner().ladder[price].ordersToBack | orderFilter}}</div>
+            </div>
+            <div class="col-xs-2 ladder-square">
+                <div class="ladder-text">{{ladder.getRunner().ladder[price].tradedVolume | sizeFilter}}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 ladder-scroll">
+        <label ng-click="ladder.scrollDown()" class="btn btn-default btn-xs col-xs-offset-4 col-xs-2 glyphicon glyphicon-menu-down"></label>
+        <div class="col-xs-6 entry">Total Matched: {{ladder.getRunner().totalMatched}}</div>
+    </div>
 </div>
-

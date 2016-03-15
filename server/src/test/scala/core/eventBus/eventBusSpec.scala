@@ -3,12 +3,17 @@ package core.eventBus
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
 import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.{FlatSpecLike, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class eventBusSpec extends TestKit(ActorSystem("testSystem")) with FlatSpecLike with Matchers {
+class eventBusSpec extends TestKit(ActorSystem("testSystem")) with FlatSpecLike with Matchers with BeforeAndAfterAll {
+
+  override def afterAll: Unit = {
+    system.shutdown()
+  }
+
   val testData = Table(
     ("publisherChannel",  "subscriptionChannel",  "isMatch"),     // Subscription Description
 
@@ -37,11 +42,12 @@ class eventBusSpec extends TestKit(ActorSystem("testSystem")) with FlatSpecLike 
     "eventBus" should (if(isMatch) "match: " else "NOT match ") + "publisher: " + publisherChannel + ", subscriber: " + subscriptionChannel in {
       val eventBus = new EventBus()
       val subscriber = TestProbe()
+      val sender = TestProbe()
       class TestMessage extends Message
       val testMessage = new TestMessage
 
       eventBus.subscribe(subscriber.ref, subscriptionChannel)
-      eventBus.publish(MessageEvent(publisherChannel, testMessage))
+      eventBus.publish(MessageEvent(publisherChannel, testMessage, sender.ref))
 
       if (isMatch) subscriber.expectMsg(500 millis, testMessage) else subscriber.expectNoMsg(500 millis)
     }

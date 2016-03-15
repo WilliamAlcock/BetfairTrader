@@ -1,0 +1,30 @@
+.bf-tabs {
+    background-color: black;
+    padding-left:10px;
+    margin-bottom: 20px
+}
+
+.bf-tabs ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.bf-tabs li {
+    border-right:2px solid white;
+    float: left;
+}
+
+.bf-tabs li a {
+    cursor:pointer;
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 2px 16px;
+    text-decoration: none;
+}
+
+.bf-tabs li a.active {
+    color: #33ccff;
+}

@@ -1,13 +1,12 @@
 package core.dataProvider.polling
 
 import akka.actor.{Actor, Props}
-import core.api.output.MarketBookUpdate
 import core.dataProvider.DataProviderException
 import core.dataProvider.polling.MarketPoller.Poll
 import core.eventBus.{EventBus, MessageEvent}
 import domain.MatchProjection.MatchProjection
 import domain.OrderProjection.OrderProjection
-import domain.PriceProjection
+import domain.{MarketBookUpdate, PriceProjection}
 import org.joda.time.DateTime
 import server.Configuration
 import service.BetfairService
@@ -33,7 +32,7 @@ class MarketPoller(config: Configuration,
         matchProjection = Some(("matchProjection", matchProjection))
       ) onComplete {
         case Success(Some(listMarketBookContainer)) => listMarketBookContainer.result.foreach(x =>
-          eventBus.publish(MessageEvent(config.dataModelInstructions, MarketBookUpdate(DateTime.now(), x))))
+          eventBus.publish(MessageEvent(config.dataModelInstructions, MarketBookUpdate(DateTime.now(), x), self)))
         case Success(None) => println("call to service failed to return data")
           // TODO handle event where betfair returns empty response
         case Failure(error) => throw new DataProviderException("call to listMarketBook failed " + error)

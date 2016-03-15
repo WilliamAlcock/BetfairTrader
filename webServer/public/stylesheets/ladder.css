@@ -1,0 +1,114 @@
+.bf-ladder {
+    margin-left:0px;
+    margin-right:0px;
+    border-right: solid 1px #c9ced1;
+    border-left: solid 1px #c9ced1;
+    border-bottom: solid 1px #c9ced1;
+}
+
+.bf-ladder .heading {
+    border-right: solid 1px #c9ced1;
+    border-left: solid 1px #c9ced1;
+    background-color: #c9ced1;
+    color: rgb(39, 58, 71)
+}
+
+.bf-ladder .entry {
+    color: rgb(39, 137, 206);
+    border-bottom: solid 1px #c9ced1;
+}
+
+.bf-ladder .entry.position {
+    cursor:pointer;
+}
+
+.bf-ladder .entry .column {
+    border-right: solid 1px #c9ced1;
+}
+
+.bf-ladder .entry.size {
+    display:inline-flex;
+    line-height: 31px;
+}
+
+.bf-ladder .size>label, input#size, .size>div {
+    height:25px;
+    margin:2px 2px 2px 2px;
+}
+
+.bf-ladder .size>div {
+    margin-right: 5px;
+}
+
+.bf-ladder .btn-xs {
+    line-height:23px;
+    max-width: 8%;
+    min-width: 8%;
+    padding-left:0px;
+    padding-right:0px;
+}
+
+.bf-ladder .ladder-row {
+    height:25px;
+    line-height:31px;
+    cursor:pointer;
+    margin-bottom: 1px;
+}
+
+.bf-ladder .ladder-square {
+    border-left: solid rgb(224, 230, 230) 1px;
+    border-right: solid rgb(224, 230, 230) 1px;
+    height:25px;
+    line-height:31px;
+    text-align: center;
+}
+
+.bf-ladder .ladder-row .ladder-square:last-of-type {
+    border-right: none;
+}
+
+.bf-ladder .ladder-scroll {
+    padding-left:0px;
+    padding-right:0px;
+}
+
+.bf-ladder .ladder-scroll .entry{
+    border-bottom: none;
+    line-height: 26px;
+}
+
+.bf-ladder .ladder-scroll label {
+    min-width: 16.66666667%;
+    max-width: 16.66666667%;
+}
+.bf-ladder .ladder-scroll:first-of-type {
+    padding-bottom:2px
+}
+
+.bf-ladder .ladder-scroll:last-of-type {
+    border-top: solid 1px #c9ced1;
+}
+
+/* duplicated in main */
+.bf-back-color {
+    background: #72bbef;
+}
+
+/* duplicated in main */
+.bf-lay-color {
+    background: #faa9ba
+}
+
+/* duplicated in main */
+.inplay {
+    color: #009900;
+}
+
+.bf-back-header {
+    border-bottom: 2px solid #72bbef;
+}
+
+.bf-lay-header {
+    border-bottom: 2px solid #faa9ba;
+}
+

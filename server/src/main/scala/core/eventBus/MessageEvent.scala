@@ -1,3 +1,5 @@
 package core.eventBus
 
-case class MessageEvent(channel: String, message: Message)
+import akka.actor.ActorRef
+
+case class MessageEvent(channel: String, message: Any, sender: ActorRef)

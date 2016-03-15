@@ -1,0 +1,19 @@
+<div class="row bf-detail-panel">
+    <div class="col-xs-12">
+        <div class="row">
+            <div class="col-xs-12 heading">{{detail.navData.name}}</div>
+        </div>
+        <uib-accordion close-others="oneAtATime">
+            <uib-accordion-group ng-repeat="market in detail.navData.children track by market.id"
+                                 ng-if="detail.$state.current.data.isSelected[market.marketType]" is-open="detail.isOpen[market.id]">
+                <uib-accordion-heading>
+                    <i class="pull-right glyphicon"
+                       ng-class="{true:'glyphicon-triangle-top', false:'glyphicon-triangle-bottom', undefined: 'glyphicon-triangle-bottom'}[detail.isOpen[market.id]]"></i>
+                    &nbsp{{::market.name}}
+                </uib-accordion-heading>
+                <market item="market" on-runner-clicked="detail.selectRunner({runnerId:runnerId})"></market>
+            </uib-accordion-group>
+        </uib-accordion>
+    </div>
+</div>
+

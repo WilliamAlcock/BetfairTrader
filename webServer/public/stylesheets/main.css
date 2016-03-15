@@ -25,29 +25,6 @@ ul.nav.nav-tabs.nav-justified {
     border-bottom: 2px solid #faa9ba;
 }
 
-.price-row {
-    border-top: solid rgb(224, 230, 230) 1px;
-    cursor: pointer;
-    min-height: 41px;
-    max-height: 41px;
-}
-
-.price-label {
-    color: #2789ce;
-}
-
-.event-item .match-odds-placeholder {
-    line-height: 40px
-}
-
-.event-item .others-heading {
-    border-bottom: solid rgb(224, 230, 230) 1px;
-}
-
-.event-item .time {
-    color: rgb(39, 58, 71)
-}
-
 .runner {
     margin-left: 1px;
     margin-right: 1px;
@@ -88,28 +65,9 @@ ul.nav.nav-tabs.nav-justified {
     max-height: 40px;
 }
 
-
-.group-item .heading {
-    padding-left:10px;
-    padding-right:10px;
-}
-
 .bf-price {
     border-right: solid white 10px;
     font-weight: 400 !important;
-}
-
-.bf-ladder-square {
-    /*width: 60px;*/
-    min-height: 25px;
-    max-height: 25px;
-    border-left: solid rgb(224, 230, 230) 1px;
-    border-right: solid rgb(224, 230, 230) 1px;
-    padding-left: 0px;
-    padding-right: 0px;
-    text-align: center;
-    line-height: 25px;
-    cursor:pointer;
 }
 
 .bf-market-price-filled-square {
@@ -130,10 +88,7 @@ ul.nav.nav-tabs.nav-justified {
     cursor: pointer;
 }
 
-.detail-panel .panel-group .panel-default {
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-}
+
 
 .selected-item {
     background-color: rgb(39,58,71);
@@ -144,116 +99,6 @@ ul.nav.nav-tabs.nav-justified {
     padding-right: 5px;
 }
 
-.detail-panel .panel-group .panel-default .panel-heading {
-    height: 26px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-    background-color: rgb(39,58,71);
-    background-image: none;
-    color: white;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-}
-
-.detail-panel .panel-group .panel-default .panel-heading .panel-title {
-    font-size:14px;
-    line-height: 26px;
-}
-
-.detail-panel .panel-group .panel-default .panel-heading .panel-title i {
-    line-height: inherit;
-}
-
-.detail-panel .panel-group .panel-default .panel-heading a:focus {
-    text-decoration: none;
-    outline: none;
-}
-
-.detail-panel .panel-group .panel-default .panel-heading a:hover {
-    text-decoration: none;
-}
-
-.detail-panel .main-heading {
-    background-color: #c9ced1;
-    color: rgb(39, 58, 71);
-    margin-top:10px;
-    margin-bottom:10px;
-}
-
-.navigation-panel {
-    margin-left:0px;
-    margin-right:0px
-}
-
-.navigation-panel .heading {
-    background-color: #c9ced1;
-    color: rgb(39, 58, 71)
-}
-
-.navigation-panel .entry {
-    cursor:pointer;
-    color: rgb(39, 137, 206);
-    border-bottom: solid 1px #c9ced1;
-}
-
-.navigation-panel .panel-group {
-    margin-left: -15px;
-    margin-right: -15px;
-    margin-bottom: 0px;
-    line-height: 20px;
-}
-
-.navigation-panel .panel.panel-default {
-    line-height: 20px;
-    border: none;
-    background-color: white;
-    box-shadow: none;
-    border: none;
-}
-
-.navigation-panel .panel.panel-default.panel-open .panel-heading{
-    border-top: solid 1px #c9ced1;
-}
-
-.navigation-panel .panel-group .panel-default .panel-heading {
-    height: 20px !important;
-    padding:0px !important;
-    background-color: white !important;
-    background-image: none;
-    color: rgb(39, 137, 206) !important;
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px;
-}
-
-.navigation-panel .panel-title {
-    line-height: 20px !important;
-    height: 20px !important;
-    padding-left:11px;
-    padding-right:15px;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 14px !important;
-    font-weight:400
-}
-
-.navigation-panel .panel-body {
-    padding: 0px;
-    border-bottom:none;
-}
-
-.navigation-panel .panel-group .panel-default .panel-heading a:focus {
-    text-decoration: none;
-    outline:none
-}
-
-.navigation-panel .panel-group .panel-default .panel-heading a:hover {
-    text-decoration: none;
-}
-
-.navigation-panel .entry-item {
-    border-bottom: solid 1px #c9ced1;
-    padding-left:23px;
-    padding-right:15px;
-}
 
 .suspended {
     opacity: 0.3;
@@ -262,17 +107,6 @@ ul.nav.nav-tabs.nav-justified {
 
 .inplay {
     color: #009900;
-}
-
-.bf-btn {
-    /*background-color: #c9ced1;*/
-    min-height: 25px;
-    max-height: 25px;
-    line-height: 0px;
-    padding: 1px 1px 1px 1px;
-    /*color:gray;*/
-    /*font-size:x-small;*/
-    /*opacity:0.8;*/
 }
 
 .last-price-traded {
