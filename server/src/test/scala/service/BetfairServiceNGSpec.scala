@@ -9,7 +9,7 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec, ShouldMatchers}
 import server.Configuration
 import spray.httpx.unmarshalling._
 
-import scala.collection.mutable
+import scala.collection.immutable.HashMap
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -38,7 +38,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val marketFilter = new MarketFilter()
 
     // Expected Calls
-    val params = mutable.HashMap[String, Object]("filter" -> marketFilter)
+    val params = HashMap[String, Object]("filter" -> marketFilter)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listCompetitions", params = params)
 
     // Expected Response
@@ -71,7 +71,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val marketFilter = new MarketFilter()
 
     // Expected Calls
-    val params = mutable.HashMap[String, Object]("filter" -> marketFilter)
+    val params = HashMap[String, Object]("filter" -> marketFilter)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listCountries", params = params)
 
     // Expected Response
@@ -112,7 +112,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
 
     // Expected Calls
     val ops = Seq(testBetIds, testMarketIds, testOrderProjection, testPlacedDateRange, testDateRange, testOrderBy, testSortDir, testFromRecord, testRecordCount).flatten
-    val params = mutable.HashMap[String, Object]()
+    val params = HashMap[String, Object]()
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listCurrentOrders", params = params ++ ops.map(i => i._1 -> i._2).toMap)
 
     // Expected Response
@@ -160,7 +160,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     // Expected Calls
     val ops = Seq(testBetStatus, testEventTypeIds, testEventIds, testMarketIds, testRunnerIds, testBetIds, testSide, testSettledDateRange, testGroupBy,
       testFromRecord, testRecordCount).flatten
-    val params = mutable.HashMap[String, Object]("includeItemDescription" -> testIncludeItemDescription)
+    val params = HashMap[String, Object]("includeItemDescription" -> testIncludeItemDescription)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listClearedOrders", params = params ++ ops.map(i => i._1 -> i._2).toMap)
 
     // Expected Response
@@ -196,7 +196,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val marketFilter = new MarketFilter()
 
     // Expected Calls
-    val params = mutable.HashMap[String, Object]("filter" -> marketFilter)
+    val params = HashMap[String, Object]("filter" -> marketFilter)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listEvents", params = params)
 
     // Expected Response
@@ -229,7 +229,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val marketFilter = new MarketFilter()
 
     // Expected Calls
-    val params = mutable.HashMap[String, Object]("filter" -> marketFilter)
+    val params = HashMap[String, Object]("filter" -> marketFilter)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listEventTypes", params = params)
 
     // Expected Response
@@ -267,7 +267,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
 
     // Expected Calls
     val ops = Seq(testPriceProjection, testOrderProjection, testMatchProjection, testCurrencyCode).flatten
-    val params = mutable.HashMap[String, Object]("marketIds" -> testMarketIds)
+    val params = HashMap[String, Object]("marketIds" -> testMarketIds)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listMarketBook", params = params ++ ops)
 
     // Expected Response
@@ -303,7 +303,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testMaxResults = 10: Integer
 
     // Expected Calls
-    val params = mutable.HashMap[String, Object]("filter" -> testMarketFilter, "marketProjection" -> testMarketProjection,
+    val params = HashMap[String, Object]("filter" -> testMarketFilter, "marketProjection" -> testMarketProjection,
       "sort" -> testMarketSort, "maxResults" -> testMaxResults)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listMarketCatalogue", params = params)
 
@@ -340,7 +340,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testNetOfCommission = None
 
     // Expected Calls
-    val params = mutable.HashMap[String, Object]("marketIds" -> testMarketIds, "includeSettledBets" -> testIncludeSettledBets,
+    val params = HashMap[String, Object]("marketIds" -> testMarketIds, "includeSettledBets" -> testIncludeSettledBets,
       "includeBspBets" -> testIncludeBspBets, "netOfCommission" -> testIncludeBspBets)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listMarketProfitAndLoss", params = params)
 
@@ -374,7 +374,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testMarketFilter = new MarketFilter()
 
     // Expected Calls
-    val params = mutable.HashMap[String, Object]("filter" -> testMarketFilter)
+    val params = HashMap[String, Object]("filter" -> testMarketFilter)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listMarketTypes", params = params)
 
     // Expected Response
@@ -407,7 +407,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testGranularity = TimeGranularity.DAYS
 
     // Expected Calls
-    val params = mutable.HashMap[String, Object]("filter" -> testMarketFilter, "granularity" -> testGranularity)
+    val params = HashMap[String, Object]("filter" -> testMarketFilter, "granularity" -> testGranularity)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listTimeRanges", params = params)
 
     // Expected Response
@@ -439,7 +439,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testMarketFilter = new MarketFilter()
 
     // Expected Calls
-    val params = mutable.HashMap[String, Object]("filter" -> testMarketFilter)
+    val params = HashMap[String, Object]("filter" -> testMarketFilter)
     val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listVenues", params = params)
 
     // Expected Response
@@ -473,7 +473,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testCustomerRef = Some("testCustomerRef")
 
     // Expected Call
-    val params = mutable.HashMap[String, Object](
+    val params = HashMap[String, Object](
       "marketId" -> testMarketId,
       "instructions" -> Set(testPlaceInstruction),
       "customerRef" -> testCustomerRef
@@ -513,7 +513,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testCustomerRef = Some("testCustomerRef")
 
     // Expected Call
-    val params = mutable.HashMap[String, Object](
+    val params = HashMap[String, Object](
       "marketId" -> testMarketId,
       "instructions" -> Set(testCancelInstruction),
       "customerRef" -> testCustomerRef
@@ -553,7 +553,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testCustomerRef = Some("testCustomerRef")
 
     // Expected Call
-    val params = mutable.HashMap[String, Object](
+    val params = HashMap[String, Object](
       "marketId" -> testMarketId,
       "instructions" -> Set(testReplaceInstruction),
       "customerRef" -> testCustomerRef
@@ -599,7 +599,7 @@ class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory
     val testCustomerRef = Some("testCustomerRef")
 
     // Expected Call
-    val params = mutable.HashMap[String, Object](
+    val params = HashMap[String, Object](
       "marketId" -> testMarketId,
       "instructions" -> Set(testUpdateInstruction),
       "customerRef" -> testCustomerRef

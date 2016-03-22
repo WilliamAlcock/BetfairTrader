@@ -5,38 +5,25 @@ import akka.pattern.ask
 import akka.util.Timeout
 import domain.BetStatus.BetStatus
 import domain.GroupBy.GroupBy
-import domain.MarketProjection._
-import domain.MarketSort._
 import domain.MatchProjection.MatchProjection
 import domain.OrderBy.OrderBy
 import domain.OrderProjection.OrderProjection
 import domain.Side.Side
 import domain.SortDir.SortDir
-import domain.TimeGranularity._
 import domain._
 import server.Configuration
 import service.simService.SimOrderBook._
-import service.{BetfairService, BetfairServiceNG}
+import service.{BetfairService, BetfairServiceNGCommand}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.language.postfixOps
 import scala.util.Success
 
-/**
- * Created by Alcock on 23/10/2015.
- */
-
-class SimService(config: Configuration, service: BetfairServiceNG, orderBook: ActorRef)
+class SimService(val config: Configuration, val command: BetfairServiceNGCommand, orderBook: ActorRef)
                           (implicit executionContext: ExecutionContext, system: ActorSystem) extends BetfairService {
 
   implicit val timeout = Timeout(5 seconds)
-
-  override def login() = service.login()
-  override def logout(sessionToken: String) = service.logout(sessionToken)
-  override def getNavigationData(sessionToken: String) = service.getNavigationData(sessionToken)
-  override def listCompetitions(sessionToken: String, marketFilter: MarketFilter) = service.listCompetitions(sessionToken, marketFilter)
-  override def listCountries(sessionToken: String, marketFilter: MarketFilter) = service.listCountries(sessionToken, marketFilter)
 
   override def listCurrentOrders(sessionToken: String,
                         betIds: Option[(String, Set[String])] = None,
@@ -50,8 +37,15 @@ class SimService(config: Configuration, service: BetfairServiceNG, orderBook: Ac
                         recordCount: Option[(String, Integer)] = None): Future[Option[ListCurrentOrdersContainer]] = {
 
     // 2. return current orders in format to mimic live market
-    // TODO add implementation
-    throw new NotImplementedError()
+    val _betIds = if (betIds.isDefined) betIds.get._2.toSeq else Seq.empty[String]
+    val _marketIds = if (marketIds.isDefined) marketIds.get._2.toSeq else Seq.empty[String]
+
+    val promise = Promise[Option[ListCurrentOrdersContainer]]()
+    (orderBook ? GetOrders(_betIds, _marketIds, OrderStatus.EXECUTABLE)) onComplete {
+      case Success(x: Set[CurrentOrderSummary]) => promise.success(Some(ListCurrentOrdersContainer(CurrentOrderSummaryReport(x, false))))
+      case _ => promise.failure(SimException("getOrders call to SimOrderBook has failed"))
+    }
+    promise.future
   }
 
   override def listClearedOrders(sessionToken: String,
@@ -73,11 +67,6 @@ class SimService(config: Configuration, service: BetfairServiceNG, orderBook: Ac
     throw new NotImplementedError()
   }
 
-  override def listEvents(sessionToken: String, marketFilter: MarketFilter) = service.listEvents(sessionToken, marketFilter)
-
-  override def listEventTypes(sessionToken: String, marketFilter: MarketFilter) = service.listEventTypes(sessionToken, marketFilter)
-
-
   override def listMarketBook(sessionToken: String,
                               marketIds: Set[String],
                               priceProjection: Option[(String, PriceProjection)] = None,
@@ -85,20 +74,13 @@ class SimService(config: Configuration, service: BetfairServiceNG, orderBook: Ac
                               matchProjection: Option[(String, MatchProjection)] = None,
                               currencyCode: Option[(String, String)] = None): Future[Option[ListMarketBookContainer]] = {
 
-    val promise = Promise[Option[ListMarketBookContainer]]
-    service.listMarketBook(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode) onComplete {
+    val promise = Promise[Option[ListMarketBookContainer]]()
+    super.listMarketBook(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode) onComplete {
       case Success(Some(x: ListMarketBookContainer)) => promise.completeWith(ask(orderBook, MatchOrders(x)).mapTo[Option[ListMarketBookContainer]])
       case _ => promise.failure(SimException("listMarketBook to BetfairService failed"))
     }
     promise.future
   }
-
-  override def listMarketCatalogue(sessionToken: String,
-                                  marketFilter: MarketFilter,
-                                  marketProjection: List[MarketProjection],
-                                  sort: MarketSort,
-                                  maxResults: Integer) = service.listMarketCatalogue(sessionToken, marketFilter, marketProjection, sort, maxResults)
-
 
   override def listMarketProfitAndLoss(sessionToken: String,
                                        marketIds: Set[String],
@@ -111,12 +93,6 @@ class SimService(config: Configuration, service: BetfairServiceNG, orderBook: Ac
     // TODO add implementation
     throw new NotImplementedError()
   }
-
-  override def listMarketTypes(sessionToken: String, marketFilter: MarketFilter) = service.listMarketTypes(sessionToken, marketFilter)
-
-  override def listTimeRanges(sessionToken: String, marketFilter: MarketFilter, granularity: TimeGranularity) = service.listTimeRanges(sessionToken, marketFilter, granularity)
-
-  override def listVenues(sessionToken: String, marketFilter: MarketFilter) = service.listVenues(sessionToken, marketFilter)
 
   override def placeOrders(sessionToken: String,
                          marketId: String,

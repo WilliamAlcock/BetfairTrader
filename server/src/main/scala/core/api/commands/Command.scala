@@ -19,6 +19,7 @@ case class ListEvents(marketFilter: MarketFilter) extends Command
 case class ListEventTypes(marketFilter: MarketFilter) extends Command
 case class ListMarketCatalogue(marketFilter: MarketFilter, sort: MarketSort) extends Command
 case class ListMarketBook(marketIds: Set[String]) extends Command
+case class ListCurrentOrders(betIds: Set[String], marketIds: Set[String]) extends Command
 
 case object SubscribeToSystemAlerts extends Command
 case class SubscribeToMarkets(markets: Set[String], pollingGroup: PollingGroup) extends Command

@@ -1,6 +1,6 @@
 package core
 
-import akka.actor.{ActorRef, Terminated, Actor}
+import akka.actor.{Actor, ActorRef, Props, Terminated}
 import core.api.commands._
 import core.eventBus.{EventBus, MessageEvent}
 import server.Configuration
@@ -19,11 +19,10 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
     case x: CancelOrders          => config.orderManagerInstructions
     case x: ReplaceOrders         => config.orderManagerInstructions
     case x: UpdateOrders          => config.orderManagerInstructions
+    case x: ListCurrentOrders     => config.orderManagerInstructions
   }
 
   var subscribers = Set.empty[ActorRef]
-
-  system.log.info(self.toString)
 
   def watch(subscriber: ActorRef) = {
     if (!subscribers.contains(subscriber)) {
@@ -46,7 +45,7 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
     case SubscribeToMarkets(marketIds, pollingGroup) =>
       watch(sender())
       marketIds.foreach(x => {
-        val channel = config.getPublishChannel(Seq(x))
+        val channel = config.getMarketUpdateChannel(Seq(x))
         eventBus.subscribe(sender(), channel)
         system.log.info("Subscribing " + sender() + " to " + channel)
       })
@@ -55,7 +54,7 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
 
     case UnSubscribeFromMarkets(marketIds, pollingGroup) =>
       marketIds.foreach(x => {
-        val channel = config.getPublishChannel(Seq(x))
+        val channel = config.getMarketUpdateChannel(Seq(x))
         eventBus.unsubscribe(sender(), channel)
         system.log.info("UnSubscribing " + sender + " from " + channel)
       })
@@ -68,4 +67,8 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
     case x: String =>
       system.log.info("I have your message: " + x)
   }
+}
+
+object Controller {
+  def props(config: Configuration, eventBus: EventBus) = Props(new Controller(config, eventBus))
 }

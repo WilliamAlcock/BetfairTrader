@@ -8,7 +8,6 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{BeforeAndAfterEach, BeforeAndAfterAll, FlatSpec, Matchers}
 import service.simService.TestHelpers._
 
-
 class OrderBookSpec extends FlatSpec with Matchers with BeforeAndAfterAll with MockFactory with BeforeAndAfterEach {
 
   override def afterAll = {

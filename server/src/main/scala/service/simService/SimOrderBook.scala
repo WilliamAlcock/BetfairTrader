@@ -1,7 +1,8 @@
 package service.simService
 
 import akka.actor.{Actor, Props}
-import domain.{InstructionReportErrorCode, _}
+import domain.OrderStatus.OrderStatus
+import domain.{InstructionReportErrorCode, OrderType, PersistenceType, _}
 import service.simService.SimOrderBook._
 
 import scala.collection.immutable.HashMap
@@ -14,6 +15,7 @@ class SimOrderBook(var markets: HashMap[String, MarketOrderBook] = HashMap.empty
     case CancelOrders(marketId, instructions, customerRef) => sender ! cancelOrders(marketId, instructions, customerRef)
     case ReplaceOrders(marketId, instructions, customerRef) => sender ! replaceOrders(marketId, instructions, customerRef)
     case UpdateOrders(marketId, instructions, customerRef) => sender ! updateOrders(marketId, instructions, customerRef)
+    case GetOrders(betIds, marketIds, status) => sender ! getOrders(betIds, marketIds, status)
     case MatchOrders(marketBook) => sender ! matchOrders(marketBook)
     case x => throw SimException("Invalid Message " + x)
   }
@@ -102,6 +104,60 @@ class SimOrderBook(var markets: HashMap[String, MarketOrderBook] = HashMap.empty
         marketBook
     )))
   }
+
+  // TODO test this
+  private def getCurrentOrderSummary(marketId: String, uniqueId: String, order: Order): CurrentOrderSummary = CurrentOrderSummary(
+    betId           = order.betId,
+    marketId        = marketId,
+    selectionId     = uniqueId.split("-")(0).toLong,
+    handicap        = uniqueId.split("-")(1).toDouble,
+    priceSize       = PriceSize(order.price, order.size),
+    bspLiability    = order.bspLiability,
+    side            = order.side,
+    status          = order.status,
+    persistenceType = order.persistenceType,
+    orderType       = order.orderType,
+    placedDate      = order.placedDate,
+    matchedDate     = None,
+    averagePriceMatched = order.avgPriceMatched,
+    sizeMatched     = order.sizeMatched,
+    sizeRemaining   = order.sizeRemaining,
+    sizeLapsed      = order.sizeLapsed,
+    sizeCancelled   = order.sizeCancelled,
+    sizeVoided      = order.sizeVoided,
+    regulatorCode   = ""
+  )
+
+  // TODO test this
+  private def getRunnerOrders(marketId: String, uniqueId: String, orders: Set[Order]): Set[CurrentOrderSummary] = {
+    orders.map(x => getCurrentOrderSummary(marketId, uniqueId, x))
+  }
+
+  // TODO test this
+  private def getMarketOrders(marketId: String, marketOrderBook: MarketOrderBook): Set[CurrentOrderSummary] = {
+    marketOrderBook.getOrders.map{case (k,v) => getRunnerOrders(marketId, k,v)}.reduce(_ ++ _)
+  }
+
+  // TODO test this
+  private def getOrdersByMarket(marketIds: Seq[String]): Set[CurrentOrderSummary] = {
+    val orders = if (marketIds.nonEmpty) {
+      // Filter by markets
+      marketIds.map(id => if (markets.contains(id)) getMarketOrders(id, markets(id)) else Set.empty[CurrentOrderSummary])
+    } else {
+      markets.map { case (k, v) => getMarketOrders(k, v)}
+    }
+    orders.reduce(_ ++ _)
+  }
+
+  // TODO test this
+  def getOrders(betIds: Seq[String], marketIds: Seq[String], status: OrderStatus): Set[CurrentOrderSummary] = {
+    val _betIds = betIds.toSet
+    if (betIds.nonEmpty) {                                                                                  // Filter by betIds
+      getOrdersByMarket(marketIds).filter(x => _betIds.contains(x.betId) && x.status == status)
+    } else {
+      getOrdersByMarket(marketIds).filter(x => x.status == status)
+    }
+  }
 }
 
 object SimOrderBook {
@@ -113,4 +169,5 @@ object SimOrderBook {
   case class ReplaceOrders(marketId: String, instructions: Set[ReplaceInstruction], customerRef: Option[String] = None)
   case class UpdateOrders(marketId: String, instructions: Set[UpdateInstruction], customerRef: Option[String] = None)
   case class MatchOrders(listMarketBookContainer: ListMarketBookContainer)
+  case class GetOrders(betIds: Seq[String], marketIds: Seq[String], status: OrderStatus)
 }

@@ -6,7 +6,7 @@ import org.scalatest.concurrent.Eventually._
 import org.scalatest.time.{Second, Span}
 import server.Configuration
 
-import scala.collection.mutable
+import scala.collection.immutable.HashMap
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -36,7 +36,7 @@ class BetfairServiceNGCommandSpec extends UnitSpec with WireMockFixture {
       val requests = addRequestHeaderListener()
 
       val marketFilter = new MarketFilter()
-      val params = mutable.HashMap[String, Object]("filter" -> marketFilter)
+      val params = HashMap[String, Object]("filter" -> marketFilter)
       val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listEvents", params = params)
       service.makeAPIRequest[ListEventResultContainer](sessionToken, request)
 
@@ -53,7 +53,7 @@ class BetfairServiceNGCommandSpec extends UnitSpec with WireMockFixture {
       val requests = addRequestHeaderListener()
 
       val marketFilter = new MarketFilter()
-      val params = mutable.HashMap[String, Object]("filter" -> marketFilter)
+      val params = HashMap[String, Object]("filter" -> marketFilter)
       val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listEvents", params = params)
       service.makeAPIRequest[ListEventResultContainer](sessionToken, request)
 

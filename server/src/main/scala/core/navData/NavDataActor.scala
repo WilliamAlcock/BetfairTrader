@@ -39,6 +39,7 @@ class NavDataActor(config: Configuration, sessionToken: String, betfairService: 
   }
 
   override def preStart(): Unit = {
+    super.preStart()
     updateNavData()
   }
 
@@ -52,7 +53,16 @@ class NavDataActor(config: Configuration, sessionToken: String, betfairService: 
         sender ! horseRacingData
       case _ => println("request for unknown nav data")  // Do Nothing
     }
-    case Update => updateNavData()
+    case Update =>
+      val (oldSoccerData, oldHorseRacingData) = (soccerData, horseRacingData)
+      try {
+        updateNavData()
+      } catch {
+        case _: Exception =>                // If the update fails continue using the old data
+          soccerData = oldSoccerData
+          horseRacingData = oldHorseRacingData
+      }
+
   }
 }
 

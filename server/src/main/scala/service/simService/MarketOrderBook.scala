@@ -45,7 +45,7 @@ case class MarketOrderBook(runners: HashMap[String, RunnerOrderBook] = HashMap.e
   def matchOrders(marketBook: MarketBook): MarketOrderBook = {
     marketBook.runners.foldLeft[MarketOrderBook](this)((acc: MarketOrderBook, runner: Runner) =>
       runner.ex match {
-        case Some(x) if (acc.runners.isDefinedAt(runner.uniqueId)) =>
+        case Some(x) if acc.runners.isDefinedAt(runner.uniqueId) =>
           acc.copy(runners = acc.runners + (runner.uniqueId -> acc.runners(runner.uniqueId).matchOrders(
             x.availableToBack.sortBy(x => -x.price).head.price,
             x.availableToLay.sortBy(x => x.price).head.price
@@ -58,10 +58,10 @@ case class MarketOrderBook(runners: HashMap[String, RunnerOrderBook] = HashMap.e
   def updateMarketBook(marketBook: MarketBook): MarketBook = {
     marketBook.copy(runners = marketBook.runners.map(runner =>
       if (runners.contains(runner.uniqueId)) {
-        val orders = runners(runner.uniqueId).getOrders()
+        val orders = runners(runner.uniqueId).getOrders
         runner.copy(
           orders = Some(orders),
-          matches = Some(runners(runner.uniqueId).getMatches()),
+          matches = Some(runners(runner.uniqueId).getMatches),
           ex = utils.updateExchangePrices(runner.ex, orders)
         )
       } else {
@@ -71,11 +71,12 @@ case class MarketOrderBook(runners: HashMap[String, RunnerOrderBook] = HashMap.e
   }
 
   def getOrder(uniqueId: String, betId: String): Option[Order] = {
-    if (runners.contains(uniqueId)) runners(uniqueId).getOrders().find(x => x.betId == betId) else None
+    if (runners.contains(uniqueId)) runners(uniqueId).getOrders.find(x => x.betId == betId) else None
   }
 
   // TODO test
-  def getOrderUniqueId(betId: String): String = {
-    runners.filter(_._2.hasBetId(betId)).keys.head
-  }
+  def getOrders: Map[String, Set[Order]] = runners.mapValues(_.getOrders)
+
+  // TODO test
+  def getOrderUniqueId(betId: String): String = runners.filter(_._2.hasBetId(betId)).keys.head
 }

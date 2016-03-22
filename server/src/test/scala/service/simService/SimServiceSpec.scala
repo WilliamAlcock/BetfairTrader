@@ -7,9 +7,10 @@ import org.scalamock.scalatest.MockFactory
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import server.Configuration
+import service.BetfairServiceNGCommand
 import service.simService.SimOrderBook._
-import service.{BetfairServiceNG, BetfairServiceNGCommand}
 
+import scala.collection.immutable.HashMap
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -19,13 +20,13 @@ import scala.util.Success
 class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLike with ImplicitSender with ScalaFutures
   with Matchers with BeforeAndAfterAll with MockFactory with BeforeAndAfterEach {
 
-  var mockBetfairService: BetfairServiceNG = _
+  var mockBetfairService: BetfairServiceNGCommand = _
   var orderBook: TestProbe = _
   var simService: SimService = _
   val sessionToken = "12345"
 
   val config = Configuration("TestAppKey", "TestUsername", "TestPassword", "TestApiUrl", "TestIsoUrl", "TestNavUrl")
-  class MockBetfairServiceNG extends BetfairServiceNG(config, new BetfairServiceNGCommand(config))
+  class MockBetfairServiceNG extends BetfairServiceNGCommand(config)
 
   override def afterAll: Unit = {
     system.shutdown()
@@ -37,41 +38,6 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
     simService = new SimService(config, mockBetfairService, orderBook.ref)
   }
 
-  // TODO check messages received from all tests!
-  "SimService login" should "call BetfairService" in {
-    (mockBetfairService.login _).expects().once()
-
-    simService.login()
-  }
-
-  "SimService logout" should "call BetfairService" in {
-    (mockBetfairService.logout _).expects(sessionToken).once()
-
-    simService.logout(sessionToken)
-  }
-
-  "SimService getNavigationData" should "call BetfairService" in {
-    (mockBetfairService.getNavigationData _).expects(sessionToken).once()
-
-    simService.getNavigationData(sessionToken)
-  }
-
-  "SimService listCompetitions" should "call BetfairService" in {
-    val marketFilter = mock[MarketFilter]
-
-    (mockBetfairService.listCompetitions _).expects(sessionToken, marketFilter).once()
-
-    simService.listCompetitions(sessionToken, marketFilter)
-  }
-
-  "SimService listCountries" should "call BetfairService" in {
-    val marketFilter = mock[MarketFilter]
-
-    (mockBetfairService.listCountries _).expects(sessionToken, marketFilter).once()
-
-    simService.listCountries(sessionToken, marketFilter)
-  }
-
 //  "SimService listCurrentOrders" should "call BetfairService" in {
 //
 //  }
@@ -79,22 +45,6 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
 //  "SimService listClearedOrders" should "call BetfairService" in {
 //
 //  }
-
-  "SimService listEvents" should "call BetfairService" in {
-    val marketFilter = mock[MarketFilter]
-
-    (mockBetfairService.listEvents _).expects(sessionToken, marketFilter).once()
-
-    simService.listEvents(sessionToken, marketFilter)
-  }
-
-  "SimService listEventTypes" should "call BetfairService" in {
-    val marketFilter = mock[MarketFilter]
-
-    (mockBetfairService.listEventTypes _).expects(sessionToken, marketFilter).once()
-
-    simService.listEventTypes(sessionToken, marketFilter)
-  }
 
   "SimService listMarketBook" should "call BetfairService then update MarketBook using orderBook" in {
 
@@ -109,8 +59,18 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
       val returnedMarketBook = MarketBook("1", false, "TEST_STATUS", 0, false, false, false, 1, 1, 1, None, 0, 0, false, false, 1, Set.empty)
       val updatedMarketBook =  MarketBook("2", false, "TEST_STATUS", 0, false, false, false, 1, 1, 1, None, 0, 0, false, false, 1, Set.empty)
 
-      (mockBetfairService.listMarketBook _)
-        .expects(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode)
+      // this simplifies the json serialisation of the Options when in the params HashMap
+      val flattenedOpts = Seq(priceProjection, orderProjection, matchProjection, currencyCode).flatten
+
+      val params = HashMap[String, Object]("marketIds" -> marketIds)
+
+      val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listMarketBook",
+        params = params ++ flattenedOpts.map(i => i._1 -> i._2).toMap)
+
+      import spray.httpx.PlayJsonSupport._
+
+      (mockBetfairService.makeAPIRequest[ListMarketBookContainer] _)
+        .expects(sessionToken, request)
         .returns(if (successful) Future.successful(Some(ListMarketBookContainer(List(returnedMarketBook)))) else Future.successful(None))
 
       val future = simService.listMarketBook(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode)
@@ -127,48 +87,12 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
     })
   }
 
-  "SimService listMarketCatalogue" should "call BetfairService" in {
-    val marketFilter = mock[MarketFilter]
-    val marketProjection = List(MarketProjection.COMPETITION)
-    val sort = MarketSort.FIRST_TO_START
-    val maxResults: Integer = 10
-
-    (mockBetfairService.listMarketCatalogue _).expects(sessionToken, marketFilter, marketProjection, sort, maxResults).once()
-
-    simService.listMarketCatalogue(sessionToken, marketFilter, marketProjection, sort, maxResults)
-  }
-
 //  def listMarketProfitAndLoss(sessionToken: String,
 //                              marketIds: Set[String],
 //                              includeSettledBets: Option[Boolean] = None,
 //                              includeBspBets: Option[Boolean] = None,
 //                              netOfCommission: Option[Boolean] = None): Future[Option[MarketProfitAndLossContainer]]
 //
-
-  "SimService listMarketTypes" should "call BetfairService" in {
-    val marketFilter = mock[MarketFilter]
-
-    (mockBetfairService.listMarketTypes _).expects(sessionToken, marketFilter).once()
-
-    simService.listMarketTypes(sessionToken, marketFilter)
-  }
-
-  "SimService listTimeRanges" should "call BetfairService" in {
-    val marketFilter = mock[MarketFilter]
-    val granularity = TimeGranularity.DAYS
-
-    (mockBetfairService.listTimeRanges _).expects(sessionToken, marketFilter, granularity).once()
-
-    simService.listTimeRanges(sessionToken, marketFilter, granularity)
-  }
-
-  "SimService listVenues" should "call BetfairService" in {
-    val marketFilter = mock[MarketFilter]
-
-    (mockBetfairService.listVenues _).expects(sessionToken, marketFilter).once()
-
-    simService.listVenues(sessionToken, marketFilter)
-  }
 
   "SimService placeOrders" should "call orderBook" in {
     val marketId = "3142"

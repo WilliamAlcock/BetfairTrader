@@ -40,7 +40,7 @@ object Main {
 //    val betfairService = new SimService(config, new BetfairServiceNG(config, betfairServiceNGCommand), simOrderBook)
 
     // Login
-    val sessionTokenFuture = betfairService.login.map {
+    val sessionTokenFuture = betfairService.login().map {
       case Some(loginResponse) => loginResponse.token
       case _ => throw new BetfairServiceNGException("no session token")
     }
@@ -52,7 +52,9 @@ object Main {
     val navDataActor = system.actorOf(NavDataActor.props(config, sessionToken, betfairService, eventBus), "navDataActor")
     val dataModelActor = system.actorOf(DataModelActor.props(config, eventBus), "dataModel")
     val dataProvider = system.actorOf(DataProvider.props(config, sessionToken, betfairService, eventBus), "dataProvider")
-    val orderManager = system.actorOf(OrderManager.props(config, sessionToken, betfairService, eventBus), "orderManager")
+
+    val controller = system.actorOf(Props(new Controller(config, eventBus)), "controller")
+    val orderManager = system.actorOf(OrderManager.props(config, sessionToken, controller, betfairService, eventBus), "orderManager")
 
     // Subscribe to event bus
     eventBus.subscribe(navDataActor, config.navDataInstructions)
@@ -60,7 +62,7 @@ object Main {
     eventBus.subscribe(dataProvider, config.dataProviderInstructions)
     eventBus.subscribe(orderManager, config.orderManagerInstructions)
 
-    val controller = system.actorOf(Props(new Controller(config, eventBus)), "controller")
+
 
     // DataStoreWriter
 //    system.actorOf(DataStoreWriter.props(config, controller), "dataStoreWriter")

@@ -45,19 +45,16 @@ case class RunnerOrderBook(backOrderBook: OrderBook = OrderBook(Side.BACK),
   )
 
   // TODO test
-  def hasBetId(betId: String) = {
-    if (backOrderBook.hasBetId(betId)) {require(!layOrderBook.hasBetId(betId)); true} else layOrderBook.hasBetId(betId)
-  }
+  def hasBetId(betId: String) = backOrderBook.hasBetId(betId) || layOrderBook.hasBetId(betId)
 
   // back and lay orders
-  def getOrders(): Set[Order] = {
-    (backOrderBook.getOrders ++ layOrderBook.getOrders).toSet[Order]
-  }
+  def getOrders: Set[Order] = (backOrderBook.getOrders ++ layOrderBook.getOrders).toSet[Order]
 
-  def getMatches(): Set[Match] = {
-    (backOrderBook.getMatches ++ layOrderBook.getMatches).toSet[Match]
-  }
+  def getMatches: Set[Match] = (backOrderBook.getMatches ++ layOrderBook.getMatches).toSet[Match]
 
-  def getOrderSide(betId: String): Option[Side] =
-    if (backOrderBook.hasBetId(betId)) Some(Side.BACK) else if (layOrderBook.hasBetId(betId)) Some(Side.LAY) else None
+  def getOrderSide(betId: String): Option[Side] = betId match {
+    case x if backOrderBook.hasBetId(x) => Some(Side.BACK)
+    case x if layOrderBook.hasBetId(x) => Some(Side.LAY)
+    case _ => None
+  }
 }

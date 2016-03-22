@@ -14,6 +14,7 @@ class eventBusSpec extends TestKit(ActorSystem("testSystem")) with FlatSpecLike 
     system.shutdown()
   }
 
+  // Assuming channels take the format base/event/market
   val testData = Table(
     ("publisherChannel",  "subscriptionChannel",  "isMatch"),     // Subscription Description
 

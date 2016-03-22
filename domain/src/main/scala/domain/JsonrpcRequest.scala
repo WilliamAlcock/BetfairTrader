@@ -3,7 +3,7 @@ package domain
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 
-import scala.collection.mutable.Map
+import scala.collection.immutable.Map
 
 case class JsonrpcRequest(jsonrpc: String = "2.0", method: String, id: String, params: Map[String, Object])
 

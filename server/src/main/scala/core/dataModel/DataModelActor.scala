@@ -13,7 +13,7 @@ class DataModelActor(config: Configuration, eventBus: EventBus, var dataModel: D
     case Some(x) if marketBookUpdate.data == x => dataModel               // If we already have this copy ignore it
     case _ =>                                                             // Otherwise broadcast it and update our copy
       eventBus.publish(MessageEvent(
-        config.getPublishChannel(Seq(marketBookUpdate.data.marketId)),
+        config.getMarketUpdateChannel(Seq(marketBookUpdate.data.marketId)),
         marketBookUpdate,
         self
       ))

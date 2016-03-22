@@ -7,7 +7,6 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FlatSpec, Matchers}
 import service.simService.TestHelpers._
 
-
 class RunnerOrderBookSpec extends FlatSpec with Matchers with MockFactory with BeforeAndAfterEach with BeforeAndAfterAll {
 
   override def afterAll = {
@@ -182,7 +181,7 @@ class RunnerOrderBookSpec extends FlatSpec with Matchers with MockFactory with B
     (backOrderBook.getOrders _).expects().returns(List(mockBackOrder))
     (layOrderBook.getOrders _).expects().returns(List(mockLayOrder))
 
-    RunnerOrderBook(backOrderBook, layOrderBook).getOrders() should be (Set(mockBackOrder, mockLayOrder))
+    RunnerOrderBook(backOrderBook, layOrderBook).getOrders should be (Set(mockBackOrder, mockLayOrder))
   }
 
   "RunnerOrderBook" should "getMatches from both orderbooks" in {
@@ -192,7 +191,7 @@ class RunnerOrderBookSpec extends FlatSpec with Matchers with MockFactory with B
     (backOrderBook.getMatches _).expects().returns(List(backMatch))
     (layOrderBook.getMatches _).expects().returns(List(layMatch))
 
-    RunnerOrderBook(backOrderBook, layOrderBook).getMatches() should be (Set(backMatch, layMatch))
+    RunnerOrderBook(backOrderBook, layOrderBook).getMatches should be (Set(backMatch, layMatch))
   }
 
 }
