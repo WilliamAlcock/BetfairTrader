@@ -91,6 +91,7 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
     GetNavigationData("1")                                          -> config.navDataInstructions,
     ListEventTypes(MarketFilter())                                  -> config.dataProviderInstructions,
     ListEvents(MarketFilter())                                      -> config.dataProviderInstructions,
+    ListMarketBook(Set("1"))                                        -> config.dataModelInstructions,
     ListMarketCatalogue(MarketFilter(), MarketSort.FIRST_TO_START)  -> config.dataProviderInstructions,
     StopPollingAllMarkets                                           -> config.dataProviderInstructions,
     PlaceOrders("1", Set.empty, None)                               -> config.orderManagerInstructions,

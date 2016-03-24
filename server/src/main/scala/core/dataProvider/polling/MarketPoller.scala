@@ -23,7 +23,7 @@ class MarketPoller(config: Configuration,
 
   override def receive = {
     case Poll(marketIds, priceProjection, orderProjection, matchProjection) =>
-      println("     Polling " + marketIds.size + " markets")
+//      println("     Polling " + marketIds.size + " markets")
       betfairService.listMarketBook(
         sessionToken,
         marketIds,

@@ -16,6 +16,7 @@ case class JsonrpcRequest(jsonrpc: String = "2.0", method: String, id: Int, para
     case "listEvents"                 => params.as[ListEvents]
     case "listEventTypes"             => params.as[ListEventTypes]
     case "listMarketCatalogue"        => params.as[ListMarketCatalogue]
+    case "listMarketBook"             => params.as[ListMarketBook]
     case "listCurrentOrders"          => params.as[ListCurrentOrders]
     case "listMatches"                => ListMatches
 

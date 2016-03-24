@@ -11,6 +11,7 @@ import org.joda.time.DateTime
 import play.api.libs.json.Json
 import server.Configuration
 import service.BetfairService
+import service.simService.OrderFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -21,7 +22,7 @@ sealed case class OrderData(selectionId: Long, handicap: Double, order: Order)
 sealed case class MatchData(selectionId: Long, handicap: Double, _match: Match)
 
 // TODO should orderManager make sure that any markets being operated on are being polled ?
-class OrderManager(config: Configuration, sessionToken: String, controller: ActorRef, betfairService: BetfairService, eventBus: EventBus) extends Actor {
+class OrderManager(config: Configuration, sessionToken: String, controller: ActorRef, betfairService: BetfairService, eventBus: EventBus) extends Actor with OrderFactory {
 
   import context._
 
@@ -102,14 +103,9 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
         case Some(trackedOrder) if trackedOrder.order != order =>
           trackedOrders = trackedOrders + (marketId -> ((marketOrders - trackedOrder) + OrderData(selectionId, handicap, order)))
           Set(OrderUpdated(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order)))      // Order Updated
-        case Some(_) => Set.empty[OrderManagerOutput]
-        case None =>
-          trackedOrders = trackedOrders + (marketId -> (marketOrders + OrderData(selectionId, handicap, order)))
-          Set(OrderPlaced(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order)))        // Order Placed
+        case _ => Set.empty[OrderManagerOutput]
       }
-      case None =>
-        trackedOrders = trackedOrders + (marketId -> Set(OrderData(selectionId, handicap, order)))
-        Set(OrderPlaced(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order)))          // Order Placed
+      case _ => Set.empty[OrderManagerOutput]
     }
     case _ => Set.empty[OrderManagerOutput]
   }
@@ -205,16 +201,38 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
       sender() ! listMatches
 
     case MarketBookUpdate(timestamp, marketBook) =>
+      println("processing marketBook", marketBook)
       processMarketBook(marketBook).foreach(broadcast)
       if (allOrdersCompleted(marketBook)) controller ! UnSubscribeFromMarkets(Set(marketBook.marketId), BEST)           // If all the orders are matched unSubscribe from this market
+
+    // TODO test, orders are placed once when a successful report has been recieved
+    case x: PlaceExecutionReportContainer =>
+      // if the status == success subscribe to updates for the market, add the order to the tracked orders, broadcast the order has been placed
+      if (x.result.status == ExecutionReportStatus.SUCCESS) {
+        controller ! SubscribeToMarkets(Set(x.result.marketId), BEST)
+        x.result.instructionReports.map(report => {
+          val marketOrders = trackedOrders.getOrElse(x.result.marketId, Set.empty[OrderData])
+          val order = createOrder(report.instruction).copy(
+            betId = report.betId.get,
+            placedDate = report.placedDate.getOrElse(DateTime.now()),
+            avgPriceMatched = report.averagePriceMatched.getOrElse(0.0),
+            sizeMatched = report.sizeMatched.getOrElse(0.0)
+          )
+          println("Placing order", order)
+          trackedOrders = trackedOrders + (x.result.marketId -> (marketOrders + OrderData(report.instruction.selectionId, report.instruction.handicap, order)))
+          Set(OrderPlaced(
+            x.result.marketId,
+            report.instruction.selectionId,
+            report.instruction.handicap,
+            CurrentOrderSummary.fromOrder(x.result.marketId, report.instruction.selectionId + "-" + report.instruction.handicap, order))
+          )        // Order Placed
+        }).flatten.foreach(broadcast)
+      }
 
     case PlaceOrders(marketId, instructions, customerRef) =>
       betfairService.placeOrders(sessionToken, marketId, instructions, customerRef) onComplete {
         case Success(Some(x)) =>
-          // if the status == success subscribe to updates for the market
-          if (x.result.status == ExecutionReportStatus.SUCCESS) {
-            controller ! SubscribeToMarkets(Set(marketId), BEST)
-          }
+          if (x.result.status == ExecutionReportStatus.SUCCESS) self ! x          // If the report is successful forward it to self to be tracked
           sender() ! x
         case _ => sender() ! OrderManagerException("Market " + marketId + " placeOrders failed!")
       }

@@ -14,6 +14,7 @@ class LadderCtrl
 
     @$log.log "Ladder Controller", @$stateParams, @DataModelService
 
+    @WebSocketService.listMarketBook([@$stateParams.marketId])
     @WebSocketService.subscribeToMarkets([@$stateParams.marketId], "ALL_AND_TRADED")
     @WebSocketService.listMarketCatalogue([@$stateParams.marketId])
 

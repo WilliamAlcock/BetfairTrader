@@ -7,6 +7,7 @@ directivesModule.directive('market',  ['$log', 'DataModelService', 'WebSocketSer
   link: (scope, iElement, iAttrs) ->
     $log.debug 'market content directive'
 
+    WebSocketService.listMarketBook([scope.item.id])
     WebSocketService.subscribeToMarkets([scope.item.id], "BEST")
     WebSocketService.listMarketCatalogue([scope.item.id])
 

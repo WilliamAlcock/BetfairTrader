@@ -7,6 +7,7 @@ directivesModule.directive('matchOdds',  ['$log', 'WebSocketService', 'DataModel
   link: (scope, iElement, iAttrs) ->
     $log.debug 'match Odds directive'
 
+    WebSocketService.listMarketBook([scope.item.id])
     WebSocketService.subscribeToMarkets([scope.item.id], "BEST")
     WebSocketService.listMarketCatalogue([scope.item.id])
 

@@ -14,6 +14,7 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
     case x: ListEventTypes        => config.dataProviderInstructions
     case x: ListEvents            => config.dataProviderInstructions
     case x: ListMarketCatalogue   => config.dataProviderInstructions
+    case x: ListMarketBook        => config.dataModelInstructions
     case StopPollingAllMarkets    => config.dataProviderInstructions
     case x: PlaceOrders           => config.orderManagerInstructions
     case x: CancelOrders          => config.orderManagerInstructions
@@ -50,7 +51,6 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
         eventBus.subscribe(sender(), channel)
         system.log.info("Subscribing " + sender() + " to " + channel)
       })
-      eventBus.publish(MessageEvent(config.dataModelInstructions, ListMarketBook(marketIds), sender()))
       eventBus.publish(MessageEvent(config.dataProviderInstructions, SubscribeToMarkets(marketIds, pollingGroup), sender()))
 
     case UnSubscribeFromMarkets(marketIds, pollingGroup) =>

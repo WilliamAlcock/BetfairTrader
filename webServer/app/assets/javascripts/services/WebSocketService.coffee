@@ -103,6 +103,8 @@ class WebSocketService
 
   unSubscribeFromMarkets: (markets, pollingGroup) -> @sendJsonrpcMessage({method: "unSubscribeFromMarkets", params: {markets: markets, pollingGroup: {group: pollingGroup}}})
 
+  listMarketBook: (marketIds) -> @sendJsonrpcMessage({method: "listMarketBook", params: {marketIds: marketIds}})
+
   listMarketCatalogue: (marketIds) ->
     marketFilter = {
       marketIds: marketIds
