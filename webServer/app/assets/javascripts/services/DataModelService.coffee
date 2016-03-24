@@ -26,22 +26,24 @@ class DataModelService
     data = switch location[0]
       when "Today"
         {
-        children: @navData.soccerData.today
-        name: "Today's Fixtures"
-        type: "EVENT"
+          children: @navData.soccerData.today
+          name: "Today's Fixtures"
+          type: "EVENT"
         }
       when "Tomorrow"
         {
-        children: @navData.soccerData.tomorrow
-        name: "Tomorrow's Fixtures"
-        type: "EVENT"
+          children: @navData.soccerData.tomorrow
+          name: "Tomorrow's Fixtures"
+          type: "EVENT"
         }
       when "allFootball"
-        output = (d for d in @navData.soccerData.allFootball when d.name is location[1])[0]      # get the country
-        (d for d in output.navData when d.id is location[2])[0]                                  # get the event
-      else {}
+        if (@navData.soccerData.allFootball?)
+          output = (d for d in @navData.soccerData.allFootball when d.name is location[1])[0]      # get the country
+          (d for d in output.navData when d.id is location[2])[0]                                  # get the event
+        else null
+      else null
 
-    if (event?)
+    if (event? && @navData.soccerData.allFootball?)
       location = event.split "/"
       location.shift()                                       # remove the first index as that will be the last index of the coupon
       for l in location

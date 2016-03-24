@@ -3,9 +3,9 @@
         <div class="row">
             <div class="col-xs-12 heading">{{detail.navData.name}}</div>
         </div>
-        <group ng-if="detail.navData.type == 'GROUP'" item="detail.navData" hide-heading="true"
+        <group ng-if="detail.navData.children != undefined && detail.navData.type == 'GROUP'" item="detail.navData" hide-heading="true"
                on-event-clicked="detail.selectEvent({eventId:eventId})"></group>
-        <event ng-if="detail.navData.type == 'EVENT'" item="detail.navData" hide-heading="true"
+        <event ng-if="detail.navData.children != undefined && detail.navData.type == 'EVENT'" item="detail.navData" hide-heading="true"
                on-event-clicked="detail.selectEvent({eventId:eventId})" list-all-markets="true"></event>
     </div>
 </div>

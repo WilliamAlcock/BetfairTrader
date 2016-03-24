@@ -3,7 +3,9 @@ class MainCtrl
   constructor: (@$log, @$state) ->
     @$log.debug "Main Controller"
 
-    @selected = @$state.current.url.split("/")[1]
+    @selected = @$state.current.name.split(".")[2]
+
+    console.log('SELECTED TAB', @selected, @$state.current)
 
     @tabs = [
       {name: "soccer", display: 'Soccer', state: 'init.main.soccer'},

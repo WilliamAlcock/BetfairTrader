@@ -56,9 +56,11 @@ class WebSocketService
         when "SoccerData"
           @$log.log("Soccer Data -> ", message)
           @$rootScope.$apply(@DataModel.setSoccerData(message.result.result))
+          @$rootScope.$broadcast('soccerDataUpdated', message.result.result)
         when "HorseRacingData"
           @$log.log("Horse Racing Data -> ", message)
           @$rootScope.$apply(@DataModel.setHorseRacingData(message.result.result))
+          @$rootScope.$broadcast('horseRacingDataUpdated', message.result.result)
         when "CurrentOrdersUpdate"
           @$log.log("Current order update", message)
           @$rootScope.$apply(@OrderBook.setOrders(message.result.result.currentOrders))

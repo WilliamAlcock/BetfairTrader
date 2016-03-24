@@ -5,6 +5,12 @@ class NavigationCtrl
 
     @navData = @DataModelService.getSoccerNavData(@$stateParams.coupon, @$stateParams.event)
 
+    @$scope.$on 'soccerDataUpdated', @update
+
+  update: () =>
+    @navData = @DataModelService.getSoccerNavData(@$stateParams.coupon, @$stateParams.event)
+    @$scope.$apply()
+
   selected: (id) ->
     @$log.log("selected", id, @$state.current.data.isSelected[id])
     if (@$state.current.data.isSelected[id]?)

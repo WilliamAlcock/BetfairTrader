@@ -130,7 +130,7 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
     sender.send(controller, SubscribeToSystemAlerts)
   }
 
-  "Controller.receive -> SubscribeToMarkets" should "watch the sender for termination, subscribe the sender to the markets and request the current copy of the marketBook" in {
+  "Controller.receive -> SubscribeToMarkets" should "watch the sender for termination, subscribe the sender to the markets" in {
     val _watch = mockFunction[ActorRef, Unit]
 
     controller = TestActorRef(Props(new Controller(testConfig, eventBus) {
@@ -154,9 +154,6 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
 
     // publish changes to the dataProvider
     _publish.expects(MessageEvent(testConfig.dataProviderInstructions, command, sender.ref))
-
-    // Request the current copy fo the marketBook
-    _publish.expects(MessageEvent(testConfig.dataModelInstructions, ListMarketBook(markets.toSet), sender.ref))
 
     sender.send(controller, command)
   }
