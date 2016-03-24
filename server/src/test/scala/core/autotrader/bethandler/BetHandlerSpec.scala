@@ -2,6 +2,7 @@ package core.autotrader.bethandler
 
 import akka.actor.ActorSystem
 import akka.testkit.{TestFSMRef, TestKit, TestProbe}
+import com.typesafe.config.ConfigFactory
 import core.api.commands._
 import core.autotrader.betHandler.BetHandler
 import core.autotrader.betHandler.BetHandler._
@@ -14,7 +15,7 @@ import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, FlatSpecLike, Match
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 
-class BetHandlerSpec extends TestKit(ActorSystem("testSystem")) with FlatSpecLike with Matchers with MockFactory with BeforeAndAfterEach with BeforeAndAfterAll {
+class BetHandlerSpec extends TestKit(ActorSystem("testSystem", ConfigFactory.parseString(""))) with FlatSpecLike with Matchers with MockFactory with BeforeAndAfterEach with BeforeAndAfterAll {
 
   var mockController, subscriber, exchange: TestProbe = _
 

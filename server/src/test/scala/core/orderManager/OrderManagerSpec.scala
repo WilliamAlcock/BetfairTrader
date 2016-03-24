@@ -3,6 +3,7 @@ package core.orderManager
 import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit, TestProbe}
 import com.miguno.akka.testing.VirtualTime
+import com.typesafe.config.ConfigFactory
 import core.api.commands._
 import core.dataProvider.polling.BEST
 import core.eventBus.{EventBus, MessageEvent}
@@ -22,7 +23,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class OrderManagerSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLike with Matchers with BeforeAndAfterEach with MockFactory with ImplicitSender{
+class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.parseString(""))) with FlatSpecLike with Matchers with BeforeAndAfterEach with MockFactory with ImplicitSender{
 
   var controller: TestProbe = _
   var betfairService: BetfairService = _

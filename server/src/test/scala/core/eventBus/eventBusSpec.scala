@@ -2,13 +2,14 @@ package core.eventBus
 
 import akka.actor.ActorSystem
 import akka.testkit.{TestKit, TestProbe}
+import com.typesafe.config.ConfigFactory
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike, Matchers}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class eventBusSpec extends TestKit(ActorSystem("testSystem")) with FlatSpecLike with Matchers with BeforeAndAfterAll {
+class eventBusSpec extends TestKit(ActorSystem("testSystem", ConfigFactory.parseString(""))) with FlatSpecLike with Matchers with BeforeAndAfterAll {
 
   override def afterAll: Unit = {
     system.shutdown()

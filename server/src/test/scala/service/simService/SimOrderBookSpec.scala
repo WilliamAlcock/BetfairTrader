@@ -2,6 +2,7 @@ package service.simService
 
 import akka.actor.{Props, ActorSystem}
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestActorRef, TestKit}
+import com.typesafe.config.ConfigFactory
 import domain.{OrderStatus, OrderType, PersistenceType, Side, _}
 import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
@@ -13,7 +14,7 @@ import scala.collection.immutable.HashMap
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class SimOrderBookSpec extends TestKit(ActorSystem("testSystem")) with DefaultTimeout with ImplicitSender
+class SimOrderBookSpec extends TestKit(ActorSystem("testSystem", ConfigFactory.parseString(""))) with DefaultTimeout with ImplicitSender
   with FlatSpecLike with BeforeAndAfterAll with Matchers with MockFactory with BeforeAndAfterEach {
 
   override def afterAll {
@@ -200,8 +201,8 @@ class SimOrderBookSpec extends TestKit(ActorSystem("testSystem")) with DefaultTi
 
     val marketOrderBook = mock[MarketOrderBook]
 
-    class TestOrder extends Order(
-      "TEST_BET_ID",
+    class TestOrder(betId: String) extends Order(
+      betId,
       OrderType.LIMIT,
       OrderStatus.EXECUTABLE,
       PersistenceType.LAPSE,
@@ -218,8 +219,8 @@ class SimOrderBookSpec extends TestKit(ActorSystem("testSystem")) with DefaultTi
       sizeVoided = 8.0
     )
 
-    class TestCurrentOrderSummary extends CurrentOrderSummary(
-      "TEST_BET_ID",
+    class TestCurrentOrderSummary(betId: String) extends CurrentOrderSummary(
+      betId,
       "TEST_MARKET_ID",
       12345L,
       123.45,
@@ -240,8 +241,18 @@ class SimOrderBookSpec extends TestKit(ActorSystem("testSystem")) with DefaultTi
       regulatorCode = ""
     )
 
-    val mockOrders = List.range(1,4).map(x => mock[TestOrder])
-    val mockCurrentOrderSummary = List.range(1,4).map(x => mock[TestCurrentOrderSummary])
+    val mockOrders = List(
+      new TestOrder("TEST_BET_ID_1"),
+      new TestOrder("TEST_BET_ID_2"),
+      new TestOrder("TEST_BET_ID_3"),
+      new TestOrder("TEST_BET_ID_4")
+    )
+    val mockCurrentOrderSummary = List(
+      new TestCurrentOrderSummary("TEST_BET_ID_1"),
+      new TestCurrentOrderSummary("TEST_BET_ID_2"),
+      new TestCurrentOrderSummary("TEST_BET_ID_3"),
+      new TestCurrentOrderSummary("TEST_BET_ID_4")
+    )
 
     val orders = Map[String, Set[Order]](
       "1-2" -> Set(mockOrders(0), mockOrders(1)),
@@ -258,8 +269,8 @@ class SimOrderBookSpec extends TestKit(ActorSystem("testSystem")) with DefaultTi
 
     _getCurrentOrderSummary.expects(marketId, "1-2", mockOrders(0)).returns(mockCurrentOrderSummary(0))
     _getCurrentOrderSummary.expects(marketId, "1-2", mockOrders(1)).returns(mockCurrentOrderSummary(1))
-    _getCurrentOrderSummary.expects(marketId, "1-2", mockOrders(2)).returns(mockCurrentOrderSummary(2))
-    _getCurrentOrderSummary.expects(marketId, "1-2", mockOrders(3)).returns(mockCurrentOrderSummary(3))
+    _getCurrentOrderSummary.expects(marketId, "2-3", mockOrders(2)).returns(mockCurrentOrderSummary(2))
+    _getCurrentOrderSummary.expects(marketId, "2-3", mockOrders(3)).returns(mockCurrentOrderSummary(3))
 
     simOrderBook.underlyingActor.getMarketOrders(marketId, marketOrderBook)
   }

@@ -2,6 +2,7 @@ package service.simService
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
+import com.typesafe.config.ConfigFactory
 import domain._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest._
@@ -16,9 +17,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.util.Success
 
-class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLike with ImplicitSender with ScalaFutures
+class SimServiceSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.parseString(""))) with FlatSpecLike with ImplicitSender with ScalaFutures
   with Matchers with BeforeAndAfterAll with MockFactory with BeforeAndAfterEach {
 
   var mockBetfairService: BetfairServiceNGCommand = _
@@ -68,24 +68,28 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
       val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listMarketBook",
         params = params ++ flattenedOpts.map(i => i._1 -> i._2).toMap)
 
+      val returnValue = if (successful) Future.successful(Some(ListMarketBookContainer(List(returnedMarketBook)))) else Future.successful(None)
+
       (mockBetfairService.makeAPIRequest(_: String, _: JsonrpcRequest)(_: FromResponseUnmarshaller[ListMarketBookContainer]))
         .expects(sessionToken, request, *)
-        .returns(if (successful) Future.successful(Some(ListMarketBookContainer(List(returnedMarketBook)))) else Future.successful(None))
-
-//      (mockBetfairService.makeAPIRequest[ListMarketBookContainer] _)
-//        .expects(sessionToken, request)
-//        .returns(if (successful) Future.successful(Some(ListMarketBookContainer(List(returnedMarketBook)))) else Future.successful(None))
+        .returns(returnValue)
 
       val future = simService.listMarketBook(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode)
 
       if (successful) {
-        orderBook.expectMsg(500 millis, MatchOrders(ListMarketBookContainer(List(returnedMarketBook)), orderProjection.get._2))
+        orderBook.expectMsg(2 seconds, MatchOrders(ListMarketBookContainer(List(returnedMarketBook)), orderProjection.get._2))
         orderBook.reply(Some(ListMarketBookContainer(List(updatedMarketBook))))
-        future.isCompleted should be (true)
-        future.value.get should be (Success(Some(ListMarketBookContainer(List(updatedMarketBook)))))
+        whenReady(future) {
+          case Some(container: ListMarketBookContainer) =>
+            container should be (ListMarketBookContainer(List(updatedMarketBook)))
+          case _ => fail()
+        }
       } else {
-        future.isCompleted should be (false)
-        future.value should be (None)
+        try {
+          whenReady(future) {case _ => fail()}
+        } catch {
+          case _ =>   // The future should fail with an exception
+        }
       }
     })
   }
@@ -107,13 +111,11 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
 
     orderBook.expectMsg(500 millis, PlaceOrders(marketId, instructions, customerRef))
     orderBook.reply(mockPlaceExecutionReportContainer)
-    whenReady(future) { res =>
-      res match {
-        case Some(container: PlaceExecutionReportContainer) =>
-          container should be (mockPlaceExecutionReportContainer)
-        case _ =>
-          fail()
-      }
+    whenReady(future) {
+      case Some(container: PlaceExecutionReportContainer) =>
+        container should be (mockPlaceExecutionReportContainer)
+      case _ =>
+        fail()
     }
   }
 
@@ -127,13 +129,11 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
 
     orderBook.expectMsg(500 millis, CancelOrders(marketId, instructions, customerRef))
     orderBook.reply(mockCancelExecutionReportContainer)
-    whenReady(future) { res =>
-      res match {
-        case Some(container: CancelExecutionReportContainer) =>
-          container should be (mockCancelExecutionReportContainer)
-        case _ =>
-          fail()
-      }
+    whenReady(future) {
+      case Some(container: CancelExecutionReportContainer) =>
+        container should be (mockCancelExecutionReportContainer)
+      case _ =>
+        fail()
     }
   }
 
@@ -147,13 +147,11 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
 
     orderBook.expectMsg(500 millis, ReplaceOrders(marketId, instructions, customerRef))
     orderBook.reply(mockReplaceExecutionReportContainer)
-    whenReady(future) { res =>
-      res match {
-        case Some(container: ReplaceExecutionReportContainer) =>
-          container should be (mockReplaceExecutionReportContainer)
-        case _ =>
-          fail()
-      }
+    whenReady(future) {
+      case Some(container: ReplaceExecutionReportContainer) =>
+        container should be (mockReplaceExecutionReportContainer)
+      case _ =>
+        fail()
     }
   }
 
@@ -167,13 +165,11 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
 
     orderBook.expectMsg(500 millis, UpdateOrders(marketId, instructions, customerRef))
     orderBook.reply(mockUpdateExecutionReportContainer)
-    whenReady(future) { res =>
-      res match {
-        case Some(container: UpdateExecutionReportContainer) =>
-          container should be (mockUpdateExecutionReportContainer)
-        case _ =>
-          fail()
-      }
+    whenReady(future) {
+      case Some(container: UpdateExecutionReportContainer) =>
+        container should be (mockUpdateExecutionReportContainer)
+      case _ =>
+        fail()
     }
   }
 }

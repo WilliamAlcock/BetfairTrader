@@ -2,6 +2,7 @@ package core
 
 import akka.actor._
 import akka.testkit._
+import com.typesafe.config.ConfigFactory
 import core.api.commands._
 import core.dataProvider.polling.BEST
 import core.eventBus.{EventBus, MessageEvent}
@@ -16,7 +17,7 @@ import server.Configuration
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class ControllerSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLike with Matchers with BeforeAndAfterEach with MockFactory with ImplicitSender {
+class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.parseString(""))) with FlatSpecLike with Matchers with BeforeAndAfterEach with MockFactory with ImplicitSender {
 
   var eventBus: EventBus = _
   var controller: TestActorRef[Controller] = _
@@ -203,11 +204,7 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
   }
 
   "Controller.watch" should "watch the subscriber and add it to the subscribers set if it is not already being watch" in {
-    val _watch = mockFunction[ActorRef, Unit]
-
-    controller = TestActorRef(Props(new Controller(testConfig, eventBus) {
-      override def watch(s: ActorRef) = _watch.apply(s)
-    }))
+    controller = TestActorRef(Props(new Controller(testConfig, eventBus)))
 
     controller.underlyingActor.watch(sender.ref)
 
@@ -215,16 +212,13 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
 
     // Send a poison pill and assert unsubscribe has been called (this is an indication that the controller is watching the sender)
     _unsubscribe.expects(sender.ref)
+    _publish.expects(MessageEvent(config.dataProviderInstructions, UnSubscribe, sender.ref))
 
     sender.ref ! PoisonPill
   }
 
   "Controller.watch" should "do nothing if the subscriber is already a member of the subscribers set" in {
-    val _watch = mockFunction[ActorRef, Unit]
-
-    controller = TestActorRef(Props(new Controller(testConfig, eventBus) {
-      override def watch(s: ActorRef) = _watch.apply(s)
-    }))
+    controller = TestActorRef(Props(new Controller(testConfig, eventBus)))
 
     controller.underlyingActor.subscribers = Set(sender.ref)
 

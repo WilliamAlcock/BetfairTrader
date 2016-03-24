@@ -7,7 +7,7 @@ import scala.io.Source
 
 class SoccerNavDataSpec extends FlatSpec with Matchers with SoccerNavData {
 
-  val navData = Json.parse(Source.fromFile("server/src/test/scala/core/dataModel/navData/navData.json").getLines().mkString).validate[NavData].get
+  val navData = Json.parse(Source.fromFile("server/src/test/scala/core/navData/navData.json").getLines().mkString).validate[NavData].get
 
 //  "Soccer Nav Data" should "get fixtures" in {
 //    //val data = getSoccerData(navData)

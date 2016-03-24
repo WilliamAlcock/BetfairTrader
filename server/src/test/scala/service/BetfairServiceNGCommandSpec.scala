@@ -1,9 +1,10 @@
 package service
 
 import akka.actor.ActorSystem
+import com.typesafe.config.ConfigFactory
 import domain.{JsonrpcRequest, ListEventResultContainer, MarketFilter}
 import org.scalatest.concurrent.Eventually._
-import org.scalatest.time.{Second, Span}
+import org.scalatest.time.{Seconds, Span}
 import server.Configuration
 
 import scala.collection.immutable.HashMap
@@ -12,7 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class BetfairServiceNGCommandSpec extends UnitSpec with WireMockFixture {
 
-  implicit val system = ActorSystem("on-spray-can")
+  implicit val system = ActorSystem("on-spray-can", ConfigFactory.parseString(""))
 
   val sessionToken = "12345"
 
@@ -40,7 +41,7 @@ class BetfairServiceNGCommandSpec extends UnitSpec with WireMockFixture {
       val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listEvents", params = params)
       service.makeAPIRequest[ListEventResultContainer](sessionToken, request)
 
-      val timeout = org.scalatest.concurrent.Eventually.PatienceConfig(Span(1, Second))
+      val timeout = org.scalatest.concurrent.Eventually.PatienceConfig(Span(2, Seconds))
       eventually(requests should have length(1))(timeout)
       val headerAppToken = requests(0).getHeader("X-Application")
       headerAppToken.firstValue() should be("testAppKey")
@@ -57,7 +58,7 @@ class BetfairServiceNGCommandSpec extends UnitSpec with WireMockFixture {
       val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listEvents", params = params)
       service.makeAPIRequest[ListEventResultContainer](sessionToken, request)
 
-      val timeout = org.scalatest.concurrent.Eventually.PatienceConfig(Span(1, Second))
+      val timeout = org.scalatest.concurrent.Eventually.PatienceConfig(Span(2, Seconds))
       eventually(requests should have length(1))(timeout)
       val headerSessionToken = requests(0).getHeader("X-Authentication")
       headerSessionToken.firstValue() should be(sessionToken)

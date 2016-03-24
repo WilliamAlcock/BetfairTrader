@@ -1,6 +1,7 @@
 package service
 
 import akka.actor.ActorSystem
+import com.typesafe.config.ConfigFactory
 import domain._
 import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
@@ -15,7 +16,7 @@ import scala.concurrent.Future
 
 class BetfairServiceNGSpec extends FlatSpec with ShouldMatchers with MockFactory with ScalaFutures with BeforeAndAfterEach {
 
-  implicit val system = ActorSystem("on-spray-can")
+  implicit val system = ActorSystem("on-spray-can", ConfigFactory.parseString(""))
 
   // TODO make config implicit to avoid this workaround
   val testConfig = Configuration(
