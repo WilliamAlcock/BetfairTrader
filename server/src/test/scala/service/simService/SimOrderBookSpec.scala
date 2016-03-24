@@ -1,8 +1,9 @@
 package service.simService
 
-import akka.actor.ActorSystem
+import akka.actor.{Props, ActorSystem}
 import akka.testkit.{DefaultTimeout, ImplicitSender, TestActorRef, TestKit}
-import domain._
+import domain.{OrderStatus, OrderType, PersistenceType, Side, _}
+import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatest._
 import service.simService.SimOrderBook.{CancelOrders, MatchOrders, PlaceOrders, UpdateOrders}
@@ -126,10 +127,10 @@ class SimOrderBookSpec extends TestKit(ActorSystem("testSystem")) with DefaultTi
     val returnedMarketOrderBook2 = mock[MarketOrderBook]
 
     (marketOrderBook1.matchOrders _).expects(marketBook1).returns(returnedMarketOrderBook1)
-    (returnedMarketOrderBook1.updateMarketBook _).expects(marketBook1).returns(returnedMarketBook1)
+    (returnedMarketOrderBook1.updateMarketBook _).expects(marketBook1, OrderProjection.ALL).returns(returnedMarketBook1)
 
     (marketOrderBook2.matchOrders _).expects(marketBook2).returns(returnedMarketOrderBook2)
-    (returnedMarketOrderBook2.updateMarketBook _).expects(marketBook2).returns(returnedMarketBook2)
+    (returnedMarketOrderBook2.updateMarketBook _).expects(marketBook2, OrderProjection.ALL).returns(returnedMarketBook2)
 
     val expectedResult = Some(ListMarketBookContainer(List(returnedMarketBook1, returnedMarketBook2, marketBook4)))
 
@@ -140,10 +141,139 @@ class SimOrderBookSpec extends TestKit(ActorSystem("testSystem")) with DefaultTi
     )
 
     within(1 second) {
-      simOrderBook ! MatchOrders(listMarketBookContainer)
+      simOrderBook ! MatchOrders(listMarketBookContainer, OrderProjection.ALL)
       expectMsg(expectedResult)
       simOrderBook.underlyingActor.markets should be (expectedMarkets)
     }
   }
+
+  "SimOrderBook.getCurrentOrderSummary" should "convert an order to currentOrderSummary" in {
+    val marketId = "TEST_MARKET_ID"
+    val uniqueId = "12345-123.45"
+    val placedDate = DateTime.now()
+    val order = Order(
+      "TEST_BET_ID",
+      OrderType.LIMIT,
+      OrderStatus.EXECUTABLE,
+      PersistenceType.LAPSE,
+      Side.BACK,
+      price = 10.0,
+      size = 100.0,
+      bspLiability = 1.0,
+      placedDate = placedDate,
+      avgPriceMatched = 3.0,
+      sizeMatched = 4.0,
+      sizeRemaining = 5.0,
+      sizeLapsed = 6.0,
+      sizeCancelled = 7.0,
+      sizeVoided = 8.0
+    )
+
+    val expectedOutput = CurrentOrderSummary(
+      "TEST_BET_ID",
+      "TEST_MARKET_ID",
+      12345L,
+      123.45,
+      PriceSize(10.0, 100.0),
+      bspLiability = 1.0,
+      Side.BACK,
+      OrderStatus.EXECUTABLE,
+      PersistenceType.LAPSE,
+      OrderType.LIMIT,
+      placedDate = placedDate,
+      matchedDate = None,
+      averagePriceMatched = 3.0,
+      sizeMatched = 4.0,
+      sizeRemaining = 5.0,
+      sizeLapsed = 6.0,
+      sizeCancelled = 7.0,
+      sizeVoided = 8.0,
+      regulatorCode = ""
+    )
+
+    simOrderBook.underlyingActor.getCurrentOrderSummary(marketId, uniqueId, order) should be (expectedOutput)
+  }
+
+  "SimOrderBook.getMarketOrders" should "return the market's orders as a set of currentOrderSummary" in {
+    val marketId = "TEST_MARKET_ID"
+    val uniqueId = "12345-123.56"
+
+    val marketOrderBook = mock[MarketOrderBook]
+
+    class TestOrder extends Order(
+      "TEST_BET_ID",
+      OrderType.LIMIT,
+      OrderStatus.EXECUTABLE,
+      PersistenceType.LAPSE,
+      Side.BACK,
+      price = 10.0,
+      size = 100.0,
+      bspLiability = 1.0,
+      placedDate = DateTime.now(),
+      avgPriceMatched = 3.0,
+      sizeMatched = 4.0,
+      sizeRemaining = 5.0,
+      sizeLapsed = 6.0,
+      sizeCancelled = 7.0,
+      sizeVoided = 8.0
+    )
+
+    class TestCurrentOrderSummary extends CurrentOrderSummary(
+      "TEST_BET_ID",
+      "TEST_MARKET_ID",
+      12345L,
+      123.45,
+      PriceSize(10.0, 100.0),
+      bspLiability = 1.0,
+      Side.BACK,
+      OrderStatus.EXECUTABLE,
+      PersistenceType.LAPSE,
+      OrderType.LIMIT,
+      placedDate = DateTime.now(),
+      matchedDate = None,
+      averagePriceMatched = 3.0,
+      sizeMatched = 4.0,
+      sizeRemaining = 5.0,
+      sizeLapsed = 6.0,
+      sizeCancelled = 7.0,
+      sizeVoided = 8.0,
+      regulatorCode = ""
+    )
+
+    val mockOrders = List.range(1,4).map(x => mock[TestOrder])
+    val mockCurrentOrderSummary = List.range(1,4).map(x => mock[TestCurrentOrderSummary])
+
+    val orders = Map[String, Set[Order]](
+      "1-2" -> Set(mockOrders(0), mockOrders(1)),
+      "2-3" -> Set(mockOrders(2), mockOrders(3))
+    )
+
+    (marketOrderBook.getOrders _).expects().returns(orders)
+
+    val _getCurrentOrderSummary = mockFunction[String, String, Order, CurrentOrderSummary]
+
+    simOrderBook = TestActorRef[SimOrderBook](Props(new SimOrderBook(markets, reportFactory = mockReportFactory) {
+      override def getCurrentOrderSummary(m: String, u: String, o: Order) = _getCurrentOrderSummary.apply(m, u ,o)
+    }))
+
+    _getCurrentOrderSummary.expects(marketId, "1-2", mockOrders(0)).returns(mockCurrentOrderSummary(0))
+    _getCurrentOrderSummary.expects(marketId, "1-2", mockOrders(1)).returns(mockCurrentOrderSummary(1))
+    _getCurrentOrderSummary.expects(marketId, "1-2", mockOrders(2)).returns(mockCurrentOrderSummary(2))
+    _getCurrentOrderSummary.expects(marketId, "1-2", mockOrders(3)).returns(mockCurrentOrderSummary(3))
+
+    simOrderBook.underlyingActor.getMarketOrders(marketId, marketOrderBook)
+  }
+
+//  "SimOrderBook.getOrdersByMarket" should "call getMarketOrders for all the given marketIds" in {
+
+    // no marketIds
+
+    // no
+
+//  }
+
+//  "SimOrderBook." should "" in {
+
+//  }
 }
 

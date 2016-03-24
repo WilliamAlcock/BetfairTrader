@@ -7,7 +7,8 @@ import core.eventBus.EventBus
 import core.navData.NavDataActor
 import core.orderManager.OrderManager
 import server.Configuration
-import service.{BetfairServiceNG, BetfairServiceNGCommand, BetfairServiceNGException}
+import service.simService.{SimOrderBook, SimService}
+import service.{BetfairServiceNGCommand, BetfairServiceNGException}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -34,10 +35,10 @@ object Main {
 
     // create command, api and event bus objects
     val betfairServiceNGCommand = new BetfairServiceNGCommand(config)
-    val betfairService = new BetfairServiceNG(config, betfairServiceNGCommand)
+//    val betfairService = new BetfairServiceNG(config, betfairServiceNGCommand)
     // create simService
-//    val simOrderBook = system.actorOf(SimOrderBook.props(), "simOrderBook")
-//    val betfairService = new SimService(config, new BetfairServiceNG(config, betfairServiceNGCommand), simOrderBook)
+    val simOrderBook = system.actorOf(SimOrderBook.props(), "simOrderBook")
+    val betfairService = new SimService(config, betfairServiceNGCommand, simOrderBook)
 
     // Login
     val sessionTokenFuture = betfairService.login().map {

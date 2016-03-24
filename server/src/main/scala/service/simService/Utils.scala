@@ -28,7 +28,7 @@ trait Utils {
   // TODO add test for divide by 0
   def getMatchFromOrders(orders: List[Order], side: Side): Match = orders.foldLeft[Match](Match(None, None, side, 0, 0, None))((acc, x) => {
     if (x.side == side && x.sizeMatched > 0) {
-      acc.copy(price = ((acc.price * acc.size) + (x.price * x.sizeMatched)) / (acc.size + x.sizeMatched), size = (acc.size + x.sizeMatched))
+      acc.copy(price = ((acc.price * acc.size) + (x.price * x.sizeMatched)) / (acc.size + x.sizeMatched), size = acc.size + x.sizeMatched)
     } else acc
   })
 }

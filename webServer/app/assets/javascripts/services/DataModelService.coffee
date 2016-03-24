@@ -1,6 +1,6 @@
 class DataModelService
 
-  constructor: (@$log, @$rootScope) ->
+  constructor: (@$log) ->
     @navData = {
       soccerData: {},
       horseRacingData: {}
@@ -49,5 +49,23 @@ class DataModelService
 
     data
 
+  getRunnerCatalogue: (marketId, selectionId) =>
+    if (@marketCatalogueData[marketId]?)
+      (rc for rc in @marketCatalogueData[marketId].runners when rc.selectionId is selectionId)[0]
+    else {}
 
-servicesModule.service('DataModelService', ['$log', '$rootScope', DataModelService])
+  getLiability: (side, price, size) =>
+    switch side
+      when "BACK" then size
+      when "LAY" then (price - 1) * size
+      else null
+
+  getProfit: (side, price, size) =>
+    switch side
+      when "BACK" then size * (price - 1)
+      when "LAY" then size
+      else null
+
+
+
+servicesModule.service('DataModelService', ['$log', DataModelService])

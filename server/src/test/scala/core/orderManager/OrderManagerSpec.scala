@@ -9,7 +9,7 @@ import core.eventBus.{EventBus, MessageEvent}
 import core.orderManager.OrderManager._
 import domain.ExecutionReportStatus.ExecutionReportStatus
 import domain.OrderStatus.OrderStatus
-import domain._
+import domain.{OrderType, PersistenceType, Side, _}
 import org.joda.time.DateTime
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -35,10 +35,9 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecL
   val betId = "TEST_BET_ID"
   val selectionId = 1L
 
-  case class testBroadcast(override val marketId: String) extends OrderManagerOutput {
-    override val handicap: Double = 1.0
-    override val order: Order = Order(betId, OrderType.LIMIT, OrderStatus.EXECUTABLE, PersistenceType.LAPSE, Side.BACK, 1.0, 2.0, 3.0, DateTime.now(), 5.0, 6.0, 7.0, 8.0, 9.0, 10.0)
-    override val selectionId: Long = 1L
+  case class testBroadcast(marketId: String) extends OrderManagerOutput {
+    override val selectionId = 1L
+    override val handicap = 1.0
   }
 
   val testConfig = Configuration(
@@ -412,73 +411,103 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecL
     orderManager.underlyingActor.processMarketBook(input) should be (expectedOutput.toSet)
   }
 
-  "OrderManager.processRunner" should "return the output of processOrder for each order in the given runner" in {
-
-    val orders = List(
-      Order(betId, OrderType.LIMIT, OrderStatus.EXECUTABLE, PersistenceType.LAPSE, Side.BACK, 1.0, 1.0, 1.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
-      Order(betId, OrderType.LIMIT, OrderStatus.EXECUTABLE, PersistenceType.LAPSE, Side.BACK, 2.0, 2.0, 2.0, DateTime.now(), 2.0, 2.0, 2.0, 2.0, 2.0, 2.0)
-    )
-
-    val runner = Runner(1L, 1.0, "TEST_RUNNER_STATUS_1", orders = Some(orders.toSet))
-
-    val _processOrder = mockFunction[String, Long, Double, Order, Set[OrderManagerOutput]]
-
-    val expectedOutput = List(
-      testBroadcast("1"),
-      testBroadcast("2")
-    )
-
-    _processOrder.expects(marketId, 1L, 1.0, orders(0)).returns(Set[OrderManagerOutput](expectedOutput(0)))
-    _processOrder.expects(marketId, 1L, 1.0, orders(1)).returns(Set[OrderManagerOutput](expectedOutput(1)))
-
-    orderManager = TestActorRef(Props(new OrderManager(testConfig, sessionToken, controller.ref, betfairService, eventBus) {
-      override def preStart() = {}
-
-      override def processOrder(marketId: String, selectionId: Long, handicap: Double, order: Order): Set[OrderManagerOutput] =
-        _processOrder.apply(marketId, selectionId, handicap, order)
-    }))
-
-    orderManager.underlyingActor.processRunner(marketId, runner) should be (expectedOutput.toSet)
-  }
-
-  private def generateOrderManagerOutput(s: String, marketId: String, selectionId: Long, handicap: Double, order: Order, size: Double = 0): OrderManagerOutput = s match {
-    case "OrderPlaced" => OrderPlaced(marketId, selectionId, handicap, order)
-    case "OrderFilled" => OrderFilled(marketId, selectionId, handicap, order, size)
-    case "OrderUpdated" => OrderUpdated(marketId, selectionId, handicap, order)
-    case "OrderExecuted" => OrderExecuted(marketId, selectionId, handicap, order)
-  }
-
-
-  val processOrder_Cases = Table(
-    ("order status",                  "is bet tracked", "has sizeMatched increased",  "expected output"),
-    (OrderStatus.EXECUTABLE,          true,             true,                         Set("OrderFilled", "OrderUpdated")),
-    (OrderStatus.EXECUTABLE,          true,             false,                        Set("OrderUpdated")),
-    (OrderStatus.EXECUTABLE,          false,            false,                        Set("OrderPlaced")),
-    (OrderStatus.EXECUTABLE,          false,            true,                         Set("OrderPlaced")),
-    (OrderStatus.EXECUTION_COMPLETE,  true,             true,                         Set("OrderExecuted")),
-    (OrderStatus.EXECUTION_COMPLETE,  true,             false,                        Set("OrderExecuted")),
-    (OrderStatus.EXECUTION_COMPLETE,  false,            false,                        Set.empty[String]),
-    (OrderStatus.EXECUTION_COMPLETE,  false,            true,                         Set.empty[String])
+  val processRunner_Cases = Table(
+    ("orders defined", "matches defined"),
+    (true, true),
+    (true, false),
+    (false, true),
+    (false, false)
   )
 
-  forAll(processOrder_Cases) { (orderStatus: OrderStatus, isBetTracked: Boolean, hasSizeMatchedIncreased: Boolean, expectedOutput: Set[String]) =>
-    "OrderManager.processOrder" should "return " + expectedOutput + " when " + isBetTracked + " " + hasSizeMatchedIncreased + " " + orderStatus in {
-      val handicap = 1.2
-      val order = Order(betId, OrderType.LIMIT, orderStatus, PersistenceType.LAPSE, Side.BACK, 1.0, 1.0, 1.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+  forAll(processRunner_Cases){(ordersDefined: Boolean, matchesDefined: Boolean) =>
+    "OrderManager.processRunner" should "return the orderManagerOutput for the orders and matches in the given runner, orders: " + ordersDefined + ", matches: " + matchesDefined in {
+      val _updateOrder = mockFunction[String, Long, Double, Order, Set[OrderManagerOutput]]
+      val _removeCompletedOrders = mockFunction[String, Long, Double, Set[Order], Set[OrderManagerOutput]]
+      val _updateMatch = mockFunction[String, Long, Double, Match, Set[OrderManagerOutput]]
 
       orderManager = TestActorRef(Props(new OrderManager(testConfig, sessionToken, controller.ref, betfairService, eventBus) {
         override def preStart() = {}
+
+        override def updateOrder(m: String, s: Long, h: Double, o: Order): Set[OrderManagerOutput] = _updateOrder.apply(m, s, h, o)
+        override def removeCompletedOrders(m: String, s: Long, h: Double, o: Set[Order]): Set[OrderManagerOutput] = _removeCompletedOrders.apply(m, s, h, o)
+        override def updateMatch(m: String, s: Long, h: Double, ma: Match): Set[OrderManagerOutput] = _updateMatch.apply(m, s, h, ma)
       }))
 
-      if (isBetTracked) {
-        orderManager.underlyingActor.trackedOrders = Map[String, OrderData](betId -> OrderData(marketId, selectionId, 1.0, order))
+      val orders = List(
+        Order(betId, OrderType.LIMIT, OrderStatus.EXECUTABLE, PersistenceType.LAPSE, Side.BACK, 1.0, 1.0, 1.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0),
+        Order(betId, OrderType.LIMIT, OrderStatus.EXECUTABLE, PersistenceType.LAPSE, Side.BACK, 2.0, 2.0, 2.0, DateTime.now(), 2.0, 2.0, 2.0, 2.0, 2.0, 2.0)
+      )
+
+      val matches = List(
+        Match(side = Side.BACK, price = 1.0, size = 2.0),
+        Match(side = Side.LAY, price = 1.0, size = 2.0)
+      )
+
+      val runner = Runner(1L, 1.0, "TEST_RUNNER_STATUS_1",
+        orders = if (ordersDefined) Some(orders.toSet) else None,
+        matches = if (matchesDefined) Some(matches.toSet) else None
+      )
+
+      if (ordersDefined) {
+        _updateOrder.expects(marketId, 1L, 1.0, orders(0)).returns(Set(testBroadcast("1")))
+        _updateOrder.expects(marketId, 1L, 1.0, orders(1)).returns(Set(testBroadcast("2")))
+
+        _removeCompletedOrders.expects(marketId, 1L, 1.0, orders.toSet[Order]).returns(Set(testBroadcast("3")))
       }
 
-      val placedOrder = if (hasSizeMatchedIncreased) order.copy(sizeMatched = order.sizeMatched + 10) else order
+      if (matchesDefined) {
+        _updateMatch.expects(marketId, 1L, 1.0, matches(0)).returns(Set(testBroadcast("4")))
+        _updateMatch.expects(marketId, 1L, 1.0, matches(1)).returns(Set(testBroadcast("5")))
+      }
 
-      orderManager.underlyingActor.processOrder(marketId, selectionId, handicap, placedOrder) should be (expectedOutput.map(x => generateOrderManagerOutput(x, marketId, selectionId, handicap, placedOrder, 10)))
+      val expectedOutput = (ordersDefined, matchesDefined) match {
+        case (true, true) => Set(testBroadcast("1"), testBroadcast("2"), testBroadcast("3"), testBroadcast("4"), testBroadcast("5"))
+        case (true, false) => Set(testBroadcast("1"), testBroadcast("2"), testBroadcast("3"))
+        case (false, true) => Set(testBroadcast("4"), testBroadcast("5"))
+        case (false, false) => Set()
+      }
+
+      orderManager.underlyingActor.processRunner(marketId, runner) should be (expectedOutput)
     }
   }
+
+//  private def generateOrderManagerOutput(s: String, marketId: String, selectionId: Long, handicap: Double, order: Order, size: Double = 0): OrderManagerOutput = s match {
+//    case "OrderPlaced" => OrderPlaced(CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order))
+//    case "OrderFilled" => OrderFilled(CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order), size)
+//    case "OrderUpdated" => OrderUpdated(CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order))
+//    case "OrderExecuted" => OrderExecuted(CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order))
+//  }
+//
+//  val processOrder_Cases = Table(
+//    ("order status",                  "is bet tracked", "has sizeMatched increased",  "expected output"),
+//    (OrderStatus.EXECUTABLE,          true,             true,                         Set("OrderFilled", "OrderUpdated")),
+//    (OrderStatus.EXECUTABLE,          true,             false,                        Set("OrderUpdated")),
+//    (OrderStatus.EXECUTABLE,          false,            false,                        Set("OrderPlaced")),
+//    (OrderStatus.EXECUTABLE,          false,            true,                         Set("OrderPlaced")),
+//    (OrderStatus.EXECUTION_COMPLETE,  true,             true,                         Set("OrderExecuted")),
+//    (OrderStatus.EXECUTION_COMPLETE,  true,             false,                        Set("OrderExecuted")),
+//    (OrderStatus.EXECUTION_COMPLETE,  false,            false,                        Set.empty[String]),
+//    (OrderStatus.EXECUTION_COMPLETE,  false,            true,                         Set.empty[String])
+//  )
+//
+//  forAll(processOrder_Cases) { (orderStatus: OrderStatus, isBetTracked: Boolean, hasSizeMatchedIncreased: Boolean, expectedOutput: Set[String]) =>
+//    "OrderManager.processOrder" should "return " + expectedOutput + " when " + isBetTracked + " " + hasSizeMatchedIncreased + " " + orderStatus in {
+//      val handicap = 1.2
+//      val order = Order(betId, OrderType.LIMIT, orderStatus, PersistenceType.LAPSE, Side.BACK, 1.0, 1.0, 1.0, DateTime.now(), 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+//
+//      orderManager = TestActorRef(Props(new OrderManager(testConfig, sessionToken, controller.ref, betfairService, eventBus) {
+//        override def preStart() = {}
+//      }))
+//
+//      if (isBetTracked) {
+//        orderManager.underlyingActor.trackedOrders = Map[String, OrderData](betId -> OrderData(marketId, selectionId, 1.0, order))
+//      }
+//
+//      val placedOrder = if (hasSizeMatchedIncreased) order.copy(sizeMatched = order.sizeMatched + 10) else order
+//
+//      orderManager.underlyingActor.processOrder(marketId, selectionId, handicap, placedOrder) should be (expectedOutput.map(x => generateOrderManagerOutput(x, marketId, selectionId, handicap, placedOrder, 10)))
+//    }
+//  }
 
   "OrderManager.broadcast" should "publish the given output on the orderUpdateChannel" in {
     val _publish = mockFunction[MessageEvent, Unit]
@@ -500,14 +529,14 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecL
   }
 
   "OrderManager" should "update tracked orders from the exchange on startup and at intervals defined by config" in {
-    val _update = mockFunction[Map[String, OrderData], Map[String, OrderData]]
+    val _update = mockFunction[Map[String, Set[OrderData]], Map[String, Set[OrderData]]]
 
     val time = new VirtualTime
 
-    _update.expects(Map.empty[String, OrderData]).returns(Map.empty[String, OrderData]).repeated(2)
+    _update.expects(Map.empty[String, Set[OrderData]]).returns(Map.empty[String, Set[OrderData]]).repeated(2)
 
     orderManager = TestActorRef(Props(new OrderManager(testConfig, sessionToken, controller.ref, betfairService, eventBus) {
-      override def update(to: Map[String, OrderData]) = _update.apply(to)
+      override def update(to: Map[String, Set[OrderData]]) = _update.apply(to)
       override def scheduler = time.scheduler
     }))
 

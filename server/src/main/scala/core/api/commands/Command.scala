@@ -19,13 +19,16 @@ case class ListEvents(marketFilter: MarketFilter) extends Command
 case class ListEventTypes(marketFilter: MarketFilter) extends Command
 case class ListMarketCatalogue(marketFilter: MarketFilter, sort: MarketSort) extends Command
 case class ListMarketBook(marketIds: Set[String]) extends Command
-case class ListCurrentOrders(betIds: Set[String], marketIds: Set[String]) extends Command
+case class ListCurrentOrders(betIds: Set[String] = Set.empty, marketIds: Set[String] = Set.empty) extends Command
+case object ListMatches extends Command
 
 case object SubscribeToSystemAlerts extends Command
 case class SubscribeToMarkets(markets: Set[String], pollingGroup: PollingGroup) extends Command
 case class UnSubscribeFromMarkets(markets: Set[String], pollingGroup: PollingGroup) extends Command
 case object UnSubscribe extends Command
 case object StopPollingAllMarkets extends Command
+
+case class SubscribeToOrderUpdates(markets: Set[String] = Set.empty) extends Command
 
 object Command {
   implicit val formatGetNavigationData = Json.format[GetNavigationData]
@@ -39,7 +42,10 @@ object Command {
   implicit val formatListEventTypes = Json.format[ListEventTypes]
   implicit val formatListMarketCatalogue = Json.format[ListMarketCatalogue]
   implicit val formatListMarketBook = Json.format[ListMarketBook]
+  implicit val formatListCurrentOrders = Json.format[ListCurrentOrders]
 
   implicit val formatSubscribeToMarkets = Json.format[SubscribeToMarkets]
   implicit val formatUnSubscribeFromMarkets = Json.format[UnSubscribeFromMarkets]
+
+  implicit val formatSubscribeToOrderUpdates = Json.format[SubscribeToOrderUpdates]
 }

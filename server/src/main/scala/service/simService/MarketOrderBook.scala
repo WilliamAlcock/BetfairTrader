@@ -1,5 +1,6 @@
 package service.simService
 
+import domain.OrderProjection.OrderProjection
 import domain._
 
 import scala.collection.immutable.HashMap
@@ -55,12 +56,19 @@ case class MarketOrderBook(runners: HashMap[String, RunnerOrderBook] = HashMap.e
     )
   }
 
-  def updateMarketBook(marketBook: MarketBook): MarketBook = {
+  // TODO test
+  def filterOrdersByProjection(orders: Set[Order], orderProjection: OrderProjection): Set[Order] = orderProjection match {
+    case OrderProjection.EXECUTABLE => orders.filter(_.status == OrderStatus.EXECUTABLE)
+    case OrderProjection.EXECUTION_COMPLETE => orders.filter(_.status == OrderStatus.EXECUTION_COMPLETE)
+    case _ => orders
+  }
+
+  def updateMarketBook(marketBook: MarketBook, orderProjection: OrderProjection): MarketBook = {
     marketBook.copy(runners = marketBook.runners.map(runner =>
       if (runners.contains(runner.uniqueId)) {
         val orders = runners(runner.uniqueId).getOrders
         runner.copy(
-          orders = Some(orders),
+          orders = Some(filterOrdersByProjection(orders, orderProjection)),
           matches = Some(runners(runner.uniqueId).getMatches),
           ex = utils.updateExchangePrices(runner.ex, orders)
         )

@@ -44,8 +44,11 @@ case class RunnerOrderBook(backOrderBook: OrderBook = OrderBook(Side.BACK),
     layOrderBook = layOrderBook.matchOrders(availableToLay)
   )
 
-  // TODO test
-  def hasBetId(betId: String) = backOrderBook.hasBetId(betId) || layOrderBook.hasBetId(betId)
+  // throw an error if the id exists in both books
+  def hasBetId(betId: String) = if (backOrderBook.hasBetId(betId)) {
+    require(!layOrderBook.hasBetId(betId))
+    true
+  } else layOrderBook.hasBetId(betId)
 
   // back and lay orders
   def getOrders: Set[Order] = (backOrderBook.getOrders ++ layOrderBook.getOrders).toSet[Order]

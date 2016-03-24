@@ -14,7 +14,7 @@ class WebSocketService
     "NavigationDataUpdate":   NAVIGATION_DATA_UPDATE
   }
 
-  constructor: (@$log, @$q, @$rootScope, @DataModel) ->
+  constructor: (@$log, @$q, @$rootScope, @DataModel, @OrderBook) ->
     @$log.debug "constructing Websocket service"
     @id = 0
 
@@ -27,6 +27,9 @@ class WebSocketService
     @ws.onopen = =>
       @$log.debug "WebSocket open"
       @subscribeToSystemAlerts()        # TODO move this to resolve in state
+      @subscribeToOrderUpdates()        # TODO move this to resolve in state
+      @listCurrentOrders()              # TODO move this to resolve in state
+      @listMatches()                    # TODO move this to resolve in state
       deferred.resolve()
 
     @ws.onclose = => @$log.debug "WebSocket closed"
@@ -56,6 +59,25 @@ class WebSocketService
         when "HorseRacingData"
           @$log.log("Horse Racing Data -> ", message)
           @$rootScope.$apply(@DataModel.setHorseRacingData(message.result.result))
+        when "CurrentOrdersUpdate"
+          @$log.log("Current order update", message)
+          @$rootScope.$apply(@OrderBook.setOrders(message.result.result.currentOrders))
+        when "CurrentMatchesUpdate"
+          @$log.log("Current match update", message)
+          @$rootScope.$apply(@OrderBook.setMatches(message.result.result.matches))
+        when "OrderMatched"
+          @$log.log("Order Matched", message)
+          @$rootScope.$apply(@OrderBook.orderMatched(message.result.result))
+        when "OrderPlaced"
+          @$log.log("Order Placed", message)
+          @$rootScope.$apply(@OrderBook.orderPlaced(message.result.result))
+        when "OrderUpdated"
+          @$log.log("Order Updated", message)
+          @$rootScope.$apply(@OrderBook.orderUpdated(message.result.result))
+        when "OrderExecuted"
+          @$log.log("Order Executed", message)
+          @$rootScope.$apply(@OrderBook.orderExecuted(message.result.result))
+
         else null
     else if angular.isDefined(message.error)
       console.log("error response " + message.error)
@@ -67,7 +89,13 @@ class WebSocketService
     message.id = ++@id
     @ws.send(JSON.stringify(message))
 
-  subscribeToSystemAlerts: -> @sendJsonrpcMessage({method: "subscribeToSystemAlerts", params: {}})
+  subscribeToSystemAlerts: () -> @sendJsonrpcMessage({method: "subscribeToSystemAlerts", params: {}})
+
+  subscribeToOrderUpdates: () -> @sendJsonrpcMessage({method: "subscribeToOrderUpdates", params: {markets: []}})
+
+  listCurrentOrders: () -> @sendJsonrpcMessage({method: "listCurrentOrders", params: {betIds: [], marketIds: []}})
+
+  listMatches: () -> @sendJsonrpcMessage({method: "listMatches", params: {}})
 
   getNavigationData: (eventTypeId) -> @sendJsonrpcMessage({method: "getNavigationData", params: {eventTypeId: eventTypeId}})
 
@@ -108,7 +136,8 @@ class WebSocketService
 #
 
   cancelOrders: (marketId, orders, customerRef) ->
+    console.log(marketId, orders)
     instructions = orders.map (x) -> {betId:x.betId}
     @sendJsonrpcMessage({method: "cancelOrders",  params: {marketId: marketId, instructions: instructions}})
 
-servicesModule.service('WebSocketService', ['$log', '$q', '$rootScope', 'DataModelService', WebSocketService])
+servicesModule.service('WebSocketService', ['$log', '$q', '$rootScope', 'DataModelService', 'OrderBookService', WebSocketService])

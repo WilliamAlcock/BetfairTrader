@@ -79,7 +79,8 @@ lazy val webServerDependencies = Seq(
   "org.webjars" % "angular-ui-bootstrap" % "0.14.3",
   "org.webjars" % "angular-ui-router" % "0.2.18",
   "org.webjars.npm" % "ui-select" % "0.13.2",
-  "org.mockito" % "mockito-core" % "1.10.19" % "test"
+  "org.mockito" % "mockito-core" % "1.10.19" % "test",
+  "org.webjars.bower" % "ngAudio" % "1.7.1"
 )
 
 lazy val domain = project.in(file("domain"))

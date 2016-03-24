@@ -70,6 +70,8 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
       config.apiUrl,
       config.isoUrl,
       config.navUrl,
+      config.orderProjection,
+      config.matchProjection,
       config.orderManagerUpdateInterval,
       config.systemAlertsChannel,
       config.marketUpdateChannel,
@@ -94,7 +96,8 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
     CancelOrders("1", Set.empty, None)                              -> config.orderManagerInstructions,
     ReplaceOrders("1", Set.empty, None)                             -> config.orderManagerInstructions,
     UpdateOrders("1", Set.empty, None)                              -> config.orderManagerInstructions,
-    ListCurrentOrders(Set.empty, Set.empty)                         -> config.orderManagerInstructions
+    ListCurrentOrders(Set.empty, Set.empty)                         -> config.orderManagerInstructions,
+    ListMatches                                                     -> config.orderManagerInstructions
   )
 
   forAll(command_Cases) { (command: Command, outputChannel: String) =>

@@ -1,6 +1,7 @@
 package core.navData
 
 import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import play.api.libs.json._
 
 trait NavData {
@@ -56,29 +57,31 @@ object NavData {
       "numberOfWinners" -> JsString(x.numberOfWinners))
   }
 
-  private def convertData(data: JsValue): NavData = get(data, "type") match {
-    case "EVENT_TYPE" =>  new EventType(getChildren(data), get(data, "id"), get(data, "name"))
-    case "GROUP" =>       new Group(getChildren(data), get(data, "id"), get(data, "name"))
-    case "EVENT" =>       new Event(getChildren(data), get(data, "id"), get(data, "name"), get(data, "countryCode"))
-    case "RACE" =>
-      new Race(
-        getChildren(data),
-        get(data, "id"),
-        get(data, "name"),
-        (data \ "startTime").as[DateTime],
-        get(data, "venue"),
-        get(data, "raceNumber"),
-        get(data, "countryCode")
-      )
-    case "MARKET" =>
-      new Market(
-        get(data, "exchangeId"),
-        get(data, "id"),
-        (data \ "marketStartTime").as[DateTime],
-        get(data, "marketType"),
-        get(data, "numberOfWinners"),
-        get(data, "name")
-      )
+  private def convertData(data: JsValue): NavData = {
+    get(data, "type") match {
+      case "EVENT_TYPE" =>  new EventType(getChildren(data), get(data, "id"), get(data, "name"))
+      case "GROUP" =>       new Group(getChildren(data), get(data, "id"), get(data, "name"))
+      case "EVENT" =>       new Event(getChildren(data), get(data, "id"), get(data, "name"), get(data, "countryCode"))
+      case "RACE" =>
+        new Race(
+          getChildren(data),
+          get(data, "id"),
+          get(data, "name"),
+          (data \ "startTime").as[DateTime],
+          get(data, "venue"),
+          get(data, "raceNumber"),
+          get(data, "countryCode")
+        )
+      case "MARKET" =>
+        new Market(
+            get(data, "exchangeId"),
+            get(data, "id"),
+            DateTime.parse((data \ "marketStartTime").as[String], DateTimeFormat.forPattern(dateFormat).withZoneUTC()),
+            get(data, "marketType"),
+            get(data, "numberOfWinners"),
+            get(data, "name")
+          )
+    }
   }
 
   private def get(data: JsValue, property: String): String = {

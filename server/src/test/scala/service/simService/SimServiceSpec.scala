@@ -9,6 +9,7 @@ import org.scalatest.concurrent.ScalaFutures
 import server.Configuration
 import service.BetfairServiceNGCommand
 import service.simService.SimOrderBook._
+import spray.httpx.unmarshalling._
 
 import scala.collection.immutable.HashMap
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -67,16 +68,18 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem")) with FlatSpecLik
       val request = new JsonrpcRequest(id = "1", method = "SportsAPING/v1.0/listMarketBook",
         params = params ++ flattenedOpts.map(i => i._1 -> i._2).toMap)
 
-      import spray.httpx.PlayJsonSupport._
-
-      (mockBetfairService.makeAPIRequest[ListMarketBookContainer] _)
-        .expects(sessionToken, request)
+      (mockBetfairService.makeAPIRequest(_: String, _: JsonrpcRequest)(_: FromResponseUnmarshaller[ListMarketBookContainer]))
+        .expects(sessionToken, request, *)
         .returns(if (successful) Future.successful(Some(ListMarketBookContainer(List(returnedMarketBook)))) else Future.successful(None))
+
+//      (mockBetfairService.makeAPIRequest[ListMarketBookContainer] _)
+//        .expects(sessionToken, request)
+//        .returns(if (successful) Future.successful(Some(ListMarketBookContainer(List(returnedMarketBook)))) else Future.successful(None))
 
       val future = simService.listMarketBook(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode)
 
       if (successful) {
-        orderBook.expectMsg(500 millis, MatchOrders(ListMarketBookContainer(List(returnedMarketBook))))
+        orderBook.expectMsg(500 millis, MatchOrders(ListMarketBookContainer(List(returnedMarketBook)), orderProjection.get._2))
         orderBook.reply(Some(ListMarketBookContainer(List(updatedMarketBook))))
         future.isCompleted should be (true)
         future.value.get should be (Success(Some(ListMarketBookContainer(List(updatedMarketBook)))))

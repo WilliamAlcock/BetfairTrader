@@ -1,6 +1,7 @@
 package service.simService
 
 import akka.actor.{Actor, Props}
+import domain.OrderProjection.OrderProjection
 import domain.OrderStatus.OrderStatus
 import domain.{InstructionReportErrorCode, OrderType, PersistenceType, _}
 import service.simService.SimOrderBook._
@@ -16,7 +17,7 @@ class SimOrderBook(var markets: HashMap[String, MarketOrderBook] = HashMap.empty
     case ReplaceOrders(marketId, instructions, customerRef) => sender ! replaceOrders(marketId, instructions, customerRef)
     case UpdateOrders(marketId, instructions, customerRef) => sender ! updateOrders(marketId, instructions, customerRef)
     case GetOrders(betIds, marketIds, status) => sender ! getOrders(betIds, marketIds, status)
-    case MatchOrders(marketBook) => sender ! matchOrders(marketBook)
+    case MatchOrders(marketBook, orderProjection) => sender ! matchOrders(marketBook, orderProjection)
     case x => throw SimException("Invalid Message " + x)
   }
 
@@ -95,18 +96,18 @@ class SimOrderBook(var markets: HashMap[String, MarketOrderBook] = HashMap.empty
     reportFactory.getUpdateExecutionReportContainer(marketId, instructions.map(x => updateOrder(marketId, x)), customerRef)
   }
 
-  def matchOrders(listMarketBookContainer: ListMarketBookContainer): Option[ListMarketBookContainer] = {
+  def matchOrders(listMarketBookContainer: ListMarketBookContainer, orderProjection: OrderProjection): Option[ListMarketBookContainer] = {
     Some(ListMarketBookContainer(listMarketBookContainer.result.map(marketBook =>
       if (markets.contains(marketBook.marketId)) {
         markets = markets + (marketBook.marketId -> markets(marketBook.marketId).matchOrders(marketBook))
-        markets(marketBook.marketId).updateMarketBook(marketBook)
+        markets(marketBook.marketId).updateMarketBook(marketBook, orderProjection)
       } else
         marketBook
     )))
   }
 
-  // TODO test this
-  private def getCurrentOrderSummary(marketId: String, uniqueId: String, order: Order): CurrentOrderSummary = CurrentOrderSummary(
+  // TODO this function has been moved to the domain package, move the test and refactor this class
+  def getCurrentOrderSummary(marketId: String, uniqueId: String, order: Order): CurrentOrderSummary = CurrentOrderSummary(
     betId           = order.betId,
     marketId        = marketId,
     selectionId     = uniqueId.split("-")(0).toLong,
@@ -128,25 +129,19 @@ class SimOrderBook(var markets: HashMap[String, MarketOrderBook] = HashMap.empty
     regulatorCode   = ""
   )
 
-  // TODO test this
-  private def getRunnerOrders(marketId: String, uniqueId: String, orders: Set[Order]): Set[CurrentOrderSummary] = {
-    orders.map(x => getCurrentOrderSummary(marketId, uniqueId, x))
+  def getMarketOrders(marketId: String, marketOrderBook: MarketOrderBook): Set[CurrentOrderSummary] = {
+    marketOrderBook.getOrders.map{case (k,v) => v.map(x => getCurrentOrderSummary(marketId, k, x))}.reduce(_ ++ _)
   }
 
   // TODO test this
-  private def getMarketOrders(marketId: String, marketOrderBook: MarketOrderBook): Set[CurrentOrderSummary] = {
-    marketOrderBook.getOrders.map{case (k,v) => getRunnerOrders(marketId, k,v)}.reduce(_ ++ _)
-  }
-
-  // TODO test this
-  private def getOrdersByMarket(marketIds: Seq[String]): Set[CurrentOrderSummary] = {
+  def getOrdersByMarket(marketIds: Seq[String]): Set[CurrentOrderSummary] = {
     val orders = if (marketIds.nonEmpty) {
       // Filter by markets
       marketIds.map(id => if (markets.contains(id)) getMarketOrders(id, markets(id)) else Set.empty[CurrentOrderSummary])
     } else {
       markets.map { case (k, v) => getMarketOrders(k, v)}
     }
-    orders.reduce(_ ++ _)
+    orders.flatten.toSet
   }
 
   // TODO test this
@@ -168,6 +163,6 @@ object SimOrderBook {
   case class CancelOrders(marketId: String, instructions: Set[CancelInstruction], customerRef: Option[String] = None)
   case class ReplaceOrders(marketId: String, instructions: Set[ReplaceInstruction], customerRef: Option[String] = None)
   case class UpdateOrders(marketId: String, instructions: Set[UpdateInstruction], customerRef: Option[String] = None)
-  case class MatchOrders(listMarketBookContainer: ListMarketBookContainer)
+  case class MatchOrders(listMarketBookContainer: ListMarketBookContainer, orderProjection: OrderProjection)
   case class GetOrders(betIds: Seq[String], marketIds: Seq[String], status: OrderStatus)
 }

@@ -32,4 +32,26 @@ object CurrentOrderSummary {
   implicit val dateTimeReads = Reads.jodaDateReads(dateFormat)
   implicit val dateTimeWrites = Writes.jodaDateWrites(dateFormat)
   implicit val formatCurrentOrderSummary = Json.format[CurrentOrderSummary]
+
+  def fromOrder(marketId: String, uniqueId: String, order: Order): CurrentOrderSummary = CurrentOrderSummary(
+    betId           = order.betId,
+    marketId        = marketId,
+    selectionId     = uniqueId.split("-")(0).toLong,
+    handicap        = uniqueId.split("-")(1).toDouble,
+    priceSize       = PriceSize(order.price, order.size),
+    bspLiability    = order.bspLiability,
+    side            = order.side,
+    status          = order.status,
+    persistenceType = order.persistenceType,
+    orderType       = order.orderType,
+    placedDate      = order.placedDate,
+    matchedDate     = None,
+    averagePriceMatched = order.avgPriceMatched,
+    sizeMatched     = order.sizeMatched,
+    sizeRemaining   = order.sizeRemaining,
+    sizeLapsed      = order.sizeLapsed,
+    sizeCancelled   = order.sizeCancelled,
+    sizeVoided      = order.sizeVoided,
+    regulatorCode   = ""
+  )
 }

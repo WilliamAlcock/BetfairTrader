@@ -1,6 +1,6 @@
 class LadderCtrl
 
-  constructor: (@$log, @$stateParams, @$scope, @WebSocketService, @DataModelService, @PriceService) ->
+  constructor: (@$log, @$stateParams, @$scope, @WebSocketService, @DataModelService, @PriceService, @$rootScope) ->
 
     # TODO get these values from config
     @depth = 5
@@ -10,7 +10,7 @@ class LadderCtrl
 
     @catalogueData = @DataModelService.marketCatalogueData
 
-    @catalogue = undefined
+    @catalogue = {}
 
     @$log.log "Ladder Controller", @$stateParams, @DataModelService
 
@@ -19,8 +19,8 @@ class LadderCtrl
 
     @$scope.$on '$destroy', () -> @WebSocketService.unSubscribeFromMarkets([@$stateParams.marketId], "ALL_AND_TRADED")
 
-    @cancelMarketWatch = @$scope.$on 'market-' + @$stateParams.marketId, @updateRunner
-    @cancelCatalogueWatch = @$scope.$on 'catalogue-' + @$stateParams.marketId, @updateRunner
+    @cancelMarketWatch = @$scope.$on 'market-' + @$stateParams.marketId, @updateLadder
+    @cancelCatalogueWatch = @$scope.$on 'catalogue-' + @$stateParams.marketId, @updateTitle
 
   togglePosition: () =>
     @isPositionOpen = !@isPositionOpen
@@ -29,6 +29,11 @@ class LadderCtrl
     if (@DataModelService.marketBookData[@$stateParams.marketId]?)
       @DataModelService.marketBookData[@$stateParams.marketId].runners[@$stateParams.selectionId]
     else {}
+
+  getRunnerCatalogue: () =>
+    if (Object.keys(@catalogue).length == 0)
+      @catalogue = @DataModelService.getRunnerCatalogue(@$stateParams.marketId, parseInt(@$stateParams.selectionId.split('-')[0], 10))
+    @catalogue
 
   placeOrder: (side, price, size) =>
     @WebSocketService.placeOrders(
@@ -66,14 +71,14 @@ class LadderCtrl
 
   snapToOffer: () => @prices = @PriceService.getLadderPrices(@getRunner().ex.availableToLay[0].price, @depth)
 
-  updateRunner: () =>
-    @$log.log('updating runner', )
+  updateTitle: () =>
     if (@catalogueData[@$stateParams.marketId]?)
-      @catalogue = (x for x in @catalogueData[@$stateParams.marketId].runners when x.uniqueId == @$stateParams.selectionId)[0]
-      @$log.log('got catalogue data', @catalogueData[@$stateParams.marketId], @catalogue)
-      @snapToBid()
-      @$scope.$apply()
-      @cancelMarketWatch()
+      @$rootScope.title = @catalogueData[@$stateParams.marketId].event.name
       @cancelCatalogueWatch()
 
-controllersModule.controller('LadderCtrl', ['$log', '$stateParams', '$scope', 'WebSocketService', 'DataModelService', 'PriceService', LadderCtrl])
+  updateLadder: () =>
+    @snapToBid()
+    @$scope.$apply()
+    @cancelMarketWatch()
+
+controllersModule.controller('LadderCtrl', ['$log', '$stateParams', '$scope', 'WebSocketService', 'DataModelService', 'PriceService', '$rootScope', LadderCtrl])

@@ -1,0 +1,42 @@
+<div class="row bf-orders">
+    <div class="col-xs-12 heading">{{catalogueData[marketId].event.name}}</div>
+    <div class="col-xs-12 heading">{{catalogueData[marketId].marketName}} - {{getRunnerCatalogue().runnerName}}</div>
+    <div class="col-xs-12">
+        <div class="row">
+            <div class="col-xs-3 price">Price</div>
+            <div class="col-xs-3">Vol</div>
+            <div class="col-xs-3">Profit</div>
+            <div class="col-xs-3">Liability</div>
+        </div>
+    </div>
+    <!--Back Orders-->
+    <div class="col-xs-12" ng-repeat="(betId, order) in data | toArray | filter: {side: 'BACK'} track by order.betId">
+        <div class="row bf-back-color" ng-class="{true: 'bf-first-back-order', false: ''}[$first]">
+            <div class="col-xs-3">
+                <span class="glyphicon glyphicon-remove text-danger" ng-click="cancelOrder(order)"></span>
+                {{order.priceSize.price}}
+            </div>
+            <div class="col-xs-3">{{order.priceSize.size | number: 2}}</div>
+            <div class="col-xs-3">{{getLiability(order) | number: 2}}</div>
+            <div class="col-xs-3">
+                {{getProfit(order) | number: 2}}
+                <span class="glyphicon glyphicon-info-sign pull-right text-info" ng-click="getOrderInfo(order)"></span>
+            </div>
+        </div>
+    </div>
+    <!--Lay Orders-->
+    <div class="col-xs-12" ng-repeat="(betId, order) in data | toArray | filter: {side: 'LAY'} track by order.betId">
+        <div class="row bf-lay-color" ng-class="{true: 'bf-first-lay-order', false: ''}[$first]">
+            <div class="col-xs-3">
+                <span class="glyphicon glyphicon-remove cancel text-danger" ng-click="cancelOrder(order)"></span>
+                {{order.priceSize.price}}
+            </div>
+            <div class="col-xs-3">{{order.priceSize.size | number: 2}}</div>
+            <div class="col-xs-3">{{getLiability(order) | number: 2}}</div>
+            <div class="col-xs-3">
+                {{getProfit(order) | number: 2}}
+                <span class="glyphicon glyphicon-info-sign pull-right text-info" ng-click="getOrderInfo(order)"></span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,22 +1,24 @@
 package core.orderManager
 
-import akka.actor.{Scheduler, Actor, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Props, Scheduler}
 import core.api.commands._
 import core.api.output.Output
 import core.dataProvider.polling.BEST
-import core.eventBus.{MessageEvent, EventBus}
+import core.eventBus.{EventBus, MessageEvent}
 import core.orderManager.OrderManager._
 import domain._
 import org.joda.time.DateTime
+import play.api.libs.json.Json
 import server.Configuration
 import service.BetfairService
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
-
 import scala.util.Success
 
-sealed case class OrderData(marketId: String, selectionId: Long, handicap: Double, order: Order)
+sealed case class OrderData(selectionId: Long, handicap: Double, order: Order)
+sealed case class MatchData(selectionId: Long, handicap: Double, _match: Match)
 
 // TODO should orderManager make sure that any markets being operated on are being polled ?
 class OrderManager(config: Configuration, sessionToken: String, controller: ActorRef, betfairService: BetfairService, eventBus: EventBus) extends Actor {
@@ -30,8 +32,9 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
 
   var timer = scheduler.schedule(config.orderManagerUpdateInterval, config.orderManagerUpdateInterval, self, Validate)
 
-  var trackedOrders = Map.empty[String, OrderData]
-  var executedOrders = Map.empty[String, OrderData]
+  // Keyed by MarketId
+  var trackedOrders = Map.empty[String, Set[OrderData]]
+  var matches = Map.empty[String, Set[MatchData]]
 
   override def preStart() = {
     super.preStart()
@@ -42,18 +45,16 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
     eventBus.publish(MessageEvent(
       config.getOrderUpdateChannel(Seq(output.marketId, output.selectionId.toString, output.handicap.toString)),
       output,
-      self
-    ))
+      self))
   }
 
-  def update(trackedOrders: Map[String, OrderData]): Map[String, OrderData] = {
+  def update(trackedOrders: Map[String, Set[OrderData]]): Map[String, Set[OrderData]] = {
     try {
       val currentOrders = Await.result(betfairService.listCurrentOrders(sessionToken), 10 seconds)
 
       currentOrders match {
-        case Some(ListCurrentOrdersContainer(x)) => x.currentOrders.map(orderSummary =>
-          orderSummary.betId -> OrderData(
-            orderSummary.marketId,
+        case Some(ListCurrentOrdersContainer(x)) => x.currentOrders.groupBy(_.marketId).mapValues(_.map(orderSummary =>
+          OrderData(
             orderSummary.selectionId,
             orderSummary.handicap,
             Order(
@@ -74,7 +75,7 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
               orderSummary.sizeVoided
             )
           )
-        ).toMap
+        ))
         case _ => trackedOrders
         // Unable to get current order from exchange
       }
@@ -84,43 +85,81 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
   }
 
   /*
-    Process order for a given market and selection
-    Returns a set of updates
+  Updated:
+  Order IS tracked, IS in marketBookUpdate
+
+  Placed:
+  Order IS NOT tracked, IS in marketBookUpdate
+
+  Executed:
+  Order IS tracked, IS NOT in marketBookUpdate
+ */
+
+  // TODO test
+  def updateOrder(marketId: String, selectionId: Long, handicap: Double, order: Order): Set[OrderManagerOutput] = order.status match {
+    case OrderStatus.EXECUTABLE => trackedOrders.get(marketId) match {
+      case Some(marketOrders) => marketOrders.find(x => x.order.betId == order.betId) match {
+        case Some(trackedOrder) if trackedOrder.order != order =>
+          trackedOrders = trackedOrders + (marketId -> ((marketOrders - trackedOrder) + OrderData(selectionId, handicap, order)))
+          Set(OrderUpdated(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order)))      // Order Updated
+        case Some(_) => Set.empty[OrderManagerOutput]
+        case None =>
+          trackedOrders = trackedOrders + (marketId -> (marketOrders + OrderData(selectionId, handicap, order)))
+          Set(OrderPlaced(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order)))        // Order Placed
+      }
+      case None =>
+        trackedOrders = trackedOrders + (marketId -> Set(OrderData(selectionId, handicap, order)))
+        Set(OrderPlaced(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order)))          // Order Placed
+    }
+    case _ => Set.empty[OrderManagerOutput]
+  }
+
+  // TODO test
+  def removeCompletedOrders(marketId: String, selectionId: Long, handicap: Double, orders: Set[Order]): Set[OrderManagerOutput] = trackedOrders.get(marketId) match {
+    case Some(marketOrders) =>
+      val orderIds = orders.map(_.betId)
+      val completedOrders = marketOrders.filter(x => x.selectionId == selectionId && x.handicap == handicap && !orderIds.contains(x.order.betId))
+      trackedOrders = trackedOrders + (marketId -> (marketOrders -- completedOrders))
+      completedOrders.map(x => OrderExecuted(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, x.order)))           // Order Executed
+
+    case None => Set.empty[OrderManagerOutput]
+  }
+
+  /*
+  Filled:
+  Match does not exist in matches or has changed
    */
-  def processOrder(marketId: String, selectionId: Long, handicap: Double, order: Order): Set[OrderManagerOutput] = order.status match {
-    case OrderStatus.EXECUTABLE =>
-      val output: Set[OrderManagerOutput] = trackedOrders.get(order.betId) match {                                                                            // Is the order being tracked ?
-        case Some(trackedOrder) if order.sizeMatched > trackedOrder.order.sizeMatched =>
-          Set(
-            OrderFilled(marketId, selectionId, handicap, order, order.sizeMatched - trackedOrder.order.sizeMatched),
-            OrderUpdated(marketId, selectionId, handicap, order)                                                          // Order Filled & Updated
-          )
-        case Some(trackedOrder) =>
-          Set(OrderUpdated(marketId, selectionId, handicap, order))                                                                                        // Order Updated
-        case None =>
-          Set(OrderPlaced(marketId, selectionId, handicap, order))                                                                                         // Order Placed
-      }
-      trackedOrders = trackedOrders + (order.betId -> OrderData(marketId, selectionId, handicap, order))
-      output
-    case OrderStatus.EXECUTION_COMPLETE =>                                                                              // Is the order being tracked ?
-      val output: Set[OrderManagerOutput] = trackedOrders.get(order.betId) match {
-        case Some(trackedOrder) =>
-          trackedOrders = trackedOrders - order.betId
-          Set(OrderExecuted(marketId, selectionId, handicap, order))                                                                                       // Order Executed
-        case None =>
-          Set.empty[OrderManagerOutput]                                                                                   // Do Nothing
-      }
-      executedOrders = executedOrders + (order.betId -> OrderData(marketId, selectionId, handicap, order))
-      output
+
+  // TODO test
+  def updateMatch(marketId: String, selectionId: Long, handicap: Double, _match: Match): Set[OrderManagerOutput] = matches.get(marketId) match {
+    case Some(marketMatches) => marketMatches.find(x => x.selectionId == selectionId && x.handicap == handicap && x._match.side == _match.side) match {
+      case Some(trackedMatch) if trackedMatch._match != _match =>
+        matches = matches + (marketId -> ((marketMatches - trackedMatch) + MatchData(selectionId, handicap, _match)))
+        Set(OrderMatched(marketId, selectionId, handicap, _match))
+      case Some(_) => Set.empty[OrderManagerOutput]
+      case None =>
+        matches = matches + (marketId -> (marketMatches + MatchData(selectionId, handicap, _match)))
+        Set(OrderMatched(marketId, selectionId, handicap, _match))
+    }
+    case None =>
+      matches = matches + (marketId -> Set(MatchData(selectionId, handicap, _match)))
+      Set(OrderMatched(marketId, selectionId, handicap, _match))
   }
 
   /*
     Process the orders for a given runner
     Returns a set of updates
    */
-  def processRunner(marketId: String, runner: Runner): Set[OrderManagerOutput] = runner.orders match {
-    case Some(x) => x.map(order => processOrder(marketId, runner.selectionId, runner.handicap, order)).flatten
-    case _ => Set.empty[OrderManagerOutput]
+  def processRunner(marketId: String, runner: Runner): Set[OrderManagerOutput] = {
+    val orderUpdates = runner.orders match {
+      case Some(orders) => orders.map(updateOrder(marketId, runner.selectionId, runner.handicap, _)).flatten ++ removeCompletedOrders(marketId, runner.selectionId, runner.handicap, orders)
+      case _ => Set.empty[OrderManagerOutput]
+    }
+    val matchUpdates = runner.matches match {
+      case Some(_matches) => _matches.map(updateMatch(marketId, runner.selectionId, runner.handicap, _)).flatten
+      case _ => Set.empty[OrderManagerOutput]
+    }
+    orderUpdates ++ matchUpdates
   }
 
   /*
@@ -136,11 +175,34 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
     false otherwise
    */
   def allOrdersCompleted(marketBook: MarketBook): Boolean = marketBook.runners.map(runner =>
-    runner.orders.isDefined && runner.orders.get.forall(x => x.status == OrderStatus.EXECUTION_COMPLETE)
+    runner.orders.isDefined && runner.orders.get.forall(x => x.status != OrderStatus.EXECUTABLE)
   ).forall(x => x)
+
+  // TODO test
+  def listCurrentOrders(betIds: Set[String], marketIds: Set[String]): Set[CurrentOrderSummary] = {
+    val output = (marketIds.nonEmpty match {
+      case true => trackedOrders.filterKeys(marketIds.contains)
+      case false => trackedOrders
+    }).map{case (marketId, orderData) => orderData.map(x => CurrentOrderSummary.fromOrder(marketId, x.selectionId + "-" + x.handicap, x.order))}.flatten.toSet
+    if (betIds.nonEmpty) {
+      output.filter(x => betIds.contains(x.betId))
+    } else {
+      output
+    }
+  }
+
+  def listMatches: ListMatchesContainer = ListMatchesContainer(
+    matches.map{case (marketId, _matches) => _matches.map(x => OrderMatched(marketId, x.selectionId, x.handicap, x._match))}.flatten.toSet
+  )
 
   override def receive = {
     case Validate => trackedOrders = update(trackedOrders)
+
+    case ListCurrentOrders(betIds: Set[String], marketIds: Set[String]) =>
+      sender() ! ListCurrentOrdersContainer(CurrentOrderSummaryReport(listCurrentOrders(betIds, marketIds), moreAvailable = false))
+
+    case ListMatches =>
+      sender() ! listMatches
 
     case MarketBookUpdate(timestamp, marketBook) =>
       processMarketBook(marketBook).foreach(broadcast)
@@ -182,13 +244,20 @@ object OrderManager {
     val marketId: String
     val selectionId: Long
     val handicap: Double
-    val order: Order
   }
 
-  final case class OrderFilled(marketId: String, selectionId: Long, handicap: Double, order: Order, size: Double) extends OrderManagerOutput
-  final case class OrderPlaced(marketId: String, selectionId: Long, handicap: Double, order: Order) extends OrderManagerOutput
-  final case class OrderUpdated(marketId: String, selectionId: Long, handicap: Double, order: Order) extends OrderManagerOutput
-  final case class OrderExecuted(marketId: String, selectionId: Long, handicap: Double, order: Order) extends OrderManagerOutput
+  final case class OrderMatched(marketId: String, selectionId: Long, handicap: Double, _match: Match) extends OrderManagerOutput
+  final case class OrderPlaced(marketId: String, selectionId: Long, handicap: Double, order: CurrentOrderSummary) extends OrderManagerOutput
+  final case class OrderUpdated(marketId: String, selectionId: Long, handicap: Double, order: CurrentOrderSummary) extends OrderManagerOutput
+  final case class OrderExecuted(marketId: String, selectionId: Long, handicap: Double, order: CurrentOrderSummary) extends OrderManagerOutput
+
+  final case class ListMatchesContainer(matches: Set[OrderMatched]) extends Output
+
+  implicit val formatOrderFilled = Json.format[OrderMatched]
+  implicit val formatOrderPlaced = Json.format[OrderPlaced]
+  implicit val formatOrderUpdated = Json.format[OrderUpdated]
+  implicit val formatOrderExecuted = Json.format[OrderExecuted]
+  implicit val formatListMatchesContainer = Json.format[ListMatchesContainer]
 
   case object Validate
 }

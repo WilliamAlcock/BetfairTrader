@@ -8,7 +8,7 @@ import core.dataProvider.polling.MarketPoller.Poll
 import core.dataProvider.polling.{MarketPoller, PollingGroup, PollingGroups}
 import core.eventBus.EventBus
 import domain.MarketSort.MarketSort
-import domain.{MatchProjection, OrderProjection, _}
+import domain._
 import org.joda.time.DateTime
 import server.Configuration
 import service.BetfairService
@@ -25,16 +25,11 @@ class DataProvider(config: Configuration,
 
   import context._
 
-  // TODO implement update navigation data
-  val ORDER_PROJECTION = OrderProjection.ALL
-  val MATCH_PROJECTION = MatchProjection.ROLLED_UP_BY_PRICE
+  // TODO get these values from config
+  val pollingInterval: FiniteDuration = 500 millis
+  val numberOfWorkers: Int = 4
 
-  val workers: Seq[ActorRef] = List[ActorRef](
-    context.actorOf(MarketPoller.props(config, sessionToken, betfairService, eventBus), "pollingWorker1"),
-    context.actorOf(MarketPoller.props(config, sessionToken, betfairService, eventBus), "pollingWorker2"),
-    context.actorOf(MarketPoller.props(config, sessionToken, betfairService, eventBus), "pollingWorker3"),
-    context.actorOf(MarketPoller.props(config, sessionToken, betfairService, eventBus), "pollingWorker4")
-  )
+  val workers: Seq[ActorRef] = List.range(0, numberOfWorkers).map(x => context.actorOf(MarketPoller.props(config, sessionToken, betfairService, eventBus), "pollingWorker" + x))
 
   var pollingRouter: ActorRef = context.actorOf(RoundRobinGroup(workers.map {x=> x.path.toString}.toList).props(), "router")
   var pollingGroups = PollingGroups()
@@ -53,16 +48,14 @@ class DataProvider(config: Configuration,
 
   def tick() = {
     pollingGroups.pollingGroups.foreach{ case (pollingGroup: PollingGroup, markets: Set[String]) =>
-      sendToRouter(markets, pollingGroup.maxMarkets, (m: Set[String]) =>
-        pollingRouter ! Poll(m, pollingGroup.getPriceProjection(), ORDER_PROJECTION, MATCH_PROJECTION)
-      )}
+      sendToRouter(markets, pollingGroup.maxMarkets, (m: Set[String]) => pollingRouter ! Poll(m, pollingGroup.getPriceProjection(), config.orderProjection, config.matchProjection))}
     pollingGroups.pollingGroups.size match {
       case x if x == 0 =>
         println(DateTime.now().toString + " ticking no markets")
         cancelPolling.cancel()
         isPolling = false
       case x =>
-        cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)     // TODO this value should come from config
+        cancelPolling = context.system.scheduler.scheduleOnce(pollingInterval, self, Tick)     // TODO this value should come from config
         isPolling = true
     }
   }
@@ -104,7 +97,7 @@ class DataProvider(config: Configuration,
   private def subscribeToMarkets(markets: Set[String], pollingGroup: PollingGroup, subscriber: ActorRef) = {
     markets.foreach(x => pollingGroups = pollingGroups.addSubscriber(x, subscriber.toString(), pollingGroup))
     if (!isPolling) {
-      cancelPolling = context.system.scheduler.scheduleOnce(500 milliseconds, self, Tick)     // TODO this value should come from config
+      cancelPolling = context.system.scheduler.scheduleOnce(pollingInterval, self, Tick)     // TODO this value should come from config
       isPolling = true
     }
   }

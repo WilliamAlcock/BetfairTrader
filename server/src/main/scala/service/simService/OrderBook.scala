@@ -94,9 +94,9 @@ case class OrderBook(side: Side,
 
   def hasBetId(betId: String):Boolean = orders.find(x => x.betId == betId).size > 0
 
-  def getOrders(): List[Order] = orders
+  def getOrders: List[Order] = orders
 
-  def getMatches(): List[Match] = matches
+  def getMatches: List[Match] = matches
 
-  def getSide(): Side = side
+  def getSide: Side = side
 }

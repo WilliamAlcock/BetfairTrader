@@ -71,31 +71,32 @@ angular.module('myApp.routeConfig', ['ui.router'])
             resolve: {
               webSocket: (WebSocketService) -> WebSocketService.init()
             },
-            template: '<ui-view></ui-view>'
+            templateUrl: '/assets/partials/main/main.html',
+            controller: 'MainCtrl as main'
           })
           .state('init.main', {
             abstract: true,
-            templateUrl: '/assets/partials/main/main.html'
-            controller: 'MainCtrl as main'
+            views: {
+              'position@init': {
+                templateUrl: '/assets/partials/main/position.html',
+                controller: 'positionCtrl as position'
+              }
+            }
           })
           .state('init.main.soccer', {
             url: "/soccer",
-            onEnter: (WebSocketService) -> WebSocketService.getNavigationData("1")
+            onEnter: (WebSocketService) -> WebSocketService.getNavigationData("1"),
             views: {
-              'navigation@init.main': {
+              'navigation@init': {
                 templateUrl: '/assets/partials/main/soccer/navigation.html',
                 controller: 'soccerNavigationCtrl as nav'
               },
-              'position@init.main': {
-                templateUrl: '/assets/partials/main/soccer/position.html',
-                controller: 'soccerPositionCtrl as position'
-              }
             },
           })
           .state('init.main.soccer.coupon', {
             url: "/:coupon",
             views: {
-              'detail@init.main': {
+              'detail@init': {
                 templateUrl: '/assets/partials/main/soccer/coupon/detail.html',
                 controller: 'soccerCouponDetailCtrl as detail'
               },
@@ -119,11 +120,11 @@ angular.module('myApp.routeConfig', ['ui.router'])
               }
             }
             views: {
-              'navigation@init.main': {
+              'navigation@init': {
                 templateUrl: '/assets/partials/main/soccer/event/navigation.html',
                 controller: 'soccerEventNavigationCtrl as nav'
               },
-              'detail@init.main': {
+              'detail@init': {
                 templateUrl: '/assets/partials/main/soccer/event/detail.html',
                 controller: 'soccerEventDetailCtrl as detail'
               },
@@ -135,18 +136,14 @@ angular.module('myApp.routeConfig', ['ui.router'])
               onEnter: (WebSocketService) -> WebSocketService.getNavigationData("7")
               params: {},
               views: {
-                'navigation@init.main': {
+                'navigation@init': {
                   templateUrl: '/assets/partials/main/horseRacing/navigation.html',
                   controller: 'horseRacingNavigationCtrl as nav'
                 },
-                'detail@init.main': {
+                'detail@init': {
                   templateUrl: '/assets/partials/main/horseRacing/detail.html',
                   controller: 'horseRacingDetailCtrl as detail'
                 },
-                'position@init.main': {
-                  templateUrl: '/assets/partials/main/horseRacing/position.html',
-                  controller: 'horseRacingPositionCtrl as position'
-                }
               },
             })
 

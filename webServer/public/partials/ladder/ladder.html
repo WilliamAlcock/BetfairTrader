@@ -1,6 +1,5 @@
 <div class="row bf-ladder">
-    <div class="col-xs-12 text-center heading">{{ladder.catalogueData[ladder.$stateParams.marketId].event.name}}</div>
-    <div class="col-xs-12 text-center entry">{{ladder.catalogueData[ladder.$stateParams.marketId].marketName}}</div>
+    <div class="col-xs-12 text-center heading">{{ladder.catalogueData[ladder.$stateParams.marketId].marketName}} - {{ladder.getRunnerCatalogue().runnerName}}</div>
     <div class="col-xs-12 text-center entry">
         <div class="pull-left">
             Start Time: {{ladder.catalogueData[ladder.$stateParams.marketId].marketStartTime | dateFilter}}

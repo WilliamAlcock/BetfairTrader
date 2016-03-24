@@ -1,0 +1,76 @@
+.bf-position-panel {
+    margin-top:20px;
+    margin-left:0px;
+    margin-right:0px;
+}
+
+.bf-position-panel .heading {
+    border-right: solid 1px #c9ced1;
+    border-left: solid 1px #c9ced1;
+    background-color: #c9ced1;
+    color: rgb(39, 58, 71);
+    margin-bottom:10px;
+}
+
+.bf-position-panel .content {
+    padding-left:0px;
+    padding-right:0px;
+}
+
+.bf-position-panel .bf-orders {
+    margin-top:15px;
+}
+
+.bf-position-panel .bf-orders .heading {
+    margin-bottom:0px;
+    border-bottom:1px solid white;
+}
+
+.bf-position-panel .panel-body {
+    padding-top:0px;
+}
+
+.bf-position-panel .bf-orders .price {
+    padding-left: 28px;
+}
+
+.bf-position-panel .bf-orders .bf-lay-color {
+    color: black;
+    background: #F3DCE2;
+    border-bottom: 1px solid white;
+}
+
+.bf-position-panel .bf-orders .bf-first-back-order {
+    border-top: 2px solid #72bbef;
+}
+
+.bf-position-panel .bf-orders .bf-back-color {
+    color: black;
+    background: #C9E5F9;
+    border-bottom: 1px solid white;
+}
+
+.bf-position-panel .bf-orders .bf-first-lay-order {
+    border-top: 2px solid #faa9ba;
+}
+
+.bf-position-panel .bf-orders span.text-danger {
+    margin-left:-5px;
+    margin-right:5px;
+    top: 3px;
+    cursor:pointer;
+}
+
+.bf-position-panel .bf-orders span.text-info {
+    margin-right:-5px;
+    top: 3px;
+    cursor:pointer;
+}
+
+.bf-position-panel .bf-orders .entry {
+    cursor:pointer;
+    color: rgb(39, 137, 206);
+    border-right: solid 1px #c9ced1;
+    border-left: solid 1px #c9ced1;
+    border-bottom: solid 1px #c9ced1;
+}

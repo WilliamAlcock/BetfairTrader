@@ -1,0 +1,29 @@
+<div class="row bf-position-panel">
+    <div class="col-xs-12 heading">Positions</div>
+    <div class="col-xs-12 content">
+        <uib-accordion close-others="oneAtATime">
+            <uib-accordion-group is-open="position.isOpen.orders">
+                <uib-accordion-heading>
+                    <i class="pull-right glyphicon" ng-class="{true:'glyphicon-triangle-top', false:'glyphicon-triangle-bottom', undefined: 'glyphicon-triangle-bottom'}[position.isOpen.orders]"></i>
+                    &nbsp Orders
+                </uib-accordion-heading>
+                <div ng-repeat="(marketId, selections) in position.orders track by marketId">
+                    <div ng-repeat="(selectionId, handicaps) in selections track by selectionId">
+                        <orders class="col-xs-12" ng-repeat="(handicap, orders) in handicaps track by handicap" market-id="marketId" selection-id="selectionId" handicap="handicap" data="orders"></orders>
+                    </div>
+                </div>
+            </uib-accordion-group>
+            <uib-accordion-group is-open="position.isOpen.matches">
+                <uib-accordion-heading>
+                    <i class="pull-right glyphicon" ng-class="{true:'glyphicon-triangle-top', false:'glyphicon-triangle-bottom', undefined: 'glyphicon-triangle-bottom'}[position.isOpen.matches]"></i>
+                    &nbsp Matches
+                </uib-accordion-heading>
+                <div ng-repeat="(marketId, selections) in position.matches track by marketId">
+                    <div ng-repeat="(selectionId, handicaps) in selections track by selectionId">
+                        <matches class="col-xs-12" ng-repeat="(handicap, matches) in handicaps track by handicap" market-id="marketId" selection-id="selectionId" handicap="handicap" data="matches"></matches>
+                    </div>
+                </div>
+            </uib-accordion-group>
+        </uib-accordion>
+    </div>
+</div>
