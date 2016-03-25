@@ -84,6 +84,8 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
         override def preStart() = {}
       }))
 
+      val sender = TestProbe()
+
       val instructions = Set(PlaceInstruction(OrderType.LIMIT, 1L, 0.0, Side.BACK))
       val serviceOutput = PlaceExecutionReportContainer(PlaceExecutionReport(reportStatus, marketId, None, Set(), None))
 
@@ -91,13 +93,13 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
         .expects(sessionToken, marketId, instructions, customerRef)
         .returns(Future.successful(Some(serviceOutput)))
 
-      orderManager ! PlaceOrders(marketId, instructions, customerRef)
+      sender.ref.tell(PlaceOrders(marketId, instructions, customerRef), orderManager)
 
       if (subscribeToMarkets) {
         controller.expectMsg(SubscribeToMarkets(Set(marketId), BEST))
       }
 
-      expectMsg(serviceOutput)
+      sender.expectMsg(serviceOutput)
     }
   }
 
