@@ -1,6 +1,7 @@
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
 import core.Controller
+import core.autotrader.AutoTrader
 import core.dataModel.DataModelActor
 import core.dataProvider.DataProvider
 import core.eventBus.EventBus
@@ -56,14 +57,14 @@ object Main {
 
     val controller = system.actorOf(Props(new Controller(config, eventBus)), "controller")
     val orderManager = system.actorOf(OrderManager.props(config, sessionToken, controller, betfairService, eventBus), "orderManager")
+    val autoTrader = system.actorOf(AutoTrader.props(config, controller, eventBus), "autoTrader")
 
     // Subscribe to event bus
     eventBus.subscribe(navDataActor, config.navDataInstructions)
     eventBus.subscribe(dataModelActor, config.dataModelInstructions)
     eventBus.subscribe(dataProvider, config.dataProviderInstructions)
     eventBus.subscribe(orderManager, config.orderManagerInstructions)
-
-
+    eventBus.subscribe(autoTrader, config.autoTraderInstructions)
 
     // DataStoreWriter
 //    system.actorOf(DataStoreWriter.props(config, controller), "dataStoreWriter")

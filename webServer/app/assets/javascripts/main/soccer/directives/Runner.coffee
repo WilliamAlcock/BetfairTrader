@@ -1,4 +1,4 @@
-directivesModule.directive('runner',  ['$log', '$window', 'DataModelService', ($log, $window, DataModelService) ->
+directivesModule.directive('runner',  ['$log', '$window', '$uibModal', 'DataModelService', 'AutoTraderService', 'WebSocketService', ($log, $window, $uibModel, DataModelService, AutoTraderService, WebSocketService) ->
   templateUrl: '/assets/partials/main/soccer/directives/runner.html'
   scope: {
     id: '='
@@ -14,6 +14,28 @@ directivesModule.directive('runner',  ['$log', '$window', 'DataModelService', ($
       scope.counter++
 
     scope.bookData = DataModelService.marketBookData
+
+    scope.isStrategyRunning = () -> AutoTraderService.isStrategyRunning(scope.id, scope.catalogue.selectionId, scope.catalogue.handicap)
+
+    scope.startStrategy = () ->
+      modelInstance = $uibModel.open({
+        animation: false,
+        templateUrl: '/assets/partials/main/modals/strategy.html'
+        controller: 'StrategyModalCtrl as mod'
+        backdrop: false
+        keyboard: true
+        openedClass: 'bf-strategy-model-body'
+        size: 'md'
+        windowClass: 'bf-strategy-model-window'
+        windowTopClass: 'bf-strategy-model-top-window'
+      })
+
+      modelInstance.result.then (params) ->
+        params = {marketId: scope.id, selectionId: scope.catalogue.selectionId, entryPrice: 3.0, size: 2.0, exitPrice: 5.0}
+        $log.log('sending params', params)
+        WebSocketService.startStrategy(scope.id, scope.catalogue.selectionId, scope.catalogue.handicap, params)
+
+    scope.stopStrategy = () -> WebSocketService.stopStrategy(scope.id, scope.catalogue.selectionId, scope.catalogue.handicap)
 
     $log.debug 'runner directive'
 ])

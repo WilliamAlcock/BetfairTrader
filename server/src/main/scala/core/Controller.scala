@@ -22,6 +22,7 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
     case x: UpdateOrders          => config.orderManagerInstructions
     case x: ListCurrentOrders     => config.orderManagerInstructions
     case ListMatches              => config.orderManagerInstructions
+    case x: StartStrategy         => config.autoTraderInstructions
   }
 
   var subscribers = Set.empty[ActorRef]
@@ -64,6 +65,12 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
     case SubscribeToOrderUpdates(marketId, selectionId, handicap) =>
       watch(sender())
       val channel = config.getOrderUpdateChannel(marketId, selectionId, handicap)
+      eventBus.subscribe(sender(), channel)
+      system.log.info("Subscribing " + sender() + " to " + channel)
+
+    case SubscribeToAutoTraderUpdates(strategyId) =>
+      watch(sender())
+      val channel = config.getAutoTraderUpdateChannel(strategyId)
       eventBus.subscribe(sender(), channel)
       system.log.info("Subscribing " + sender() + " to " + channel)
 

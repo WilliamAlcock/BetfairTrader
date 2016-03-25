@@ -14,7 +14,7 @@ class WebSocketService
     "NavigationDataUpdate":   NAVIGATION_DATA_UPDATE
   }
 
-  constructor: (@$log, @$q, @$rootScope, @DataModel, @OrderBook) ->
+  constructor: (@$log, @$q, @$rootScope, @DataModel, @OrderBook, @AutoTrader) ->
     @$log.debug "constructing Websocket service"
     @id = 0
 
@@ -28,6 +28,7 @@ class WebSocketService
       @$log.debug "WebSocket open"
       @subscribeToSystemAlerts()        # TODO move this to resolve in state
       @subscribeToOrderUpdates()        # TODO move this to resolve in state
+      @subscribeToAutoTraderUpdates()   # TODO move this to resolve in state
       @listCurrentOrders()              # TODO move this to resolve in state
       @listMatches()                    # TODO move this to resolve in state
       deferred.resolve()
@@ -79,6 +80,18 @@ class WebSocketService
         when "OrderExecuted"
           @$log.log("Order Executed", message)
           @$rootScope.$apply(@OrderBook.orderExecuted(message.result.result))
+        when "StrategyCreated"
+          @$log.log("Strategy Created", message)
+          @$rootScope.$apply(@AutoTrader.strategyCreated(message.result.result))
+        when "StrategyStarted"
+          @$log.log("Strategy Started", message)
+          @$rootScope.$apply(@AutoTrader.strategyStarted(message.result.result))
+        when "StrategyStateChanged"
+          @$log.log("Strategy State Changed", message)
+          @$rootScope.$apply(@AutoTrader.strategyStateChanged(message.result.result))
+        when "StrategyStopped"
+          @$log.log("Strategy Stopped", message)
+          @$rootScope.$apply(@AutoTrader.strategyStopped(message.result.result))
 
         else null
     else if angular.isDefined(message.error)
@@ -94,6 +107,14 @@ class WebSocketService
   subscribeToSystemAlerts: () -> @sendJsonrpcMessage({method: "subscribeToSystemAlerts", params: {}})
 
   subscribeToOrderUpdates: () -> @sendJsonrpcMessage({method: "subscribeToOrderUpdates", params: {}})
+
+  subscribeToAutoTraderUpdates: () -> @sendJsonrpcMessage({method: "subscribeToAutoTraderUpdates", params: {}})
+
+  startStrategy: (marketId, selectionId, handicap, config) ->
+    @sendJsonrpcMessage({method: "startStrategy", params: {marketId: marketId, selectionId: selectionId, handicap: handicap, config: config}})
+
+  stopStrategy: (marketId, selectionId, handicap) ->
+    @sendJsonrpcMessage({method: "stopStrategy", params: {marketId: marketId, selectionId: selectionId, handicap: handicap}})
 
   listCurrentOrders: () -> @sendJsonrpcMessage({method: "listCurrentOrders", params: {betIds: [], marketIds: []}})
 
@@ -144,4 +165,4 @@ class WebSocketService
     instructions = orders.map (x) -> {betId:x.betId}
     @sendJsonrpcMessage({method: "cancelOrders",  params: {marketId: marketId, instructions: instructions}})
 
-servicesModule.service('WebSocketService', ['$log', '$q', '$rootScope', 'DataModelService', 'OrderBookService', WebSocketService])
+servicesModule.service('WebSocketService', ['$log', '$q', '$rootScope', 'DataModelService', 'OrderBookService', 'AutoTraderService', WebSocketService])

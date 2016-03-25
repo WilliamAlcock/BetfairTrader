@@ -1,5 +1,6 @@
 package core.api.commands
 
+import core.autotrader.layTheDraw.LayTheDrawConfig
 import core.dataProvider.polling.PollingGroup
 import core.eventBus.Message
 import domain.MarketSort.MarketSort
@@ -30,6 +31,10 @@ case object StopPollingAllMarkets extends Command
 
 case class SubscribeToOrderUpdates(marketId: Option[String] = None, selectionId: Option[Long] = None, handicap: Option[Double] = None) extends Command
 
+case class SubscribeToAutoTraderUpdates(strategyId: Option[String] = None) extends Command
+case class StartStrategy(marketId: String, selectionId: Long, handicap: Double, config: LayTheDrawConfig) extends Command
+case class StopStrategy(marketId: String, selectionId: Long, handicap: Double) extends Command
+
 object Command {
   implicit val formatGetNavigationData = Json.format[GetNavigationData]
 
@@ -48,4 +53,7 @@ object Command {
   implicit val formatUnSubscribeFromMarkets = Json.format[UnSubscribeFromMarkets]
 
   implicit val formatSubscribeToOrderUpdates = Json.format[SubscribeToOrderUpdates]
+
+  implicit val formatSubscribeToAutoTraderUpdates = Json.format[SubscribeToAutoTraderUpdates]
+  implicit val formatStartStrategy = Json.format[StartStrategy]
 }

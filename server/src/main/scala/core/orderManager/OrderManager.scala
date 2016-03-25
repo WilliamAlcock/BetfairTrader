@@ -201,7 +201,6 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
       sender() ! listMatches
 
     case MarketBookUpdate(timestamp, marketBook) =>
-      println("processing marketBook", marketBook)
       processMarketBook(marketBook).foreach(broadcast)
       if (allOrdersCompleted(marketBook)) controller ! UnSubscribeFromMarkets(Set(marketBook.marketId), BEST)           // If all the orders are matched unSubscribe from this market
 
@@ -218,7 +217,6 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
             avgPriceMatched = report.averagePriceMatched.getOrElse(0.0),
             sizeMatched = report.sizeMatched.getOrElse(0.0)
           )
-          println("Placing order", order)
           trackedOrders = trackedOrders + (x.result.marketId -> (marketOrders + OrderData(report.instruction.selectionId, report.instruction.handicap, order)))
           Set(OrderPlaced(
             x.result.marketId,
@@ -229,27 +227,33 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
         }).flatten.foreach(broadcast)
       }
 
+    // TODO test that the correct sender is called in the future, because sender() inside the future is NOT the sender. This has been fixed. It requires a test
     case PlaceOrders(marketId, instructions, customerRef) =>
+      val _sender = sender()
       betfairService.placeOrders(sessionToken, marketId, instructions, customerRef) onComplete {
         case Success(Some(x)) =>
           if (x.result.status == ExecutionReportStatus.SUCCESS) self ! x          // If the report is successful forward it to self to be tracked
-          sender() ! x
-        case _ => sender() ! OrderManagerException("Market " + marketId + " placeOrders failed!")
+          println("I AM THE ORDER MANAGER AND I HAVE", x, "FOR", sender())
+          _sender ! x
+        case _ => _sender ! OrderManagerException("Market " + marketId + " placeOrders failed!")
       }
     case CancelOrders(marketId, instructions, customerRef) =>
+      val _sender = sender()
       betfairService.cancelOrders(sessionToken, marketId, instructions, customerRef) onComplete {
-        case Success(Some(x)) => sender() ! x
-        case _ => sender() ! OrderManagerException("Market " + marketId + " cancelOrders failed!")
+        case Success(Some(x)) => _sender ! x
+        case _ => _sender ! OrderManagerException("Market " + marketId + " cancelOrders failed!")
       }
     case ReplaceOrders(marketId, instructions, customerRef) =>
+      val _sender = sender()
       betfairService.replaceOrders(sessionToken, marketId, instructions, customerRef) onComplete {
-        case Success(Some(x)) => sender() ! x
-        case _ => sender() ! OrderManagerException("Market " + marketId + " replaceOrders failed!")
+        case Success(Some(x)) => _sender ! x
+        case _ => _sender ! OrderManagerException("Market " + marketId + " replaceOrders failed!")
       }
     case UpdateOrders(marketId, instructions, customerRef) =>
+      val _sender = sender()
       betfairService.updateOrders(sessionToken, marketId, instructions, customerRef) onComplete {
-        case Success(Some(x)) => sender() ! x
-        case _ => sender() ! OrderManagerException("Market " + marketId + " updateOrders failed!")
+        case Success(Some(x)) => _sender ! x
+        case _ => _sender ! OrderManagerException("Market " + marketId + " updateOrders failed!")
       }
   }
 }

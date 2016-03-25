@@ -39,6 +39,28 @@
     color: #2789ce;
 }
 
+.bf-detail-panel .runner .price-label {
+    line-height: 37px;
+}
+
+.bf-detail-panel .price-label .btn-xs {
+    max-width: 15px;
+    min-width: 15px;
+    max-height: 15px;
+    margin-right: 5px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-top: 0px;
+    line-height: 12px;
+    min-height: 15px;
+}
+
+.bf-detail-panel .price-label .glyphicon {
+    font-size: 14pt;
+    margin-top: 0px;
+    top: 4px;
+}
+
 .panel-group .panel-default .panel-heading {
     height: 26px;
     padding-top: 0px;

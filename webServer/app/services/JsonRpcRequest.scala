@@ -28,6 +28,9 @@ case class JsonrpcRequest(jsonrpc: String = "2.0", method: String, id: Int, para
 
     case "subscribeToOrderUpdates"    => params.as[SubscribeToOrderUpdates]
 
+    case "subscribeToAutoTraderUpdates" => params.as[SubscribeToAutoTraderUpdates]
+    case "startStrategy"                => params.as[StartStrategy]
+
     case x =>
       println("Request " + x)
       throw new Exception("Invalid Request")

@@ -1,6 +1,7 @@
 package actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import core.autotrader.AutoTrader.{StrategyCreated, StrategyStopped, StrategyStateChange, StrategyStarted}
 import core.navData.{HorseRacingData, SoccerData}
 import core.orderManager.OrderManager._
 import domain.{ListCurrentOrdersContainer, ListMarketCatalogueContainer, MarketBookUpdate}
@@ -40,10 +41,16 @@ class WebSocketActor(out: ActorRef) extends Actor with ActorLogging {
       if (x.matches.nonEmpty) {
         sendResponse("CurrentMatchesUpdate", Json.toJson(x).as[JsObject])
       } else println("OrderBook has no matches")
-    case x: OrderMatched                   => sendResponse("OrderMatched", Json.toJson(x).as[JsObject])
+    case x: OrderMatched                  => sendResponse("OrderMatched", Json.toJson(x).as[JsObject])
     case x: OrderPlaced                   => sendResponse("OrderPlaced", Json.toJson(x).as[JsObject])
     case x: OrderUpdated                  => sendResponse("OrderUpdated", Json.toJson(x).as[JsObject])
     case x: OrderExecuted                 => sendResponse("OrderExecuted", Json.toJson(x).as[JsObject])
+
+    case x: StrategyCreated               => sendResponse("StrategyCreated", Json.toJson(x).as[JsObject])
+    case x: StrategyStarted               => sendResponse("StrategyStarted", Json.toJson(x).as[JsObject])
+    case x: StrategyStateChange           => sendResponse("StrategyStateChanged", Json.toJson(x).as[JsObject])
+    case x: StrategyStopped               => sendResponse("StrategyStopped", Json.toJson(x).as[JsObject])
+
     case x => println("Message Received: " + x)
   }
 }

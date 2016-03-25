@@ -1,0 +1,14 @@
+.bf-strategy-modal-window .modal-dialog .modal-content {
+    border-radius: 0px !important;
+}
+
+.bf-strategy-model-top-window {
+}
+
+.bf-strategy-modal .heading {
+    border-right: solid 1px #c9ced1;
+    border-left: solid 1px #c9ced1;
+    background-color: #c9ced1;
+    color: rgb(39, 58, 71);
+    padding-left: 15px;
+}
