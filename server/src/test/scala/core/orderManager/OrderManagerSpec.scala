@@ -93,7 +93,7 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
         .expects(sessionToken, marketId, instructions, customerRef)
         .returns(Future.successful(Some(serviceOutput)))
 
-      sender.ref.tell(PlaceOrders(marketId, instructions, customerRef), orderManager)
+      sender.send(orderManager, PlaceOrders(marketId, instructions, customerRef))
 
       if (subscribeToMarkets) {
         controller.expectMsg(SubscribeToMarkets(Set(marketId), BEST))
@@ -108,15 +108,17 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
       override def preStart() = {}
     }))
 
+    val sender = TestProbe()
+
     val instructions = Set(PlaceInstruction(OrderType.LIMIT, 1L, 0.0, Side.BACK))
 
     (betfairService.placeOrders _)
       .expects(sessionToken, marketId, instructions, customerRef)
       .returns(Future.successful(None))
 
-    orderManager ! PlaceOrders(marketId, instructions, customerRef)
+    sender.send(orderManager, PlaceOrders(marketId, instructions, customerRef))
 
-    expectMsg(OrderManagerException("Market TEST_MARKET_ID placeOrders failed!"))
+    sender.expectMsg(OrderManagerException("Market TEST_MARKET_ID placeOrders failed!"))
   }
 
   val cancelOrders_Cases = Table(
@@ -139,13 +141,15 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
       val instructions = Set(CancelInstruction(betId, sizeReduction))
       val serviceOutput = CancelExecutionReportContainer(CancelExecutionReport(reportStatus, marketId, None, Set(), None))
 
+      val sender = TestProbe()
+
       (betfairService.cancelOrders _)
         .expects(sessionToken, marketId, instructions, customerRef)
         .returns(Future.successful(Some(serviceOutput)))
 
-      orderManager ! CancelOrders(marketId, instructions, customerRef)
+      sender.send(orderManager, CancelOrders(marketId, instructions, customerRef))
 
-      expectMsg(serviceOutput)
+      sender.expectMsg(serviceOutput)
     }
   }
 
@@ -153,6 +157,8 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
     orderManager = TestActorRef(Props(new OrderManager(testConfig, sessionToken, controller.ref, betfairService, eventBus) {
       override def preStart() = {}
     }))
+
+    val sender = TestProbe()
 
     val sizeReduction = Some(10.0)
 
@@ -162,9 +168,9 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
       .expects(sessionToken, marketId, instructions, customerRef)
       .returns(Future.successful(None))
 
-    orderManager ! CancelOrders(marketId, instructions, customerRef)
+    sender.send(orderManager, CancelOrders(marketId, instructions, customerRef))
 
-    expectMsg(OrderManagerException("Market TEST_MARKET_ID cancelOrders failed!"))
+    sender.expectMsg(OrderManagerException("Market TEST_MARKET_ID cancelOrders failed!"))
   }
 
   val replaceOrders_Cases = Table(
@@ -182,6 +188,8 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
         override def preStart() = {}
       }))
 
+      val sender = TestProbe()
+
       val newPrice = 10.0
 
       val instructions = Set(ReplaceInstruction(betId, newPrice))
@@ -191,9 +199,9 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
         .expects(sessionToken, marketId, instructions, customerRef)
         .returns(Future.successful(Some(serviceOutput)))
 
-      orderManager ! ReplaceOrders(marketId, instructions, customerRef)
+      sender.send(orderManager, ReplaceOrders(marketId, instructions, customerRef))
 
-      expectMsg(serviceOutput)
+      sender.expectMsg(serviceOutput)
     }
   }
 

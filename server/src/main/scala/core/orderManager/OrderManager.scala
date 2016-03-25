@@ -233,7 +233,6 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
       betfairService.placeOrders(sessionToken, marketId, instructions, customerRef) onComplete {
         case Success(Some(x)) =>
           if (x.result.status == ExecutionReportStatus.SUCCESS) self ! x          // If the report is successful forward it to self to be tracked
-          println("I AM THE ORDER MANAGER AND I HAVE", x, "FOR", sender())
           _sender ! x
         case _ => _sender ! OrderManagerException("Market " + marketId + " placeOrders failed!")
       }
