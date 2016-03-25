@@ -54,13 +54,12 @@ class LayTheDraw(controller: ActorRef, config: LayTheDrawConfig) extends FSM[Sta
 
   whenUnhandled {
     case Event(e, s) =>
-      println("Unhandled event", stateName, e, s)
+//      println("Unhandled event", stateName, e, s)
       stay()
   }
 
   when(Idle) {
     case Event(MarketBookUpdate(timestamp, marketBook), _) if isInTimeRange(timestamp, config.entryTime) =>
-      println("I AM THE LAY THE DRAW STRATEGY", self)
       controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.LAY, config.size, config.entryPrice)))     // Place Lay Order
 //      if (config.stopTime.isDefined) setTimer("stopOut", StopOut, timeTillStop(config.stopTime.get) millis)                                                 // If a stopTime is defined set a timer
       goto (ConfirmingLayBet) using NoOrders
@@ -86,7 +85,6 @@ class LayTheDraw(controller: ActorRef, config: LayTheDrawConfig) extends FSM[Sta
     case Event(OrderUpdated(marketId, selectionId, handicap, order), LayOrder(o)) if order.betId == o.betId =>            // Lay Order Updated -> Update Order
       stay using LayOrder(order)
     case Event(OrderExecuted(marketId, selectionId, handicap, order), LayOrder(o)) if order.betId == o.betId =>           // Lay Order Executed -> Place Back Order
-      println("LAY BET EXECUTED", order)
       controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.BACK, order.sizeMatched, config.exitPrice)))
       goto (ConfirmingBackBet) using LayOrder(order)
 

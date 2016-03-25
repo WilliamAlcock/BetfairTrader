@@ -9,7 +9,7 @@ import server.Configuration
 class Monitor(config: Configuration, eventBus: EventBus, subject: ActorRef, marketId: String, selectionId: Long, handicap: Double, subjectId: String) extends Actor {
 
   override def preStart() ={
-    SubscribeTransitionCallBack(subject)
+    subject ! SubscribeTransitionCallBack(self)
   }
 
   def broadcast(output: AutoTraderOutput): Unit = {
@@ -27,7 +27,7 @@ class Monitor(config: Configuration, eventBus: EventBus, subject: ActorRef, mark
   }
 
   override def postStop() = {
-    UnsubscribeTransitionCallBack(subject)
+    subject ! UnsubscribeTransitionCallBack(subject)
   }
 }
 

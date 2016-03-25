@@ -4,23 +4,25 @@ class AutoTraderService
 
     @strategies = {}
 
+  setStrategy: (marketId, selectionId, handicap, strategyId, isRunning, currentState) =>
+    if (!@strategies[marketId]?) then @strategies[marketId] = {}
+    if (!@strategies[marketId][selectionId]?) then @strategies[marketId][selectionId] = {}
+    @strategies[marketId][selectionId][handicap] = {
+      strategyId: strategyId
+      isRunning: isRunning
+      currentState: currentState
+    }
+    console.log('set strategy', @strategies)
+
   isStrategyRunning: (marketId, selectionId, handicap) =>
-    @strategies[marketId]? && @strategies[marketId][selectionId]? && @strategies[marketId][selectionId][handicap]? && @strategies[marketId][selectionId][handicap].running
+    @strategies[marketId]? && @strategies[marketId][selectionId]? && @strategies[marketId][selectionId][handicap]? && @strategies[marketId][selectionId][handicap].isRunning
 
-  strategyCreated: (message) =>
-    @$log.log("Created Strategy", message)
+  strategyCreated: (message) => @setStrategy(message.marketId, message.selectionId, message.handicap, message.strategyId, false, 'Created')
 
-  strategyStarted: (message) =>
-    @$log.log("Starting Strategy", message)
-#    if (!@strategies[marketId]?) then @strategies[marketId] = {}
-#    if (!@strategies[marketId][selectionId]?) then @strategies[marketId][selectionId] = {}
-#    @strategies[marketId][selectionId][handicap] = {running: true}
+  strategyStarted: (message) => @setStrategy(message.marketId, message.selectionId, message.handicap, message.strategyId, true, message.state)
 
-  strategyStateChanged: (message) =>
-    @$log.log("Strategy State Changed", message)
+  strategyStateChanged: (message) => @setStrategy(message.marketId, message.selectionId, message.handicap, message.strategyId, true, message.newState)
 
-  strategyStopped: (message) =>
-    @$log.log("Stopping Strategy", message)
-#    @strategies[marketId][selectionId][handicap] = false
+  strategyStopped: (message) => @setStrategy(message.marketId, message.selectionId, message.handicap, message.strategyId, false, 'Stopped')
 
 servicesModule.service('AutoTraderService', ['$log', AutoTraderService])

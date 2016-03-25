@@ -30,6 +30,7 @@ case class JsonrpcRequest(jsonrpc: String = "2.0", method: String, id: Int, para
 
     case "subscribeToAutoTraderUpdates" => params.as[SubscribeToAutoTraderUpdates]
     case "startStrategy"                => params.as[StartStrategy]
+    case "stopStrategy"                 => params.as[StopStrategy]
 
     case x =>
       println("Request " + x)

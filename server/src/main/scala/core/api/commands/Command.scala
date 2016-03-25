@@ -56,4 +56,5 @@ object Command {
 
   implicit val formatSubscribeToAutoTraderUpdates = Json.format[SubscribeToAutoTraderUpdates]
   implicit val formatStartStrategy = Json.format[StartStrategy]
+  implicit val formatStopStrategy = Json.format[StopStrategy]
 }
