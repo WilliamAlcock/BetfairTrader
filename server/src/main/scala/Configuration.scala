@@ -1,8 +1,8 @@
 package server
 
-import domain.MatchProjection.MatchProjection
-import domain.OrderProjection.OrderProjection
+import domain.MatchProjection._
 import domain.{MatchProjection, OrderProjection}
+import domain.OrderProjection._
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -13,8 +13,6 @@ case class Configuration(appKey: String,
                          apiUrl: String,
                          isoUrl: String,
                          navUrl: String,
-                         orderProjection: OrderProjection   = OrderProjection.EXECUTABLE,
-                         matchProjection: MatchProjection   = MatchProjection.ROLLED_UP_BY_AVG_PRICE,
                          orderManagerUpdateInterval: FiniteDuration = 1 hour,
                          systemAlertsChannel: String        = "systemAlerts",
                          marketUpdateChannel: String        = "marketUpdates",
@@ -25,6 +23,9 @@ case class Configuration(appKey: String,
                          orderManagerInstructions: String   = "orderManagerInstructions",
                          dataProviderInstructions: String   = "dataProviderInstructions",
                          autoTraderInstructions: String     = "autoTraderInstructions") {
+
+  val orderProjection: OrderProjection   = OrderProjection.ALL
+  val matchProjection: MatchProjection   = MatchProjection.ROLLED_UP_BY_AVG_PRICE
 
   private def getPublishChannel(ids: Seq[String]): String = ids.reduce(_ + "/" + _)
 

@@ -31,7 +31,7 @@ directivesModule.directive('runner',  ['$log', '$window', '$uibModal', 'DataMode
       })
 
       modelInstance.result.then (params) ->
-        params = {marketId: scope.id, selectionId: scope.catalogue.selectionId, entryPrice: 3.0, size: 2.0, exitPrice: 5.0}
+        params = {marketId: scope.id, selectionId: scope.catalogue.selectionId, entryPrice: 3.0, size: 2.0, exitPrice: 3.5}
         $log.log('sending params', params)
         WebSocketService.startStrategy(scope.id, scope.catalogue.selectionId, scope.catalogue.handicap, params)
 

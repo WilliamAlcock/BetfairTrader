@@ -73,8 +73,6 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
       config.apiUrl,
       config.isoUrl,
       config.navUrl,
-      config.orderProjection,
-      config.matchProjection,
       config.orderManagerUpdateInterval,
       config.systemAlertsChannel,
       config.marketUpdateChannel,

@@ -6,6 +6,7 @@ import core.api.output.Output
 import core.dataProvider.polling.BEST
 import core.eventBus.{EventBus, MessageEvent}
 import core.orderManager.OrderManager._
+import domain.Side.Side
 import domain._
 import org.joda.time.DateTime
 import play.api.libs.json.Json
@@ -18,8 +19,9 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.Success
 
-sealed case class OrderData(selectionId: Long, handicap: Double, order: Order)
-sealed case class MatchData(selectionId: Long, handicap: Double, _match: Match)
+
+sealed case class OrderKey(marketId: String, selectionId: Long, handicap: Double, betId: String)
+sealed case class MatchKey(marketId: String, selectionId: Long, handicap: Double, side: Side)
 
 // TODO should orderManager make sure that any markets being operated on are being polled ?
 class OrderManager(config: Configuration, sessionToken: String, controller: ActorRef, betfairService: BetfairService, eventBus: EventBus) extends Actor with OrderFactory {
@@ -34,8 +36,8 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
   var timer = scheduler.schedule(config.orderManagerUpdateInterval, config.orderManagerUpdateInterval, self, Validate)
 
   // Keyed by MarketId
-  var trackedOrders = Map.empty[String, Set[OrderData]]
-  var matches = Map.empty[String, Set[MatchData]]
+  var trackedOrders = Map.empty[OrderKey, Order]
+  var matches = Map.empty[MatchKey, Match]
 
   override def preStart() = {
     super.preStart()
@@ -49,16 +51,13 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
       self))
   }
 
-  def update(trackedOrders: Map[String, Set[OrderData]]): Map[String, Set[OrderData]] = {
+  def update(trackedOrders: Map[OrderKey, Order]): Map[OrderKey, Order] = {
     try {
       val currentOrders = Await.result(betfairService.listCurrentOrders(sessionToken), 10 seconds)
 
       currentOrders match {
-        case Some(ListCurrentOrdersContainer(x)) => x.currentOrders.groupBy(_.marketId).mapValues(_.map(orderSummary =>
-          OrderData(
-            orderSummary.selectionId,
-            orderSummary.handicap,
-            Order(
+        case Some(ListCurrentOrdersContainer(x)) => x.currentOrders.map(orderSummary =>
+            OrderKey(orderSummary.marketId, orderSummary.selectionId, orderSummary.handicap, orderSummary.betId) -> Order(
               orderSummary.betId,
               orderSummary.orderType,
               orderSummary.status,
@@ -75,8 +74,7 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
               orderSummary.sizeCancelled,
               orderSummary.sizeVoided
             )
-          )
-        ))
+          ).toMap
         case _ => trackedOrders
         // Unable to get current order from exchange
       }
@@ -97,28 +95,20 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
  */
 
   // TODO test
-  def updateOrder(marketId: String, selectionId: Long, handicap: Double, order: Order): Set[OrderManagerOutput] = order.status match {
-    case OrderStatus.EXECUTABLE => trackedOrders.get(marketId) match {
-      case Some(marketOrders) => marketOrders.find(x => x.order.betId == order.betId) match {
-        case Some(trackedOrder) if trackedOrder.order != order =>
-          trackedOrders = trackedOrders + (marketId -> ((marketOrders - trackedOrder) + OrderData(selectionId, handicap, order)))
-          Set(OrderUpdated(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order)))      // Order Updated
+  def updateOrder(marketId: String, selectionId: Long, handicap: Double, order: Order): Set[OrderManagerOutput] = {
+      val key = OrderKey(marketId, selectionId, handicap, order.betId)
+      trackedOrders.get(key) match {
+        case Some(trackedOrder) if trackedOrder != order =>
+          order.status match {
+            case OrderStatus.EXECUTABLE =>
+              trackedOrders = trackedOrders + (key -> order)
+              Set(OrderUpdated(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order)))      // Order Updated
+            case OrderStatus.EXECUTION_COMPLETE =>
+              trackedOrders = trackedOrders - key
+              Set(OrderExecuted(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, order)))     // Order Executed
+        }
         case _ => Set.empty[OrderManagerOutput]
       }
-      case _ => Set.empty[OrderManagerOutput]
-    }
-    case _ => Set.empty[OrderManagerOutput]
-  }
-
-  // TODO test
-  def removeCompletedOrders(marketId: String, selectionId: Long, handicap: Double, orders: Set[Order]): Set[OrderManagerOutput] = trackedOrders.get(marketId) match {
-    case Some(marketOrders) =>
-      val orderIds = orders.map(_.betId)
-      val completedOrders = marketOrders.filter(x => x.selectionId == selectionId && x.handicap == handicap && !orderIds.contains(x.order.betId))
-      trackedOrders = trackedOrders + (marketId -> (marketOrders -- completedOrders))
-      completedOrders.map(x => OrderExecuted(marketId, selectionId, handicap, CurrentOrderSummary.fromOrder(marketId, selectionId + "-" + handicap, x.order)))           // Order Executed
-
-    case None => Set.empty[OrderManagerOutput]
   }
 
   /*
@@ -127,19 +117,17 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
    */
 
   // TODO test
-  def updateMatch(marketId: String, selectionId: Long, handicap: Double, _match: Match): Set[OrderManagerOutput] = matches.get(marketId) match {
-    case Some(marketMatches) => marketMatches.find(x => x.selectionId == selectionId && x.handicap == handicap && x._match.side == _match.side) match {
-      case Some(trackedMatch) if trackedMatch._match != _match =>
-        matches = matches + (marketId -> ((marketMatches - trackedMatch) + MatchData(selectionId, handicap, _match)))
+  def updateMatch(marketId: String, selectionId: Long, handicap: Double, _match: Match): Set[OrderManagerOutput] = {
+    val key = MatchKey(marketId, selectionId, handicap, _match.side)
+    matches.get(key) match {
+      case Some(trackedMatch) if trackedMatch != _match =>
+        matches = matches + (key -> _match)
+        Set(OrderMatched(marketId, selectionId, handicap, _match))
+      case None =>
+        matches = matches + (key -> _match)
         Set(OrderMatched(marketId, selectionId, handicap, _match))
       case Some(_) => Set.empty[OrderManagerOutput]
-      case None =>
-        matches = matches + (marketId -> (marketMatches + MatchData(selectionId, handicap, _match)))
-        Set(OrderMatched(marketId, selectionId, handicap, _match))
     }
-    case None =>
-      matches = matches + (marketId -> Set(MatchData(selectionId, handicap, _match)))
-      Set(OrderMatched(marketId, selectionId, handicap, _match))
   }
 
   /*
@@ -148,7 +136,7 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
    */
   def processRunner(marketId: String, runner: Runner): Set[OrderManagerOutput] = {
     val orderUpdates = runner.orders match {
-      case Some(orders) => orders.map(updateOrder(marketId, runner.selectionId, runner.handicap, _)).flatten ++ removeCompletedOrders(marketId, runner.selectionId, runner.handicap, orders)
+      case Some(orders) => orders.map(updateOrder(marketId, runner.selectionId, runner.handicap, _)).flatten
       case _ => Set.empty[OrderManagerOutput]
     }
     val matchUpdates = runner.matches match {
@@ -176,10 +164,11 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
 
   // TODO test
   def listCurrentOrders(betIds: Set[String], marketIds: Set[String]): Set[CurrentOrderSummary] = {
-    val output = (marketIds.nonEmpty match {
-      case true => trackedOrders.filterKeys(marketIds.contains)
+    val output: Set[CurrentOrderSummary] = (marketIds.nonEmpty match {
+      case true => trackedOrders.filterKeys(key => marketIds.contains(key.marketId))
       case false => trackedOrders
-    }).map{case (marketId, orderData) => orderData.map(x => CurrentOrderSummary.fromOrder(marketId, x.selectionId + "-" + x.handicap, x.order))}.flatten.toSet
+    }).map{case (key, order) => CurrentOrderSummary.fromOrder(key.marketId, key.selectionId + "-" + key.handicap, order)}.toSet
+
     if (betIds.nonEmpty) {
       output.filter(x => betIds.contains(x.betId))
     } else {
@@ -188,7 +177,7 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
   }
 
   def listMatches: ListMatchesContainer = ListMatchesContainer(
-    matches.map{case (marketId, _matches) => _matches.map(x => OrderMatched(marketId, x.selectionId, x.handicap, x._match))}.flatten.toSet
+    matches.map{case (key, _match) => OrderMatched(key.marketId, key.selectionId, key.handicap, _match)}.toSet
   )
 
   override def receive = {
@@ -210,20 +199,15 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
       if (x.result.status == ExecutionReportStatus.SUCCESS) {
         controller ! SubscribeToMarkets(Set(x.result.marketId), BEST)
         x.result.instructionReports.map(report => {
-          val marketOrders = trackedOrders.getOrElse(x.result.marketId, Set.empty[OrderData])
+          val key = OrderKey(x.result.marketId, report.instruction.selectionId, report.instruction.handicap, report.betId.get)
           val order = createOrder(report.instruction).copy(
             betId = report.betId.get,
             placedDate = report.placedDate.getOrElse(DateTime.now()),
             avgPriceMatched = report.averagePriceMatched.getOrElse(0.0),
             sizeMatched = report.sizeMatched.getOrElse(0.0)
           )
-          trackedOrders = trackedOrders + (x.result.marketId -> (marketOrders + OrderData(report.instruction.selectionId, report.instruction.handicap, order)))
-          Set(OrderPlaced(
-            x.result.marketId,
-            report.instruction.selectionId,
-            report.instruction.handicap,
-            CurrentOrderSummary.fromOrder(x.result.marketId, report.instruction.selectionId + "-" + report.instruction.handicap, order))
-          )        // Order Placed
+          trackedOrders = trackedOrders + (key -> order)
+          Set(OrderPlaced(key.marketId, key.selectionId, key.handicap, CurrentOrderSummary.fromOrder(key.marketId, key.selectionId + "-" + key.handicap, order)))        // Order Placed
         }).flatten.foreach(broadcast)
       }
 

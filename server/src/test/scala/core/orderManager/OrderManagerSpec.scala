@@ -433,14 +433,12 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
   forAll(processRunner_Cases){(ordersDefined: Boolean, matchesDefined: Boolean) =>
     "OrderManager.processRunner" should "return the orderManagerOutput for the orders and matches in the given runner, orders: " + ordersDefined + ", matches: " + matchesDefined in {
       val _updateOrder = mockFunction[String, Long, Double, Order, Set[OrderManagerOutput]]
-      val _removeCompletedOrders = mockFunction[String, Long, Double, Set[Order], Set[OrderManagerOutput]]
       val _updateMatch = mockFunction[String, Long, Double, Match, Set[OrderManagerOutput]]
 
       orderManager = TestActorRef(Props(new OrderManager(testConfig, sessionToken, controller.ref, betfairService, eventBus) {
         override def preStart() = {}
 
         override def updateOrder(m: String, s: Long, h: Double, o: Order): Set[OrderManagerOutput] = _updateOrder.apply(m, s, h, o)
-        override def removeCompletedOrders(m: String, s: Long, h: Double, o: Set[Order]): Set[OrderManagerOutput] = _removeCompletedOrders.apply(m, s, h, o)
         override def updateMatch(m: String, s: Long, h: Double, ma: Match): Set[OrderManagerOutput] = _updateMatch.apply(m, s, h, ma)
       }))
 
@@ -462,19 +460,17 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
       if (ordersDefined) {
         _updateOrder.expects(marketId, 1L, 1.0, orders(0)).returns(Set(testBroadcast("1")))
         _updateOrder.expects(marketId, 1L, 1.0, orders(1)).returns(Set(testBroadcast("2")))
-
-        _removeCompletedOrders.expects(marketId, 1L, 1.0, orders.toSet[Order]).returns(Set(testBroadcast("3")))
       }
 
       if (matchesDefined) {
-        _updateMatch.expects(marketId, 1L, 1.0, matches(0)).returns(Set(testBroadcast("4")))
-        _updateMatch.expects(marketId, 1L, 1.0, matches(1)).returns(Set(testBroadcast("5")))
+        _updateMatch.expects(marketId, 1L, 1.0, matches(0)).returns(Set(testBroadcast("3")))
+        _updateMatch.expects(marketId, 1L, 1.0, matches(1)).returns(Set(testBroadcast("4")))
       }
 
       val expectedOutput = (ordersDefined, matchesDefined) match {
-        case (true, true) => Set(testBroadcast("1"), testBroadcast("2"), testBroadcast("3"), testBroadcast("4"), testBroadcast("5"))
-        case (true, false) => Set(testBroadcast("1"), testBroadcast("2"), testBroadcast("3"))
-        case (false, true) => Set(testBroadcast("4"), testBroadcast("5"))
+        case (true, true) => Set(testBroadcast("1"), testBroadcast("2"), testBroadcast("3"), testBroadcast("4"))
+        case (true, false) => Set(testBroadcast("1"), testBroadcast("2"))
+        case (false, true) => Set(testBroadcast("3"), testBroadcast("4"))
         case (false, false) => Set()
       }
 
@@ -540,14 +536,14 @@ class OrderManagerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.p
   }
 
   "OrderManager" should "update tracked orders from the exchange on startup and at intervals defined by config" in {
-    val _update = mockFunction[Map[String, Set[OrderData]], Map[String, Set[OrderData]]]
+    val _update = mockFunction[Map[OrderKey, Order], Map[OrderKey, Order]]
 
     val time = new VirtualTime
 
-    _update.expects(Map.empty[String, Set[OrderData]]).returns(Map.empty[String, Set[OrderData]]).repeated(2)
+    _update.expects(Map.empty[OrderKey, Order]).returns(Map.empty[OrderKey, Order]).repeated(2)
 
     orderManager = TestActorRef(Props(new OrderManager(testConfig, sessionToken, controller.ref, betfairService, eventBus) {
-      override def update(to: Map[String, Set[OrderData]]) = _update.apply(to)
+      override def update(to: Map[OrderKey, Order]) = _update.apply(to)
       override def scheduler = time.scheduler
     }))
 
