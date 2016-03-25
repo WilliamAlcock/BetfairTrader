@@ -26,7 +26,13 @@ case class Configuration(appKey: String,
 
   private def getPublishChannel(ids: Seq[String]): String = ids.reduce(_ + "/" + _)
 
-  def getMarketUpdateChannel(ids: Seq[String]): String = getPublishChannel(Seq(marketUpdateChannel) ++ ids)
+  private def toSeqString[T](i: Option[T]): Seq[String] = if (i.isDefined) Seq(i.get.toString) else Seq("*")
 
-  def getOrderUpdateChannel(ids: Seq[String]): String = getPublishChannel(Seq(orderUpdateChannel) ++ ids)
+  private def stripPostFix(channel: Seq[String]): Seq[String] = channel.reverse.dropWhile(_ == "*").reverse
+
+  def getMarketUpdateChannel(marketId: Option[String] = None): String = getPublishChannel(stripPostFix(Seq[String](marketUpdateChannel) ++ toSeqString(marketId)))
+
+  def getOrderUpdateChannel(marketId: Option[String] = None, selectionId: Option[Long] = None, handicap: Option[Double] = None): String = getPublishChannel(
+    stripPostFix(Seq[String](orderUpdateChannel) ++ toSeqString(marketId) ++ toSeqString(selectionId) ++ toSeqString(handicap))
+  )
 }

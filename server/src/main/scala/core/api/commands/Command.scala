@@ -28,7 +28,7 @@ case class UnSubscribeFromMarkets(markets: Set[String], pollingGroup: PollingGro
 case object UnSubscribe extends Command
 case object StopPollingAllMarkets extends Command
 
-case class SubscribeToOrderUpdates(markets: Set[String] = Set.empty) extends Command
+case class SubscribeToOrderUpdates(marketId: Option[String] = None, selectionId: Option[Long] = None, handicap: Option[Double] = None) extends Command
 
 object Command {
   implicit val formatGetNavigationData = Json.format[GetNavigationData]

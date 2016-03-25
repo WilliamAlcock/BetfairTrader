@@ -146,8 +146,8 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
     _watch.expects(sender.ref)
 
     // Subscribe the sender to the markets
-    (testConfig.getMarketUpdateChannel _).expects(Seq(markets(0))).returns("MARKET_1_CHANNEL")
-    (testConfig.getMarketUpdateChannel _).expects(Seq(markets(1))).returns("MARKET_2_CHANNEL")
+    (testConfig.getMarketUpdateChannel _).expects(Some(markets(0))).returns("MARKET_1_CHANNEL")
+    (testConfig.getMarketUpdateChannel _).expects(Some(markets(1))).returns("MARKET_2_CHANNEL")
 
     _subscribe.expects(sender.ref, "MARKET_1_CHANNEL")
     _subscribe.expects(sender.ref, "MARKET_2_CHANNEL")
@@ -171,8 +171,8 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
     val command = UnSubscribeFromMarkets(markets.toSet, pollingGroup)
 
     // Subscribe the sender to the markets
-    (testConfig.getMarketUpdateChannel _).expects(Seq(markets(0))).returns("MARKET_1_CHANNEL")
-    (testConfig.getMarketUpdateChannel _).expects(Seq(markets(1))).returns("MARKET_2_CHANNEL")
+    (testConfig.getMarketUpdateChannel _).expects(Some(markets(0))).returns("MARKET_1_CHANNEL")
+    (testConfig.getMarketUpdateChannel _).expects(Some(markets(1))).returns("MARKET_2_CHANNEL")
 
     _unsubscribe_from.expects(sender.ref, "MARKET_1_CHANNEL")
     _unsubscribe_from.expects(sender.ref, "MARKET_2_CHANNEL")

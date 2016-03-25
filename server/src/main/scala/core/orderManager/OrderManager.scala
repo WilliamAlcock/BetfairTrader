@@ -44,7 +44,7 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
 
   def broadcast(output: OrderManagerOutput): Unit = {
     eventBus.publish(MessageEvent(
-      config.getOrderUpdateChannel(Seq(output.marketId, output.selectionId.toString, output.handicap.toString)),
+      config.getOrderUpdateChannel(Some(output.marketId), Some(output.selectionId), Some(output.handicap)),
       output,
       self))
   }

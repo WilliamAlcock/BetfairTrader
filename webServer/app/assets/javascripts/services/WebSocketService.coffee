@@ -93,7 +93,7 @@ class WebSocketService
 
   subscribeToSystemAlerts: () -> @sendJsonrpcMessage({method: "subscribeToSystemAlerts", params: {}})
 
-  subscribeToOrderUpdates: () -> @sendJsonrpcMessage({method: "subscribeToOrderUpdates", params: {markets: []}})
+  subscribeToOrderUpdates: () -> @sendJsonrpcMessage({method: "subscribeToOrderUpdates", params: {}})
 
   listCurrentOrders: () -> @sendJsonrpcMessage({method: "listCurrentOrders", params: {betIds: [], marketIds: []}})
 

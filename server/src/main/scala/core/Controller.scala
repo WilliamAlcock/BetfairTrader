@@ -46,8 +46,8 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
 
     case SubscribeToMarkets(marketIds, pollingGroup) =>
       watch(sender())
-      marketIds.foreach(x => {
-        val channel = config.getMarketUpdateChannel(Seq(x))
+      marketIds.foreach(id => {
+        val channel = config.getMarketUpdateChannel(Some(id))
         eventBus.subscribe(sender(), channel)
         system.log.info("Subscribing " + sender() + " to " + channel)
       })
@@ -55,24 +55,17 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
 
     case UnSubscribeFromMarkets(marketIds, pollingGroup) =>
       marketIds.foreach(id => {
-        val channel = config.getMarketUpdateChannel(Seq(id))
+        val channel = config.getMarketUpdateChannel(Some(id))
         eventBus.unsubscribe(sender(), channel)
         system.log.info("UnSubscribing " + sender + " from " + channel)
       })
       eventBus.publish(MessageEvent(config.dataProviderInstructions, UnSubscribeFromMarkets(marketIds, pollingGroup), sender()))
 
-    case SubscribeToOrderUpdates(marketIds) =>
+    case SubscribeToOrderUpdates(marketId, selectionId, handicap) =>
       watch(sender())
-      marketIds.isEmpty match {
-        case true =>
-          eventBus.subscribe(sender(), config.orderUpdateChannel)
-          system.log.info("Subscribing " + sender() + " to " + config.orderUpdateChannel)
-        case false => marketIds.foreach(id => {
-          val channel = config.getOrderUpdateChannel(Seq(id))
-          eventBus.subscribe(sender(), channel)
-          system.log.info("Subscribing " + sender() + " to " + channel)
-        })
-      }
+      val channel = config.getOrderUpdateChannel(marketId, selectionId, handicap)
+      eventBus.subscribe(sender(), channel)
+      system.log.info("Subscribing " + sender() + " to " + channel)
 
     case x: Command =>
       watch(sender())
