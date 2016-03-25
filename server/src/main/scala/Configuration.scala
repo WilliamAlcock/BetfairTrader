@@ -19,10 +19,12 @@ case class Configuration(appKey: String,
                          systemAlertsChannel: String        = "systemAlerts",
                          marketUpdateChannel: String        = "marketUpdates",
                          orderUpdateChannel: String         = "orderUpdates",
+                         autoTraderChannel: String          = "autoTraderUpdates",
                          navDataInstructions: String        = "navDataInstructions",
                          dataModelInstructions: String      = "dataModelInstructions",
                          orderManagerInstructions: String   = "orderManagerInstructions",
-                         dataProviderInstructions: String   = "dataProviderInstructions") {
+                         dataProviderInstructions: String   = "dataProviderInstructions",
+                         autoTraderInstructions: String     = "autoTraderInstructions") {
 
   private def getPublishChannel(ids: Seq[String]): String = ids.reduce(_ + "/" + _)
 
@@ -35,4 +37,6 @@ case class Configuration(appKey: String,
   def getOrderUpdateChannel(marketId: Option[String] = None, selectionId: Option[Long] = None, handicap: Option[Double] = None): String = getPublishChannel(
     stripPostFix(Seq[String](orderUpdateChannel) ++ toSeqString(marketId) ++ toSeqString(selectionId) ++ toSeqString(handicap))
   )
+
+  def getAutoTraderUpdateChannel(strategyId: Option[String]): String = getPublishChannel(stripPostFix(Seq[String](autoTraderChannel) ++ toSeqString(strategyId)))
 }

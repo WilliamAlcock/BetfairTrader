@@ -41,10 +41,12 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
     systemAlertsChannel       = "TEST_SYSTEM_ALERTS",
     marketUpdateChannel       = "TEST_MARKET_UPDATES",
     orderUpdateChannel        = "TEST_ORDER_UPDATES",
+    autoTraderChannel         = "TEST_AUTO_TRADER_UPDATES",
     navDataInstructions       = "TEST_NAV_DATA_INSTRUCTIONS",
     dataModelInstructions     = "TEST_DATA_MODEL_INSTRUCTIONS",
     orderManagerInstructions  = "TEST_ORDER_MANAGER_INSTRUCTIONS",
-    dataProviderInstructions  = "TEST_DATA_PROVIDER_INSTRUCTIONS"
+    dataProviderInstructions  = "TEST_DATA_PROVIDER_INSTRUCTIONS",
+    autoTraderInstructions    = "TEST_AUTO_TRADER_INSTRUCTIONS"
   )
 
   override def beforeEach(): Unit = {
@@ -77,10 +79,12 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
       config.systemAlertsChannel,
       config.marketUpdateChannel,
       config.orderUpdateChannel,
+      config.autoTraderChannel,
       config.navDataInstructions,
       config.dataModelInstructions,
       config.orderManagerInstructions,
-      config.dataProviderInstructions
+      config.dataProviderInstructions,
+      config.autoTraderInstructions
     )
 
     testConfig = mock[MockConfig]

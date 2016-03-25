@@ -10,6 +10,7 @@ import scala.language.postfixOps
 class ConfigurationSpec extends FlatSpec with Matchers {
 
   val marketId = "TEST_MARKET_ID"
+  val strategyId = "TEST_STRATEGY_ID"
 
   val testConfig = Configuration(
     appKey                    = "TEST_APP_KEY",
@@ -22,6 +23,7 @@ class ConfigurationSpec extends FlatSpec with Matchers {
     systemAlertsChannel       = "TEST_SYSTEM_ALERTS",
     marketUpdateChannel       = "TEST_MARKET_UPDATES",
     orderUpdateChannel        = "TEST_ORDER_UPDATES",
+    autoTraderChannel         = "TEST_AUTO_TRADER_UPDATES",
     navDataInstructions       = "TEST_NAV_DATA_INSTRUCTIONS",
     dataModelInstructions     = "TEST_DATA_MODEL_INSTRUCTIONS",
     orderManagerInstructions  = "TEST_ORDER_MANAGER_INSTRUCTIONS",
@@ -57,6 +59,19 @@ class ConfigurationSpec extends FlatSpec with Matchers {
   forAll(getMarketUpdateChannel_Cases) {(marketId: Option[String], output: String) =>
     "Configuration.getMarketUpdateChannel given " + marketId should "return " + output in {
       testConfig.getMarketUpdateChannel(marketId) should be (output)
+    }
+  }
+
+  val getAutoTraderUpdateChannel_Cases = Table(
+    ("strategyId",          "output"),
+
+    (Some(strategyId),      "TEST_AUTO_TRADER_UPDATES/TEST_STRATEGY_ID"),
+    (None,                  "TEST_AUTO_TRADER_UPDATES")
+  )
+
+  forAll(getAutoTraderUpdateChannel_Cases) {(strategyId: Option[String], output: String) =>
+    "Configuration.getAutoTraderUpdates given " + strategyId should "return " + output in {
+      testConfig.getAutoTraderUpdateChannel(strategyId) should be (output)
     }
   }
 }
