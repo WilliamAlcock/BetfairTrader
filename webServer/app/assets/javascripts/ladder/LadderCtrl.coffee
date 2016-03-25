@@ -66,9 +66,7 @@ class LadderCtrl
 
   scrollDown: () => @prices = @PriceService.scrollDown(@prices)
 
-  snapToBid: () =>
-    @prices = @PriceService.getLadderPrices(@getRunner().ex.availableToBack[0].price, @depth)
-    @$log.log('set prices', @prices)
+  snapToBid: () => @prices = @PriceService.getLadderPrices(@getRunner().ex.availableToBack[0].price, @depth)
 
   snapToOffer: () => @prices = @PriceService.getLadderPrices(@getRunner().ex.availableToLay[0].price, @depth)
 

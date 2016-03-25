@@ -48,6 +48,18 @@
     padding-right:0px;
 }
 
+.bf-ladder .btn-bid {
+    min-width:25px !important;
+    max-width:25px !important;
+    line-height:20px;
+}
+
+.bf-ladder .btn-offer {
+    min-width:35px !important;
+    max-width:35px !important;
+    line-height:20px;
+}
+
 .bf-ladder .ladder-row {
     height:25px;
     line-height:31px;
