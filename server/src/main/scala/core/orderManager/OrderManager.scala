@@ -205,7 +205,7 @@ class OrderManager(config: Configuration, sessionToken: String, controller: Acto
       processMarketBook(marketBook).foreach(broadcast)
       if (allOrdersCompleted(marketBook)) controller ! UnSubscribeFromMarkets(Set(marketBook.marketId), BEST)           // If all the orders are matched unSubscribe from this market
 
-    // TODO test, orders are placed once when a successful report has been recieved
+    // TODO test, orders are placed once when a successful report has been received
     case x: PlaceExecutionReportContainer =>
       // if the status == success subscribe to updates for the market, add the order to the tracked orders, broadcast the order has been placed
       if (x.result.status == ExecutionReportStatus.SUCCESS) {
