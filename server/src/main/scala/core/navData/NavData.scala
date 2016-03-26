@@ -67,7 +67,7 @@ object NavData {
           getChildren(data),
           get(data, "id"),
           get(data, "name"),
-          (data \ "startTime").as[DateTime],
+          DateTime.parse((data \ "startTime").as[String], DateTimeFormat.forPattern(dateFormat).withZoneUTC()),
           get(data, "venue"),
           get(data, "raceNumber"),
           get(data, "countryCode")
