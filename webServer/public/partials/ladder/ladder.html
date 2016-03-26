@@ -86,8 +86,8 @@
     </div>
     <div class="col-xs-12 ladder-scroll">
         <div class="col-xs-4 entry">
-            <label class="btn btn-default btn-xs btn-bid" ng-click="ladder.snapToBid()">Bid</label>
-            <label class="btn btn-default btn-xs btn-offer" ng-click="ladder.snapToOffer()">Offer</label>
+            <label class="btn btn-default btn-xs btn-snap" ng-click="ladder.snapToBid()">Bid</label>
+            <label class="btn btn-default btn-xs btn-snap" ng-click="ladder.snapToOffer()">Offer</label>
         </div>
         <label ng-click="ladder.scrollDown()" class="btn btn-default btn-xs col-xs-2 glyphicon glyphicon-menu-down"></label>
         <div class="col-xs-6 entry">Total Matched: {{ladder.getRunner().totalMatched}}</div>
