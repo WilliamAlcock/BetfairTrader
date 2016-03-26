@@ -76,6 +76,7 @@ lazy val webServerDependencies = Seq(
   "javax.inject" % "javax.inject" % "1",
   "org.webjars" % "bootstrap" % "3.3.4",
   "org.webjars" % "angularjs" % "1.3.15",
+  "org.webjars.bower" % "angular-ui-validate" % "1.2.1",
   "org.webjars" % "angular-ui-bootstrap" % "0.14.3",
   "org.webjars" % "angular-ui-router" % "0.2.18",
   "org.webjars.npm" % "ui-select" % "0.13.2",

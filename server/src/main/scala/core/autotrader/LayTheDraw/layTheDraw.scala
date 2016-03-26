@@ -1,7 +1,7 @@
 package core.autotrader.layTheDraw
 
 import akka.actor.{ActorRef, FSM, Props, Stash}
-import core.api.commands.{PlaceOrders, SubscribeToMarkets, SubscribeToOrderUpdates}
+import core.api.commands.{ListMarketBook, PlaceOrders, SubscribeToMarkets, SubscribeToOrderUpdates}
 import core.autotrader.layTheDraw.LayTheDraw.{Data, Idle, State, _}
 import core.autotrader.{Strategy, StrategyConfig}
 import core.dataProvider.polling.BEST
@@ -16,12 +16,12 @@ import scala.language.postfixOps
 
 final case class LayTheDrawConfig(marketId: String,
                                   selectionId: Long,
-                                  entryPrice: Double,
-                                  entryTime: Option[TimeRange],
+                                  layPrice: Double,
+                                  layTime: Option[TimeRange],
                                   size: Double,
-                                  exitPrice: Double
-//                                  stopPrice: Double,
-//                                  stopTime: Option[DateTime]
+                                  backPrice: Double,
+                                  stopPrice: Double,
+                                  stopTime: Option[DateTime]
                                    ) extends StrategyConfig
 
 object LayTheDrawConfig {
@@ -32,6 +32,7 @@ class LayTheDraw(controller: ActorRef, config: LayTheDrawConfig) extends FSM[Sta
 
   controller ! SubscribeToMarkets(Set(config.marketId), BEST)
   controller ! SubscribeToOrderUpdates(Some(config.marketId), Some(config.selectionId))
+  controller ! ListMarketBook(Set(config.marketId))
 
   // Returns true if the timestamp is within the trading window, false otherwise
   // If the trading window is None this will always return true
@@ -54,13 +55,13 @@ class LayTheDraw(controller: ActorRef, config: LayTheDrawConfig) extends FSM[Sta
 
   whenUnhandled {
     case Event(e, s) =>
-//      println("Unhandled event", stateName, e, s)
+      println("Unhandled event", stateName, e, s)
       stay()
   }
 
   when(Idle) {
-    case Event(MarketBookUpdate(timestamp, marketBook), _) if isInTimeRange(timestamp, config.entryTime) =>
-      controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.LAY, config.size, config.entryPrice)))     // Place Lay Order
+    case Event(MarketBookUpdate(timestamp, marketBook), _) if isInTimeRange(timestamp, config.layTime) =>
+      controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.LAY, config.size, config.layPrice)))     // Place Lay Order
 //      if (config.stopTime.isDefined) setTimer("stopOut", StopOut, timeTillStop(config.stopTime.get) millis)                                                 // If a stopTime is defined set a timer
       goto (ConfirmingLayBet) using NoOrders
   }
@@ -85,7 +86,7 @@ class LayTheDraw(controller: ActorRef, config: LayTheDrawConfig) extends FSM[Sta
     case Event(OrderUpdated(marketId, selectionId, handicap, order), LayOrder(o)) if order.betId == o.betId =>            // Lay Order Updated -> Update Order
       stay using LayOrder(order)
     case Event(OrderExecuted(marketId, selectionId, handicap, order), LayOrder(o)) if order.betId == o.betId =>           // Lay Order Executed -> Place Back Order
-      controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.BACK, order.sizeMatched, config.exitPrice)))
+      controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.BACK, order.sizeMatched, config.backPrice)))
       goto (ConfirmingBackBet) using LayOrder(order)
 
 //    // Stops
@@ -101,10 +102,10 @@ class LayTheDraw(controller: ActorRef, config: LayTheDrawConfig) extends FSM[Sta
       unstashAll()
       goto (WaitingForBackBet) using LayOrderBackId(o, result.instructionReports.head.betId.get)
     case Event(OrderManagerException(_), LayOrder(o)) =>
-      controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.BACK, o.sizeMatched, config.exitPrice)))       // Order Failed
+      controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.BACK, o.sizeMatched, config.backPrice)))       // Order Failed
       stay()
     case Event(PlaceExecutionReportContainer(_), LayOrder(o)) =>
-      controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.BACK, o.sizeMatched, config.exitPrice)))       // Order Failed
+      controller ! PlaceOrders(config.marketId, Set(getPlaceInstruction(config.selectionId, Side.BACK, o.sizeMatched, config.backPrice)))       // Order Failed
       stay()
     case Event(e, s) =>                     // Stash any other changes until confirmation has been received
       println("Stashing", e, s)

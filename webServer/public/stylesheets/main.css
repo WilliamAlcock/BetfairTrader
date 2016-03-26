@@ -1,5 +1,12 @@
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
 body {
     padding-bottom: 30px;
     min-width: 970px;

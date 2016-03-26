@@ -8,7 +8,9 @@ dependencies = [
     'myApp.routeConfig',
     'ui.router',
     'ui.select',
-    'ngSanitize'
+    'ngSanitize',
+    'ui.validate',
+    'ngMessages'
 ]
 
 ladderDependencies = [

@@ -1,6 +1,6 @@
 class PriceService
 
-  constructor: () ->
+  constructor: (@$filter) ->
 
   getPriceIncrement: (price) ->
     if price < 2 then return 0.01
@@ -25,6 +25,39 @@ class PriceService
     if price > 3 then return -0.05
     if price > 2 then return -0.02
     return -0.01
+
+  # TODO this should be a filter
+
+
+  # TODO add tests so no one ever breaks this !
+
+  # I apologise to anyone who ever reads the code in the following 5 functions
+  # In my defence I would like to point out how astonishingly bad javascript is at handling with numbers and maths
+  # That is if whatever value you have stored is still a Number, it might through some magic have been converted to a String !
+
+  round: (input, pow) => parseFloat(@$filter('number')(input, pow).replace(',', ''))
+
+  trunc: (input, pow) => Math.trunc(input * Math.pow(10, pow)) / Math.pow(10, pow)
+
+  getDp: (num) =>
+    match = (''+num).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/)
+    if (!match) then 0 else Math.max(0, (if (match[1]) then match[1].length else 0) - (if (match[2]) then +match[2] else 0))
+
+  isPriceValid: (price) ->
+    if price < 1.01 then return false
+    if price > 1000 then return false
+    inc = @getPriceIncrement(price)
+    mod = @trunc(price % inc, @getDp(price))
+    mod == 0
+
+  getClosestPriceAbove: (price) =>
+    inc = @getPriceIncrement(price)
+    mod = @trunc(price % inc, @getDp(price))
+    @round(price + inc - mod, @getDp(inc))
+
+  getClosestPriceBelow: (price) =>
+    dec = @getPriceDecrement(price) - 0.009
+    @getClosestPriceAbove(price + dec)
 
   decrementPrice: (price) => Math.round((price + @getPriceDecrement(price)) * 100) / 100
 
@@ -54,4 +87,4 @@ class PriceService
     prices.push(@getPriceBelow(Number(prices[prices.length - 1]), 1))
     prices
 
-  servicesModule.service('PriceService', [PriceService])
+  servicesModule.service('PriceService', ['$filter', PriceService])

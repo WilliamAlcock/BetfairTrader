@@ -1,12 +1,90 @@
-<div class="bf-strategy-modal">
-    <div class="modal-header">
-        <div class="heading">Start Strategy</div>
-    </div>
-    <div class="modal-body">
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" type="button" ng-click="mod.ok()">OK</button>
-        <button class="btn btn-warning" type="button" ng-click="mod.cancel()">Cancel</button>
-    </div>
-</div>
+<div class="bf-strategy-modal container-fluid">
+    <form name="strategyForm" class="form-horizontal">
+        <div class="modal-header">
+            <div class="heading">Start Strategy</div>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="form-group">
+                    <label for="orderSize" class="col-xs-3 control-label">Order Size</label>
+                    <div class="col-xs-3">
+                        <input type="number" class="form-control" id="orderSize" name="orderSize" placeholder="Order Size"
+                               ng-model="mod.data.size"  required min="2" step="0.01">
+                    </div>
+                    <div class="col-xs-4 col-xs-offset-2">
+                        <div ng-messages="strategyForm.orderSize.$error" role="alert" class="text-danger">
+                            <div ng-message="required">Order Size required</div>
+                            <div ng-message="min">Order Size must be >= 2</div>
+                        </div>
+                    </div>
 
+                </div>
+                <div class="form-group">
+                    <label for="layPrice" class="col-xs-3 control-label">Lay Price</label>
+                    <div class="col-xs-3">
+                        <input type="number" class="form-control" id="layPrice" name="layPrice" placeholder="Lay Price"
+                               ui-validate="'mod.isPriceValid($value)'" ng-model="mod.data.layPrice" required min="1.01" max="1000" step="0.01">
+                    </div>
+                    <div class="col-xs-2">
+                        <label class="btn btn-primary btn-xs" ng-click="mod.snapPriceDown('layPrice')"><span class="glyphicon glyphicon-menu-down"></span></label>
+                        <label class="btn btn-primary btn-xs" ng-click="mod.snapPriceUp('layPrice')"><span class="glyphicon glyphicon-menu-up"></span></label>
+                    </div>
+                    <div class="col-xs-4">
+                        <div ng-messages="strategyForm.layPrice.$error" role="alert" class="text-danger">
+                            <div ng-message="validator">Lay Price is invalid</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="layTime" class="col-xs-3 control-label">Lay Time</label>
+                    <div class="col-xs-3">
+                        <input type="time" step="1" class="form-control" id="layTime" placeholder="Lay Time" ng-model="mod.data.layTime">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="backPrice" class="col-xs-3 control-label">Back Price</label>
+                    <div class="col-xs-3">
+                        <input type="number" class="form-control" id="backPrice" name="backPrice" placeholder="Back Price"
+                               ui-validate="'mod.isPriceValid($value)'" ng-model="mod.data.backPrice" required min="1.01" max="1000">
+                    </div>
+                    <div class="col-xs-2">
+                        <label class="btn btn-primary btn-xs" ng-click="mod.snapPriceDown('backPrice')"><span class="glyphicon glyphicon-menu-down"></span></label>
+                        <label class="btn btn-primary btn-xs" ng-click="mod.snapPriceUp('backPrice')"><span class="glyphicon glyphicon-menu-up"></span></label>
+                    </div>
+                    <div class="col-xs-4">
+                        <div ng-messages="strategyForm.backPrice.$error" role="alert" class="text-danger">
+                            <div ng-message="validator">Back Price is invalid</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="stopPrice" class="col-xs-3 control-label">Stop Price</label>
+                    <div class="col-xs-3">
+                        <input type="number" class="form-control" id="stopPrice" name="stopPrice" placeholder="Stop Price"
+                               ui-validate="'mod.isPriceValid($value)'" ng-model="mod.data.stopPrice" required min="1.01" max="1000">
+                    </div>
+                    <div class="col-xs-2">
+                        <label class="btn btn-primary btn-xs" ng-click="mod.snapPriceDown('stopPrice')"><span class="glyphicon glyphicon-menu-down"></span></label>
+                        <label class="btn btn-primary btn-xs" ng-click="mod.snapPriceUp('stopPrice')"><span class="glyphicon glyphicon-menu-up"></span></label>
+                    </div>
+                    <div class="col-xs-4">
+                        <div ng-messages="strategyForm.stopPrice.$error" role="alert" class="text-danger">
+                            <div ng-message="validator">Stop Price is invalid</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="stopTime" class="col-xs-3 control-label">Stop Time</label>
+                    <div class="col-xs-3">
+                        <input type="time" step="1" class="form-control" id="stopTime" placeholder="Stop Time" ng-model="mod.data.stopTime">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-disabled="mod.isFormInvalid()" ng-click="mod.ok()">Submit</button>
+            <button class="btn btn-default" type="button" ng-click="mod.cancel()">Cancel</button>
+        </div>
+    </form>
+</div>
