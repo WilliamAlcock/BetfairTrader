@@ -1,7 +1,7 @@
 package core.autotrader
 
-import akka.actor.{PoisonPill, Props, Actor, ActorRef}
-import core.api.commands.{StopStrategy, StartStrategy}
+import akka.actor.{PoisonPill, Actor, ActorRef, Props}
+import core.api.commands.{StartStrategy, StopStrategy}
 import core.api.output.Output
 import core.autotrader.AutoTrader.{AutoTraderException, StrategyCreated}
 import core.autotrader.layTheDraw.LayTheDrawConfig
