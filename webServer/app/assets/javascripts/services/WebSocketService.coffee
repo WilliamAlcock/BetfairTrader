@@ -31,7 +31,7 @@ class WebSocketService
       @subscribeToAutoTraderUpdates()   # TODO move this to resolve in state
       @listCurrentOrders()              # TODO move this to resolve in state
       @listMatches()                    # TODO move this to resolve in state
-      @listRunningStrategies            # TODO move this to resolve in state
+      @listRunningStrategies()          # TODO move this to resolve in state
       deferred.resolve()
 
     @ws.onclose = => @$log.debug "WebSocket closed"
