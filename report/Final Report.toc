@@ -1,6 +1,6 @@
 \boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {1}Statement of Originality}{1}
+\contentsline {chapter}{\numberline {1}Statement Of Originality}{1}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {2}Acknowledgements}{2}
 \defcounter {refsection}{0}\relax 
