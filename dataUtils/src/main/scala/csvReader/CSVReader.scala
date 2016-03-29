@@ -209,18 +209,13 @@ class CSVReader extends CSVDataUtils with MarketDocumentUtils with IntervalFacto
     buildDataSet(db, markets.filter(_.startsWith(testingStr)), "testing", inplay, minutesBefore)
   }
 
-  def trainClassifier(dbName: String, collectionName: String) = {
+  def trainClassifier(dbName: String, collectionName: String, leafSize: Int, features: Int, numberOfTrees: Int) = {
     val col = dbIO.getCollection(dbName, collectionName)
     val data = Await.result(col.find(BSONDocument()).cursor[JsObject]().collect[List](), Duration.Inf).map(_.as[Instance])
 
-    val leafSize = 2
-    val features = 4
-    //val numberOfTrees = 100
-    List(500, 1000).foreach(numberOfTrees => {
-      println("#trees: " + numberOfTrees + ", leafSize: " + leafSize + ", #features: " + features + ", startTime: " + DateTime.now())
-      crossValidateForest(numberOfTrees = numberOfTrees, leafSize = leafSize, numberOfFeatures = features, new ExtremelyRandomForest(), data)
-      println("endTime " + DateTime.now())
-    })
+    println("#trees: " + numberOfTrees + ", leafSize: " + leafSize + ", #features: " + features + ", startTime: " + DateTime.now())
+    crossValidateForest(numberOfTrees = numberOfTrees, leafSize = leafSize, numberOfFeatures = features, new ExtremelyRandomForest(), data)
+    println("endTime " + DateTime.now())
   }
 }
 

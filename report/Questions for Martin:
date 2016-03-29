@@ -2,8 +2,9 @@ Questions for Martin:
 
 Development:
 
-Datastore vs more detailed autotrader
-(My preference is the datastore)
+Datastore vs 
+More detailed autotrader
+Integrate Decision Tree
 
 Report:
 
@@ -112,6 +113,8 @@ This is left-justified
 \begin{flushright}
 This is right-justified
 \end{flushright}
+
+DEMO:
 
 
 

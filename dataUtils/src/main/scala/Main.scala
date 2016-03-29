@@ -9,7 +9,8 @@ case class Config(mode: String = "",
                   inplay: Boolean = false,
                   minsBefore: Option[Int] = None,
                   numberOfTrees: Int = 0,
-                  leafSize: Int = 0)
+                  leafSize: Int = 0,
+                  features: Int = 0)
 
 object Main {
   val parser = new scopt.OptionParser[Config]("scopt") {
@@ -54,9 +55,10 @@ object Main {
       c.copy(mode = "trainClassifier")
     } text "trains a classifier" children(
       arg[String]("<db name>") required() action { (x, c) => c.copy(db = x) } text "database name",
-      arg[String]("<training set>") required() action { (x, c) => c.copy(file = x) } text "training set collection name"
-//      arg[Int]("<# trees>") required() action { (x, c) => c.copy(numberOfTrees = x) } text "number of trees",
-//      arg[Int]("<leafSize>") required() action { (x, c) => c.copy(leafSize = x) } text "leaf size (labels)"
+      arg[String]("<training set>") required() action { (x, c) => c.copy(file = x) } text "training set collection name",
+      arg[Int]("<leaf size>") required() action { (x, c) => c.copy(leafSize= x) } text "final leaf size",
+      arg[Int]("<# features to split>") required() action { (x, c) => c.copy(features = x) } text "number of features to split on",
+      arg[Int]("<# trees>") required() action { (x, c) => c.copy(numberOfTrees = x) } text "number of trees in forest"
     )
   }
 
@@ -68,7 +70,7 @@ object Main {
         case "buildCatalogues" => new CSVReader().buildCatalogues(config.db)
         case "writeIndicators" => new CSVReader().writeIndicators(config.db, config.interval)
         case "buildDataSet" => new CSVReader().buildTrainingAndTestSets(config.db, config.trainingStr, config.testingStr, config.inplay, config.minsBefore)
-        case "trainClassifier" => new CSVReader().trainClassifier(config.db, config.file) //, config.numberOfTrees, config.leafSize)
+        case "trainClassifier" => new CSVReader().trainClassifier(config.db, config.file, config.leafSize, config.features, config.numberOfTrees) //, config.numberOfTrees, config.leafSize)
         case _ => // should never reach this point
       }
       case None =>
