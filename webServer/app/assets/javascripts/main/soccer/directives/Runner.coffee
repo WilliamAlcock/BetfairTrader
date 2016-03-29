@@ -17,11 +17,15 @@ directivesModule.directive('runner',  ['$log', '$window', '$uibModal', 'DataMode
 
     scope.isStrategyRunning = () -> AutoTraderService.isStrategyRunning(scope.id, scope.catalogue.selectionId, scope.catalogue.handicap)
 
-    scope.startStrategy = () ->
+    scope.startStrategy = () =>
       modelInstance = $uibModel.open({
         animation: false,
         templateUrl: '/assets/partials/main/modals/strategy.html'
         controller: 'StrategyModalCtrl as mod'
+        resolve: {
+          marketId: () -> scope.id
+          catalogue: () -> scope.catalogue
+        }
         backdrop: false
         keyboard: true
         openedClass: 'bf-strategy-model-body'

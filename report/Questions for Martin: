@@ -1,0 +1,121 @@
+Questions for Martin:
+
+Development:
+
+Datastore vs 
+More detailed autotrader
+Integrate Decision Tree
+
+Report:
+
+Change the name of the project, drop Automated ?
+
+What level of documentation is expected for my code ?
+
+Can I submit my code as a github link ?
+
+What if I want to continue working on it ? can I branch the project and submit the branch ?
+
+What format should I use for diagrams ? do they all need to conform to a specific format
+
+What format should I use for references ?
+
+
+Notes to self:
+
+- Acknowledge all libraries used
+
+- 12,000 Words
+
+- Expectation appendices will not total more than 20 pages
+
+Sections:
+
+- Cover sheet									DONE
+- Signed statement of originality
+- Acknowledgements
+
+- Summary: a one page resume of the report
+- Contents: must have page numbers				DONE
+- Indroduction: 
+	- Motivation for the project
+	- Aims of the project should at least be stated in the first paragraph, preferably in the first sentence
+	- The first chapter should also explain the structure of the report
+- Professional Considerations:					STARTED
+	- Ethical issues
+		- How you addressed them
+- Body of Report
+	- Requirements analysis and specification of the problem you have tackled.
+	- Description of how you designed, built and evaluated yuor system.
+		- Usually occupy several chapters
+		- Will often include sections on:
+			- Implementation and testing (what kinds of testing ?)
+			- A discussion of the principles which underlie the program that has been written
+				- The significance of its data structures
+				- The way that its procedures and modules interact etc. A line by line description of your code is not the best way of achieving this and is NOT encouraged
+				- Evalutae your finished product using appropriate methods, backing you claims with evidence
+				- Evalutaing results should be related back to the original requirements
+				- A summary of the evaluation should appear in the Conclusion section
+- Conclusion
+	- This should include an assessment of the success of the finished product
+	- Have you achieved your objectives ?
+	- If not, why not ?
+	- It should contain suggestions for future extensions, or alternative methodologies, with hindsight, might have led to a better system
+- References
+	- Must be given correctly
+	- Full references with page numbers are required
+	- If you consult a similar project done in previous years you must reference it
+	- The references should be cited in the body of your report where appropriate
+	- Webpages you consulted need to be listed as well
+		- Title/topic of the Webpage and the last time you accessed it, not just the URL
+- Appendices
+	- Project logs
+	- Additional relevant system or test data
+	- Any technical material which you estimate is too detailed for the main body of the report
+	- You should make sure any technical material is appropriately annotated and consistenly presented
+	- DO NOT INCLUDE SOURCE CODE
+	- Any material that does not fit in the report's Appendix that you deem important can be included in the electronic submission (Although it may not be viewed)
+
+
+Latex Notes
+
+\includegraphics[width=2in]{"Images/ladder".png}
+
+
+This will produce \textbf{bold-faced} text.\nocite{MYName}
+
+
+This will produce \textsc{small caps} text.
+
+This will produce \texttt{typewriter} font.
+
+This will produce \begin{large} Large \end{large} text.
+
+This will produce \begin{Large} Larger \end{Large} text. 
+
+This will produce \begin{huge} huge \end{huge} text. 
+
+This will produce \begin{Huge} Larger \end{Huge} text. 
+
+This will produce \begin{small} Small \end{small} text. 
+
+This will produce \begin{tiny} Tiny \end{tiny} text. 
+
+$(x = z + 1)$
+
+\begin{center}This is a centered.\end{center}
+\begin{flushleft}
+This is left-justified
+\end{flushleft}
+\begin{flushright}
+This is right-justified
+\end{flushright}
+
+DEMO:
+
+
+
+
+
+
+

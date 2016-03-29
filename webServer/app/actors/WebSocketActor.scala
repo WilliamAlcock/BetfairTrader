@@ -1,7 +1,9 @@
 package actors
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import core.autotrader.AutoTrader.{StrategyCreated, StrategyStopped, StrategyStateChange, StrategyStarted}
+import core.autotrader.AutoTrader.{StrategyStopped, StrategyStateChange, StrategyStarted, StrategyCreated}
+
+//import core.autotrader.AutoTrader.{StrategyCreated, StrategyStopped, StrategyStateChange, StrategyStarted}
 import core.navData.{HorseRacingData, SoccerData}
 import core.orderManager.OrderManager._
 import domain.{ListCurrentOrdersContainer, ListMarketCatalogueContainer, MarketBookUpdate}

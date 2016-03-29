@@ -31,6 +31,7 @@ class WebSocketService
       @subscribeToAutoTraderUpdates()   # TODO move this to resolve in state
       @listCurrentOrders()              # TODO move this to resolve in state
       @listMatches()                    # TODO move this to resolve in state
+      @listRunningStrategies()          # TODO move this to resolve in state
       deferred.resolve()
 
     @ws.onclose = => @$log.debug "WebSocket closed"
@@ -115,6 +116,8 @@ class WebSocketService
 
   stopStrategy: (marketId, selectionId, handicap) ->
     @sendJsonrpcMessage({method: "stopStrategy", params: {marketId: marketId, selectionId: selectionId, handicap: handicap}})
+
+  listRunningStrategies: () -> @sendJsonrpcMessage({method: "listRunningStrategies", params: {}})
 
   listCurrentOrders: () -> @sendJsonrpcMessage({method: "listCurrentOrders", params: {betIds: [], marketIds: []}})
 

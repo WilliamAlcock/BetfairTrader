@@ -1,21 +1,18 @@
 package core.autotrader
 
-import akka.actor.{PoisonPill, Props, Actor, ActorRef}
-import core.api.commands.{StopStrategy, StartStrategy}
+import akka.actor.{Actor, ActorRef, PoisonPill, Props}
+import core.api.commands.{ListRunningStrategies, StartStrategy, StopStrategy, SubscribeToAutoTraderUpdates}
 import core.api.output.Output
-import core.autotrader.AutoTrader.{AutoTraderException, StrategyCreated}
-import core.autotrader.layTheDraw.LayTheDrawConfig
+import core.autotrader.AutoTrader._
+import core.autotrader.Runner.Init
 import core.eventBus.EventBus
 import play.api.libs.json.Json
 import server.Configuration
 
-trait Strategy
-trait StrategyConfig
-
 class AutoTrader(config: Configuration, controller: ActorRef, eventBus: EventBus) extends Actor {
 
   sealed case class StrategyKey(marketId: String, selectionId: Long, handicap: Double)
-  sealed case class StrategyActors(strategyId: String, strategy: ActorRef, monitor: ActorRef)
+  sealed case class StrategyActors(strategyId: String, strategy: ActorRef, monitor: ActorRef, state: String = "")
 
   var runningStrategies = Map.empty[StrategyKey, StrategyActors]
   var nextStrategyId: Int = 0
@@ -25,29 +22,49 @@ class AutoTrader(config: Configuration, controller: ActorRef, eventBus: EventBus
     "Strategy_" + (nextStrategyId - 1)
   }
 
-  def getStrategy(sc: StrategyConfig): ActorRef = sc match {
-    case x: LayTheDrawConfig => context.actorOf(layTheDraw.LayTheDraw.props(controller, x))
+  override def preStart() = {
+    controller ! SubscribeToAutoTraderUpdates()
   }
 
   override def receive = {
-    case StartStrategy(marketId, selectionId, handicap, layTheDrawConfig) =>
+    case ListRunningStrategies =>
+      runningStrategies.foreach{ case (key, data) => sender() ! StrategyStarted(key.marketId, key.selectionId, key.handicap, data.strategyId, data.state)}
+
+    case StrategyStarted(marketId, selectionId, handicap, strategyId, _state) =>
+      val key = StrategyKey(marketId, selectionId, handicap)
+      runningStrategies.get(key) match {
+        case Some(x) => runningStrategies = runningStrategies + (key -> x.copy(state = _state))
+        case _ => // Do Nothing
+      }
+
+    case StrategyStateChange(marketId, selectionId, handicap, strategyId, oldState, newState) =>
+      val key = StrategyKey(marketId, selectionId, handicap)
+      runningStrategies.get(key) match {
+        case Some(x) => runningStrategies = runningStrategies + (key -> x.copy(state = newState))
+        case _ => // Do Nothing
+      }
+
+    case StrategyStopped(marketId, selectionId, handicap, strategyId) =>
+      runningStrategies -= StrategyKey(marketId, selectionId, handicap)
+
+    case StartStrategy(marketId, selectionId, handicap, strategyConfig) =>
       val key = StrategyKey(marketId, selectionId, handicap)
       runningStrategies.get(key) match {
         case Some(x) => sender() ! AutoTraderException("Strategy already running on market")
         case None =>
           val id = strategyId()
-          val strategy = getStrategy(layTheDrawConfig)
+          val strategy = context.actorOf(Runner.props(controller))
           val monitor = context.actorOf(Monitor.props(config, eventBus, strategy, marketId, selectionId, handicap, id))
           runningStrategies = runningStrategies + (key -> StrategyActors(id, strategy, monitor))
+          strategy ! Init(strategyConfig.getStrategy(marketId, selectionId, handicap))
           sender() ! StrategyCreated(marketId, selectionId, handicap, id)
     }
     case StopStrategy(marketId, selectionId, handicap) =>
       val key = StrategyKey(marketId, selectionId, handicap)
       runningStrategies.get(key) match {
         case Some(x) => x.strategy ! PoisonPill
-        case None =>
+        case None => sender() ! AutoTraderException("No strategy running on market")
       }
-
   }
 }
 

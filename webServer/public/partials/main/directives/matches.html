@@ -11,14 +11,14 @@
     </div>
     <div class="col-xs-12" ng-repeat="(side, match) in data track by side">
         <!--Back Matches-->
-        <div class="row bf-back-color bf-first-back-order" ng-if="side == 'LAY'">
+        <div class="row bf-back-color bf-first-back-order" ng-if="side == 'BACK'">
             <div class="col-xs-3">{{match.price | number: 2}}</div>
             <div class="col-xs-3">{{match.size | number: 2}}</div>
             <div class="col-xs-3">{{getProfit(match) | number: 2}}</div>
             <div class="col-xs-3">{{getLiability(match) | number: 2}}</div>
         </div>
         <!--Lay Matches-->
-        <div class="row bf-lay-color bf-first-lay-order" ng-if="side == 'BACK'">
+        <div class="row bf-lay-color bf-first-lay-order" ng-if="side == 'LAY'">
             <div class="col-xs-3">{{match.price | number: 2}}</div>
             <div class="col-xs-3">{{match.size | number: 2}}</div>
             <div class="col-xs-3">{{getProfit(match) | number: 2}}</div>
