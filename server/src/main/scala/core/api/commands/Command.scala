@@ -34,6 +34,7 @@ case class SubscribeToOrderUpdates(marketId: Option[String] = None, selectionId:
 case class SubscribeToAutoTraderUpdates(strategyId: Option[String] = None) extends Command
 case class StartStrategy(marketId: String, selectionId: Long, handicap: Double, config: StrategyConfig) extends Command
 case class StopStrategy(marketId: String, selectionId: Long, handicap: Double) extends Command
+case object ListRunningStrategies extends Command
 
 object Command {
   implicit val formatGetNavigationData = Json.format[GetNavigationData]

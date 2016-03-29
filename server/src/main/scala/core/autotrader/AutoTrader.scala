@@ -1,9 +1,9 @@
 package core.autotrader
 
 import akka.actor.{Actor, ActorRef, PoisonPill, Props}
-import core.api.commands.{StartStrategy, StopStrategy, SubscribeToAutoTraderUpdates}
+import core.api.commands.{ListRunningStrategies, StartStrategy, StopStrategy, SubscribeToAutoTraderUpdates}
 import core.api.output.Output
-import core.autotrader.AutoTrader.{StrategyStopped, AutoTraderException, StrategyCreated}
+import core.autotrader.AutoTrader._
 import core.autotrader.Runner.Init
 import core.eventBus.EventBus
 import play.api.libs.json.Json
@@ -12,7 +12,7 @@ import server.Configuration
 class AutoTrader(config: Configuration, controller: ActorRef, eventBus: EventBus) extends Actor {
 
   sealed case class StrategyKey(marketId: String, selectionId: Long, handicap: Double)
-  sealed case class StrategyActors(strategyId: String, strategy: ActorRef, monitor: ActorRef)
+  sealed case class StrategyActors(strategyId: String, strategy: ActorRef, monitor: ActorRef, state: String = "")
 
   var runningStrategies = Map.empty[StrategyKey, StrategyActors]
   var nextStrategyId: Int = 0
@@ -27,6 +27,23 @@ class AutoTrader(config: Configuration, controller: ActorRef, eventBus: EventBus
   }
 
   override def receive = {
+    case ListRunningStrategies =>
+      runningStrategies.foreach{ case (key, data) => sender() ! StrategyStarted(key.marketId, key.selectionId, key.handicap, data.strategyId, data.state)}
+
+    case StrategyStarted(marketId, selectionId, handicap, strategyId, _state) =>
+      val key = StrategyKey(marketId, selectionId, handicap)
+      runningStrategies.get(key) match {
+        case Some(x) => runningStrategies = runningStrategies + (key -> x.copy(state = _state))
+        case _ => // Do Nothing
+      }
+
+    case StrategyStateChange(marketId, selectionId, handicap, strategyId, oldState, newState) =>
+      val key = StrategyKey(marketId, selectionId, handicap)
+      runningStrategies.get(key) match {
+        case Some(x) => runningStrategies = runningStrategies + (key -> x.copy(state = newState))
+        case _ => // Do Nothing
+      }
+
     case StrategyStopped(marketId, selectionId, handicap, strategyId) =>
       runningStrategies -= StrategyKey(marketId, selectionId, handicap)
 

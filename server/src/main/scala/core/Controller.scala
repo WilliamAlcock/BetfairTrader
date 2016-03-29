@@ -24,6 +24,7 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
     case ListMatches              => config.orderManagerInstructions
     case x: StartStrategy         => config.autoTraderInstructions
     case x: StopStrategy          => config.autoTraderInstructions
+    case ListRunningStrategies    => config.autoTraderInstructions
   }
 
   var subscribers = Set.empty[ActorRef]
