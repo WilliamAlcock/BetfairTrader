@@ -1,0 +1,17 @@
+[0] Config.pm:324> INFO - This is Biber 2.1
+[0] Config.pm:327> INFO - Logfile is 'Final Report.blg'
+[36] biber-darwin:276> INFO - === Tue Mar 29, 2016, 18:50:00
+[37] Biber.pm:333> INFO - Reading 'Final Report.bcf'
+[122] Biber.pm:645> INFO - Found 1 citekeys in bib section 0
+[137] Biber.pm:2977> INFO - Processing section 0
+[151] Biber.pm:3115> INFO - Looking for bibtex format file 'bibfile.bib' for section 0
+[152] bibtex.pm:1021> INFO - Decoding LaTeX character macros into UTF-8
+[153] bibtex.pm:895> INFO - Found BibTeX data source 'bibfile.bib'
+[158] Utils.pm:146> WARN - The field 'note' in entry 'BCSCodeOfConduct' cannot be null, deleting it
+[175] UCollate.pm:66> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[175] UCollate.pm:66> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[175] Biber.pm:2854> INFO - Sorting list 'nty' of type 'entry' with scheme 'nty' and locale 'en-US'
+[175] Biber.pm:2858> INFO - No sort tailoring available for locale 'en-US'
+[177] bbl.pm:505> INFO - Writing 'Final Report.bbl' with encoding 'ascii'
+[177] bbl.pm:596> INFO - Output to Final Report.bbl
+[177] Biber.pm:106> INFO - WARNINGS: 1

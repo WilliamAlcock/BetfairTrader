@@ -1,0 +1,44 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.5 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \sortlist{nty}{nty}
+    \entry{BCSCodeOfConduct}{online}{}
+      \name{author}{1}{}{%
+        {{hash=aefaa6111e4a0ef3fa71edc91e10f111}{IT}{I\bibinitperiod}{The\bibnamedelimb Chartered\bibnamedelima Institute}{T\bibinitperiod\bibinitdelim C\bibinitperiod\bibinitdelim I\bibinitperiod}{for}{f\bibinitperiod}{}{}}%
+      }
+      \strng{namehash}{aefaa6111e4a0ef3fa71edc91e10f111}
+      \strng{fullhash}{aefaa6111e4a0ef3fa71edc91e10f111}
+      \field{sortinit}{I}
+      \field{sortinithash}{25e99d37ba90f7c4fb20baf4e310faf3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{BCS Code of Conduct}
+      \field{urlday}{29}
+      \field{urlmonth}{03}
+      \field{urlyear}{2016}
+      \field{year}{2016}
+      \verb{url}
+      \verb http://www.bcs.org/category/6030
+      \endverb
+    \endentry
+  \endsortlist
+\endrefsection
+\endinput
+

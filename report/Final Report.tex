@@ -1,0 +1,64 @@
+\documentclass[11pt]{report}
+
+\usepackage[margin=1in, paperwidth=8.5in, paperheight=11in]{geometry}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage[nottoc,numbib]{tocbibind}
+\usepackage{array}
+\usepackage{titlesec}
+\usepackage[backend=biber, style=numeric-comp,url=true,isbn=true]{biblatex}
+\addbibresource{bibfile.bib}
+
+\makeatletter
+\def\ttl@mkchap@i#1#2#3#4#5#6#7{%
+    \ttl@assign\@tempskipa#3\relax\beforetitleunit
+    \vspace{\@tempskipa}%<<<<<< REMOVE THE * AFTER \vspace
+    \global\@afterindenttrue
+    \ifcase#5 \global\@afterindentfalse\fi
+    \ttl@assign\@tempskipb#4\relax\aftertitleunit
+    \ttl@topmode{\@tempskipb}{%
+        \ttl@select{#6}{#1}{#2}{#7}}%
+    \ttl@finmarks  % Outside the box!
+    \@ifundefined{ttlp@#6}{}{\ttlp@write{#6}}}
+\makeatother
+ 
+\titleformat{\chapter}[display]{\normalfont\bfseries}{}{0pt}{\Huge}
+  
+%\usepackage{lipsum} 
+
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\title{Automated Trading System for The Betfair Exchange}
+\author{William Jack Alcock\\\\Supervisor: Dr Martin Berger\\\\Candidate Number: 105860\\\\University of Sussex BSc Computer Science}
+\date{\today}
+
+\maketitle
+
+\chapter{Statement of Originality}
+
+\chapter{Acknowledgements}
+
+\chapter{Summary}
+
+\tableofcontents
+
+\chapter{Introduction}
+	\section{Motivation}
+	
+% Tidy up, add paragraph on how they were addressed
+\input{"Professional Considerations"}
+
+\chapter{Project Aims and Objectives}
+
+\chapter{Body of Report}
+	\section{Requirements Analysis}
+	\section{Design and Development}
+\chapter{Conclusion}
+
+\chapter{Appendices}
+
+\printbibliography[heading=bibintoc]
+
+\end{document}
