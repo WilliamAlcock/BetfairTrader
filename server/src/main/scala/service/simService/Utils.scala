@@ -15,7 +15,7 @@ trait Utils {
     case Some(x) =>
       val backOrders = orders.filter(x => x.side == Side.BACK && x.sizeRemaining > 0).toList.map(x => PriceSize(x.price, x.sizeRemaining))
       val layOrders = orders.filter(x => x.side == Side.LAY && x.sizeRemaining > 0).toList.map(x => PriceSize(x.price, x.sizeRemaining))
-      val tradedVolume = orders.filter(_.sizeMatched > 0).toList.map(x => PriceSize(x.price, x.sizeMatched)).toList
+      val tradedVolume = orders.filter(_.sizeMatched > 0).toList.map(x => PriceSize(x.avgPriceMatched, x.sizeMatched)).toList
 
       Some(x.copy(
         availableToBack = mergePrices(layOrders, x.availableToBack).sortBy(- _.price),
@@ -28,7 +28,7 @@ trait Utils {
   // TODO add test for divide by 0
   def getMatchFromOrders(orders: List[Order], side: Side): Match = orders.foldLeft[Match](Match(None, None, side, 0, 0, None))((acc, x) => {
     if (x.side == side && x.sizeMatched > 0) {
-      acc.copy(price = ((acc.price * acc.size) + (x.price * x.sizeMatched)) / (acc.size + x.sizeMatched), size = acc.size + x.sizeMatched)
+      acc.copy(price = ((acc.price * acc.size) + (x.avgPriceMatched * x.sizeMatched)) / (acc.size + x.sizeMatched), size = acc.size + x.sizeMatched)
     } else acc
   })
 }
