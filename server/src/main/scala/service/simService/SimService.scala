@@ -76,7 +76,7 @@ class SimService(val config: Configuration, val command: BetfairServiceNGCommand
 
     val promise = Promise[Option[ListMarketBookContainer]]()
     super.listMarketBook(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode) onComplete {
-      case Success(Some(x: ListMarketBookContainer)) => promise.completeWith(ask(orderBook, MatchOrders(x, config.orderProjection)).mapTo[Option[ListMarketBookContainer]])
+      case Success(Some(x: ListMarketBookContainer)) => promise.completeWith(ask(orderBook, MatchOrders(x, if (orderProjection.isDefined) Some(orderProjection.get._2) else None)).mapTo[Option[ListMarketBookContainer]])
       case _ => promise.failure(SimException("listMarketBook to BetfairService failed"))
     }
     promise.future

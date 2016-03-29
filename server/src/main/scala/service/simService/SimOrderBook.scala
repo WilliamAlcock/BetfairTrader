@@ -96,7 +96,7 @@ class SimOrderBook(var markets: HashMap[String, MarketOrderBook] = HashMap.empty
     reportFactory.getUpdateExecutionReportContainer(marketId, instructions.map(x => updateOrder(marketId, x)), customerRef)
   }
 
-  def matchOrders(listMarketBookContainer: ListMarketBookContainer, orderProjection: OrderProjection): Option[ListMarketBookContainer] = {
+  def matchOrders(listMarketBookContainer: ListMarketBookContainer, orderProjection: Option[OrderProjection]): Option[ListMarketBookContainer] = {
     Some(ListMarketBookContainer(listMarketBookContainer.result.map(marketBook =>
       if (markets.contains(marketBook.marketId)) {
         markets = markets + (marketBook.marketId -> markets(marketBook.marketId).matchOrders(marketBook))
@@ -163,6 +163,6 @@ object SimOrderBook {
   case class CancelOrders(marketId: String, instructions: Set[CancelInstruction], customerRef: Option[String] = None)
   case class ReplaceOrders(marketId: String, instructions: Set[ReplaceInstruction], customerRef: Option[String] = None)
   case class UpdateOrders(marketId: String, instructions: Set[UpdateInstruction], customerRef: Option[String] = None)
-  case class MatchOrders(listMarketBookContainer: ListMarketBookContainer, orderProjection: OrderProjection)
+  case class MatchOrders(listMarketBookContainer: ListMarketBookContainer, orderProjection: Option[OrderProjection])
   case class GetOrders(betIds: Seq[String], marketIds: Seq[String], status: OrderStatus)
 }

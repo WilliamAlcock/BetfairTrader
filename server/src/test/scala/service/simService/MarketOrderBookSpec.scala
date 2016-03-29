@@ -239,21 +239,21 @@ class MarketOrderBookSpec extends FlatSpec with Matchers with MockFactory with B
     (mockUtils.updateExchangePrices _).expects(runner2.ex, Set[Order](mockOrder2)).returns(Some(exchangePrices2))
     (mockUtils.updateExchangePrices _).expects(runner3.ex, Set[Order](mockOrder3)).returns(Some(exchangePrices3))
 
-    val _filterOrdersByProjection = mockFunction[Set[Order], OrderProjection, Set[Order]]
+    val _filterOrdersByProjection = mockFunction[Set[Order], Option[OrderProjection], Set[Order]]
 
-    _filterOrdersByProjection.expects(Set(mockOrder1), OrderProjection.ALL).returns(Set(mockOrder1))
-    _filterOrdersByProjection.expects(Set(mockOrder2), OrderProjection.ALL).returns(Set(mockOrder2))
-    _filterOrdersByProjection.expects(Set(mockOrder3), OrderProjection.ALL).returns(Set(mockOrder3))
+    _filterOrdersByProjection.expects(Set(mockOrder1), Some(OrderProjection.ALL)).returns(Set(mockOrder1))
+    _filterOrdersByProjection.expects(Set(mockOrder2), Some(OrderProjection.ALL)).returns(Set(mockOrder2))
+    _filterOrdersByProjection.expects(Set(mockOrder3), Some(OrderProjection.ALL)).returns(Set(mockOrder3))
 
     class TestMarketOrderBook extends MarketOrderBook(HashMap(
       "1-1.0" -> runnerOrderBook1,
       "2-2.0" -> runnerOrderBook2,
       "3-3.0" -> runnerOrderBook3
     ), reportFactory = mockReportFactory, utils = mockUtils) {
-      override def filterOrdersByProjection(o: Set[Order], op: OrderProjection) = _filterOrdersByProjection.apply(o, op)
+      override def filterOrdersByProjection(o: Set[Order], op: Option[OrderProjection]) = _filterOrdersByProjection.apply(o, op)
     }
 
-    new TestMarketOrderBook().updateMarketBook(marketBook, OrderProjection.ALL) should be (expectedResult)
+    new TestMarketOrderBook().updateMarketBook(marketBook, Some(OrderProjection.ALL)) should be (expectedResult)
   }
 
   "MarketOrderBook" should "get orders should return the order or None if it does not exist" in {

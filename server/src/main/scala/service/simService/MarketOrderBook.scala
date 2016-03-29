@@ -57,13 +57,13 @@ case class MarketOrderBook(runners: HashMap[String, RunnerOrderBook] = HashMap.e
   }
 
   // TODO test
-  def filterOrdersByProjection(orders: Set[Order], orderProjection: OrderProjection): Set[Order] = orderProjection match {
-    case OrderProjection.EXECUTABLE => orders.filter(_.status == OrderStatus.EXECUTABLE)
-    case OrderProjection.EXECUTION_COMPLETE => orders.filter(_.status == OrderStatus.EXECUTION_COMPLETE)
+  def filterOrdersByProjection(orders: Set[Order], orderProjection: Option[OrderProjection]): Set[Order] = orderProjection match {
+    case Some(OrderProjection.EXECUTABLE) => orders.filter(_.status == OrderStatus.EXECUTABLE)
+    case Some(OrderProjection.EXECUTION_COMPLETE) => orders.filter(_.status == OrderStatus.EXECUTION_COMPLETE)
     case _ => orders
   }
 
-  def updateMarketBook(marketBook: MarketBook, orderProjection: OrderProjection): MarketBook = {
+  def updateMarketBook(marketBook: MarketBook, orderProjection: Option[OrderProjection]): MarketBook = {
     marketBook.copy(runners = marketBook.runners.map(runner =>
       if (runners.contains(runner.uniqueId)) {
         val orders = runners(runner.uniqueId).getOrders

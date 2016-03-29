@@ -6,6 +6,7 @@ import domain._
 case class OrderBook(side: Side,
                      orders: List[Order] = List.empty,
                      matches: List[Match] = List.empty,
+                     lastPrice: Option[Double] = None,
                      orderFactory: OrderFactory = OrderFactory,
                      reportFactory: ReportFactory = ReportFactory,
                      utils: Utils = Utils) {
@@ -35,9 +36,10 @@ case class OrderBook(side: Side,
     )
   }
 
-  private def _matchOrder(order: Order): Order = {
+  private def _matchOrder(order: Order, price: Double): Order = {
     order.copy(
       status = OrderStatus.EXECUTION_COMPLETE,
+      avgPriceMatched = price,
       sizeMatched = order.sizeRemaining,
       sizeRemaining = 0.0
     )
@@ -46,10 +48,12 @@ case class OrderBook(side: Side,
   // TODO implement checking for incorrect instructions
   def placeOrder(instruction: PlaceInstruction): PlaceOrderResponse[OrderBook] = {
     require(instruction.side == side)
+    // Fill the order @ the lastPrice if one is defined
     val order = orderFactory.createOrder(instruction)
+    val newOrder = if (lastPrice.isDefined && isMatched(lastPrice.get, order.price)) _matchOrder(order, lastPrice.get) else order
     PlaceOrderResponse(
-      this.copy(orders = insert(orders, order)),
-      reportFactory.getPlaceInstructionReport(instruction, order)
+      this.copy(orders = insert(orders, newOrder)),
+      reportFactory.getPlaceInstructionReport(instruction, newOrder)
     )
   }
 
@@ -88,8 +92,9 @@ case class OrderBook(side: Side,
   }
 
   def matchOrders(price: Double): OrderBook = {
-    val updatedOrders = orders.map(x => if (x.status == OrderStatus.EXECUTABLE && isMatched(price, x.price)) _matchOrder(x) else x)
-    this.copy(orders = updatedOrders, matches = if (updatedOrders == orders) matches else List(utils.getMatchFromOrders(updatedOrders, side)))
+    val updatedOrders = orders.map(x => if (x.status == OrderStatus.EXECUTABLE && isMatched(price, x.price)) _matchOrder(x, price) else x)
+    val _match = utils.getMatchFromOrders(updatedOrders, side)
+    this.copy(lastPrice = Some(price), orders = updatedOrders, matches = if (_match.size == 0 && _match.price == 0) List() else List(_match))
   }
 
   def hasBetId(betId: String):Boolean = orders.find(x => x.betId == betId).size > 0

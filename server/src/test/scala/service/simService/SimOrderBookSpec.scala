@@ -128,10 +128,10 @@ class SimOrderBookSpec extends TestKit(ActorSystem("testSystem", ConfigFactory.p
     val returnedMarketOrderBook2 = mock[MarketOrderBook]
 
     (marketOrderBook1.matchOrders _).expects(marketBook1).returns(returnedMarketOrderBook1)
-    (returnedMarketOrderBook1.updateMarketBook _).expects(marketBook1, OrderProjection.ALL).returns(returnedMarketBook1)
+    (returnedMarketOrderBook1.updateMarketBook _).expects(marketBook1, Some(OrderProjection.ALL)).returns(returnedMarketBook1)
 
     (marketOrderBook2.matchOrders _).expects(marketBook2).returns(returnedMarketOrderBook2)
-    (returnedMarketOrderBook2.updateMarketBook _).expects(marketBook2, OrderProjection.ALL).returns(returnedMarketBook2)
+    (returnedMarketOrderBook2.updateMarketBook _).expects(marketBook2, Some(OrderProjection.ALL)).returns(returnedMarketBook2)
 
     val expectedResult = Some(ListMarketBookContainer(List(returnedMarketBook1, returnedMarketBook2, marketBook4)))
 
@@ -142,7 +142,7 @@ class SimOrderBookSpec extends TestKit(ActorSystem("testSystem", ConfigFactory.p
     )
 
     within(1 second) {
-      simOrderBook ! MatchOrders(listMarketBookContainer, OrderProjection.ALL)
+      simOrderBook ! MatchOrders(listMarketBookContainer, Some(OrderProjection.ALL))
       expectMsg(expectedResult)
       simOrderBook.underlyingActor.markets should be (expectedMarkets)
     }

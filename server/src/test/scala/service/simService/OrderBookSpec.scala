@@ -46,20 +46,42 @@ class OrderBookSpec extends FlatSpec with Matchers with BeforeAndAfterAll with M
   }
 
   val placeScenarios = Table(
-    ("orderBookSide", "expectedOrders"),
+    ("orderBookSide", "lastPrice", "expectedOrders"),
 
-    (Side.LAY,        List(generateOrder("3", 5, 22, Side.LAY),
-                           generateOrder("1", 4, 10, Side.LAY),
-                           generateOrder("2", 2, 5, Side.LAY))),
+    (Side.LAY,        Some(1.0),   List(generateOrder("3", 5, 22, Side.LAY).copy(status = OrderStatus.EXECUTION_COMPLETE, avgPriceMatched = 1.0, sizeMatched = 22, sizeRemaining = 0),
+                                        generateOrder("1", 4, 10, Side.LAY).copy(status = OrderStatus.EXECUTION_COMPLETE, avgPriceMatched = 1.0, sizeMatched = 10, sizeRemaining = 0),
+                                        generateOrder("2", 2, 5, Side.LAY).copy(status = OrderStatus.EXECUTION_COMPLETE, avgPriceMatched = 1.0, sizeMatched = 5, sizeRemaining = 0))),
 
-    (Side.BACK,       List(generateOrder("2", 2, 5, Side.BACK),
-                           generateOrder("1", 4, 10, Side.BACK),
-                           generateOrder("3", 5, 22, Side.BACK)))
+    (Side.LAY,        Some(10.0),  List(generateOrder("3", 5, 22, Side.LAY),
+                                        generateOrder("1", 4, 10, Side.LAY),
+                                        generateOrder("2", 2, 5, Side.LAY))),
+
+    (Side.LAY,        None,        List(generateOrder("3", 5, 22, Side.LAY),
+                                        generateOrder("1", 4, 10, Side.LAY),
+                                        generateOrder("2", 2, 5, Side.LAY))),
+
+    (Side.BACK,       Some(10.0),  List(generateOrder("2", 2, 5, Side.BACK).copy(status = OrderStatus.EXECUTION_COMPLETE, avgPriceMatched = 10.0, sizeMatched = 5, sizeRemaining = 0),
+                                        generateOrder("1", 4, 10, Side.BACK).copy(status = OrderStatus.EXECUTION_COMPLETE, avgPriceMatched = 10.0, sizeMatched = 10, sizeRemaining = 0),
+                                        generateOrder("3", 5, 22, Side.BACK).copy(status = OrderStatus.EXECUTION_COMPLETE, avgPriceMatched = 10.0, sizeMatched = 22, sizeRemaining = 0))),
+
+    (Side.BACK,       Some(1.0),   List(generateOrder("2", 2, 5, Side.BACK),
+                                        generateOrder("1", 4, 10, Side.BACK),
+                                        generateOrder("3", 5, 22, Side.BACK))),
+
+    (Side.BACK,       None,        List(generateOrder("2", 2, 5, Side.BACK),
+                                        generateOrder("1", 4, 10, Side.BACK),
+                                        generateOrder("3", 5, 22, Side.BACK)))
+
   )
 
-  "orderBook" should "placeOrder and store them ordered by price (ascending for Back, descending for LAY)" in {
+  private def isMatched(matchPrice: Double, orderPrice: Double, side: Side): Boolean = side match {
+    case Side.LAY   => matchPrice <= orderPrice
+    case Side.BACK  => matchPrice >= orderPrice
+  }
 
-    forAll(placeScenarios) { (orderBookSide: Side, expectedOrders: List[Order]) =>
+  "orderBook" should "placeOrder, match orders @ the lastPrice (if there is one) and store them ordered by price (ascending for Back, descending for LAY)" in {
+
+    forAll(placeScenarios) { (orderBookSide: Side, lastPrice: Option[Double], expectedOrders: List[Order]) =>
 
       val instructions = List(
         generatePlaceInstruction(orderBookSide, 4, 10),
@@ -77,12 +99,27 @@ class OrderBookSpec extends FlatSpec with Matchers with BeforeAndAfterAll with M
       (mockOrderFactory.createOrder _).expects(instructions(1)).returning(orders(1))
       (mockOrderFactory.createOrder _).expects(instructions(2)).returning(orders(2))
 
-      (mockReportFactory.getPlaceInstructionReport _).expects(instructions(0), orders(0))
-      (mockReportFactory.getPlaceInstructionReport _).expects(instructions(1), orders(1))
-      (mockReportFactory.getPlaceInstructionReport _).expects(instructions(2), orders(2))
+      if (lastPrice.isDefined && isMatched(lastPrice.get, orders(0).price, orders(0).side)) {
+        (mockReportFactory.getPlaceInstructionReport _).expects(instructions(0), orders(0).copy(status = OrderStatus.EXECUTION_COMPLETE, avgPriceMatched = lastPrice.get, sizeMatched = 10, sizeRemaining = 0))
+      } else {
+        (mockReportFactory.getPlaceInstructionReport _).expects(instructions(0), orders(0))
+      }
+
+      if (lastPrice.isDefined && isMatched(lastPrice.get, orders(1).price, orders(1).side)) {
+        (mockReportFactory.getPlaceInstructionReport _).expects(instructions(1), orders(1).copy(status = OrderStatus.EXECUTION_COMPLETE, avgPriceMatched = lastPrice.get, sizeMatched = 5, sizeRemaining = 0))
+      } else {
+        (mockReportFactory.getPlaceInstructionReport _).expects(instructions(1), orders(1))
+      }
+
+      if (lastPrice.isDefined && isMatched(lastPrice.get, orders(2).price, orders(2).side)) {
+        (mockReportFactory.getPlaceInstructionReport _).expects(instructions(2), orders(2).copy(status = OrderStatus.EXECUTION_COMPLETE, avgPriceMatched = lastPrice.get, sizeMatched = 22, sizeRemaining = 0))
+      } else {
+        (mockReportFactory.getPlaceInstructionReport _).expects(instructions(2), orders(2))
+      }
 
       val orderBook = instructions.foldLeft[OrderBook](OrderBook(
         orderBookSide,
+        lastPrice = lastPrice,
         orderFactory = mockOrderFactory,
         reportFactory = mockReportFactory,
         utils = mockUtils))((acc: OrderBook, x: PlaceInstruction) => acc.placeOrder(x).result)
@@ -298,36 +335,36 @@ class OrderBookSpec extends FlatSpec with Matchers with BeforeAndAfterAll with M
   }
 
   val matchScenarios = Table(
-    ("price", "orderBookSide", "matchesUpdated", "expectedOutput"),
+    ("price", "orderBookSide", "expectedOutput"),
 
-    (6.0,     Side.LAY,         false,            List(generateOrder("3", 5, 22, Side.LAY),
-                                                      generateOrder("1", 4, 10, Side.LAY),
-                                                      generateOrder("2", 2, 5, Side.LAY))),
+    (6.0,     Side.LAY,         List(generateOrder("3", 5, 22, Side.LAY),
+                                    generateOrder("1", 4, 10, Side.LAY),
+                                    generateOrder("2", 2, 5, Side.LAY))),
 
-    (6.0,     Side.BACK,       true,             List(generateOrder("2", 2, 5, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 5, sizeRemaining = Some(0)),
-                                                      generateOrder("1", 4, 10, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 10, sizeRemaining = Some(0)),
-                                                      generateOrder("3", 5, 22, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 22, sizeRemaining = Some(0)))),
+    (6.0,     Side.BACK,       List(generateOrder("2", 2, 5, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 5, sizeRemaining = Some(0)).copy(avgPriceMatched = 6.0),
+                                    generateOrder("1", 4, 10, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 10, sizeRemaining = Some(0)).copy(avgPriceMatched = 6.0),
+                                    generateOrder("3", 5, 22, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 22, sizeRemaining = Some(0)).copy(avgPriceMatched = 6.0))),
 
-    (4.0,     Side.LAY,        true,             List(generateOrder("3", 5, 22, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 22, sizeRemaining = Some(0)),
-                                                      generateOrder("1", 4, 10, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 10, sizeRemaining = Some(0)),
-                                                      generateOrder("2", 2, 5, Side.LAY))),
+    (4.0,     Side.LAY,        List(generateOrder("3", 5, 22, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 22, sizeRemaining = Some(0)).copy(avgPriceMatched = 4.0),
+                                    generateOrder("1", 4, 10, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 10, sizeRemaining = Some(0)).copy(avgPriceMatched = 4.0),
+                                    generateOrder("2", 2, 5, Side.LAY))),
 
-    (4.0,     Side.BACK,       true,             List(generateOrder("2", 2, 5, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 5, sizeRemaining = Some(0)),
-                                                      generateOrder("1", 4, 10, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 10, sizeRemaining = Some(0)),
-                                                      generateOrder("3", 5, 22, Side.BACK))),
+    (4.0,     Side.BACK,       List(generateOrder("2", 2, 5, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 5, sizeRemaining = Some(0)).copy(avgPriceMatched = 4.0),
+                                    generateOrder("1", 4, 10, Side.BACK, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 10, sizeRemaining = Some(0)).copy(avgPriceMatched = 4.0),
+                                    generateOrder("3", 5, 22, Side.BACK))),
 
-    (1.0,     Side.LAY,        true,             List(generateOrder("3", 5, 22, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 22, sizeRemaining = Some(0)),
-                                                      generateOrder("1", 4, 10, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 10, sizeRemaining = Some(0)),
-                                                      generateOrder("2", 2, 5, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 5, sizeRemaining = Some(0)))),
+    (1.0,     Side.LAY,        List(generateOrder("3", 5, 22, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 22, sizeRemaining = Some(0)).copy(avgPriceMatched = 1.0),
+                                    generateOrder("1", 4, 10, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 10, sizeRemaining = Some(0)).copy(avgPriceMatched = 1.0),
+                                    generateOrder("2", 2, 5, Side.LAY, status = OrderStatus.EXECUTION_COMPLETE, sizeMatched = 5, sizeRemaining = Some(0)).copy(avgPriceMatched = 1.0))),
 
-    (1.0,     Side.BACK,       false,            List(generateOrder("2", 2, 5, Side.BACK),
-                                                      generateOrder("1", 4, 10, Side.BACK),
-                                                      generateOrder("3", 5, 22, Side.BACK)))
+    (1.0,     Side.BACK,       List(generateOrder("2", 2, 5, Side.BACK),
+                                    generateOrder("1", 4, 10, Side.BACK),
+                                    generateOrder("3", 5, 22, Side.BACK)))
   )
 
-  "orderBook" should "matchOrders and maintain ordering" in {
+  "orderBook" should "matchOrders, update lastPrice and maintain ordering" in {
 
-    forAll(matchScenarios) { (price: Double, orderBookSide: Side, matchUpdated: Boolean, expectedResult: List[Order]) =>
+    forAll(matchScenarios) { (price: Double, orderBookSide: Side, expectedResult: List[Order]) =>
       val orders = if (orderBookSide == Side.BACK) {
         List(
           generateOrder("2", 2, 5, Side.BACK),
@@ -342,12 +379,9 @@ class OrderBookSpec extends FlatSpec with Matchers with BeforeAndAfterAll with M
         )
       }
 
-      val matches = if (matchUpdated) {
-        val _match = Match(None, None, orderBookSide, 10, 10, None)
-        (mockUtils.getMatchFromOrders _).expects(expectedResult, orderBookSide).returns(_match)
-        List(_match)
-      } else List.empty[Match]
+      val matches = List(Match(None, None, orderBookSide, 10, 10, None))
 
+      (mockUtils.getMatchFromOrders _).expects(expectedResult, orderBookSide).returns(matches(0))
 
       val orderBook = OrderBook(
         orderBookSide,
@@ -357,6 +391,7 @@ class OrderBookSpec extends FlatSpec with Matchers with BeforeAndAfterAll with M
         reportFactory = mockReportFactory,
         utils = mockUtils).matchOrders(price)
 
+      orderBook.lastPrice should be (Some(price))
       orderBook.getOrders should be (expectedResult)
     }
   }

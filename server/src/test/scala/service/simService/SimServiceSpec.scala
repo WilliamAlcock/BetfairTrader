@@ -53,7 +53,7 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
       val marketIds = Set("TEST_ID")
       // TODO fix these params so they are not tuples
       val priceProjection = Some(("priceProjection", PriceProjection(Set.empty)))
-      val orderProjection = Some(("orderProjection", OrderProjection.EXECUTABLE))           // TODO implement functionality
+      val orderProjection = Some(("orderProjection", OrderProjection.EXECUTABLE))           // TODO orderbook will always respond with whatever is defined in config
       val matchProjection = Some(("matchProjection", MatchProjection.NO_ROLLUP))            // TODO implement functionality
       val currencyCode = Some(("currencyCode", "TEST_CODE"))
 
@@ -77,7 +77,7 @@ class SimServiceSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
       val future = simService.listMarketBook(sessionToken, marketIds, priceProjection, orderProjection, matchProjection, currencyCode)
 
       if (successful) {
-        orderBook.expectMsg(2 seconds, MatchOrders(ListMarketBookContainer(List(returnedMarketBook)), orderProjection.get._2))
+        orderBook.expectMsg(2 seconds, MatchOrders(ListMarketBookContainer(List(returnedMarketBook)), Some(orderProjection.get._2)))
         orderBook.reply(Some(ListMarketBookContainer(List(updatedMarketBook))))
         whenReady(future) {
           case Some(container: ListMarketBookContainer) =>
