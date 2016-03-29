@@ -102,7 +102,8 @@ class ControllerSpec extends TestKit(ActorSystem("TestSystem", ConfigFactory.par
     UpdateOrders("1", Set.empty, None)                              -> config.orderManagerInstructions,
     ListCurrentOrders(Set.empty, Set.empty)                         -> config.orderManagerInstructions,
     ListMatches                                                     -> config.orderManagerInstructions,
-    StartStrategy("1", 1L, 1.0, null)                               -> config.autoTraderInstructions        // TODO update to include a strategy
+    StartStrategy("1", 1L, 1.0, null)                               -> config.autoTraderInstructions,
+    StopStrategy("1", 1L, 1.0)                                      -> config.autoTraderInstructions
   )
 
   forAll(command_Cases) { (command: Command, outputChannel: String) =>

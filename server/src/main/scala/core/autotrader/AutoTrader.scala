@@ -1,16 +1,13 @@
 package core.autotrader
 
-import akka.actor.{PoisonPill, Actor, ActorRef, Props}
-import core.api.commands.{StartStrategy, StopStrategy}
+import akka.actor.{Actor, ActorRef, PoisonPill, Props}
+import core.api.commands.{StartStrategy, StopStrategy, SubscribeToAutoTraderUpdates}
 import core.api.output.Output
-import core.autotrader.AutoTrader.{AutoTraderException, StrategyCreated}
-import core.autotrader.layTheDraw.LayTheDrawConfig
+import core.autotrader.AutoTrader.{StrategyStopped, AutoTraderException, StrategyCreated}
+import core.autotrader.Runner.Init
 import core.eventBus.EventBus
 import play.api.libs.json.Json
 import server.Configuration
-
-trait Strategy
-trait StrategyConfig
 
 class AutoTrader(config: Configuration, controller: ActorRef, eventBus: EventBus) extends Actor {
 
@@ -25,29 +22,32 @@ class AutoTrader(config: Configuration, controller: ActorRef, eventBus: EventBus
     "Strategy_" + (nextStrategyId - 1)
   }
 
-  def getStrategy(sc: StrategyConfig): ActorRef = sc match {
-    case x: LayTheDrawConfig => context.actorOf(layTheDraw.LayTheDraw.props(controller, x))
+  override def preStart() = {
+    controller ! SubscribeToAutoTraderUpdates()
   }
 
   override def receive = {
-    case StartStrategy(marketId, selectionId, handicap, layTheDrawConfig) =>
+    case StrategyStopped(marketId, selectionId, handicap, strategyId) =>
+      runningStrategies -= StrategyKey(marketId, selectionId, handicap)
+
+    case StartStrategy(marketId, selectionId, handicap, strategyConfig) =>
       val key = StrategyKey(marketId, selectionId, handicap)
       runningStrategies.get(key) match {
         case Some(x) => sender() ! AutoTraderException("Strategy already running on market")
         case None =>
           val id = strategyId()
-          val strategy = getStrategy(layTheDrawConfig)
+          val strategy = context.actorOf(Runner.props(controller))
           val monitor = context.actorOf(Monitor.props(config, eventBus, strategy, marketId, selectionId, handicap, id))
           runningStrategies = runningStrategies + (key -> StrategyActors(id, strategy, monitor))
+          strategy ! Init(strategyConfig.getStrategy(marketId, selectionId, handicap))
           sender() ! StrategyCreated(marketId, selectionId, handicap, id)
     }
     case StopStrategy(marketId, selectionId, handicap) =>
       val key = StrategyKey(marketId, selectionId, handicap)
       runningStrategies.get(key) match {
         case Some(x) => x.strategy ! PoisonPill
-        case None =>
+        case None => sender() ! AutoTraderException("No strategy running on market")
       }
-
   }
 }
 

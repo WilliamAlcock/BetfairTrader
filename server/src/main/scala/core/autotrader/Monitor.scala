@@ -1,15 +1,17 @@
 package core.autotrader
 
-import akka.actor.{Props, ActorRef, Actor}
-import akka.actor.FSM.{UnsubscribeTransitionCallBack, Transition, CurrentState, SubscribeTransitionCallBack}
-import core.autotrader.AutoTrader.{StrategyStateChange, StrategyStarted, AutoTraderOutput}
-import core.eventBus.{EventBus, MessageEvent}
+import akka.actor.FSM.{CurrentState, Transition, UnsubscribeTransitionCallBack, SubscribeTransitionCallBack}
+import akka.actor._
+import core.autotrader.AutoTrader.{StrategyStopped, StrategyStateChange, StrategyStarted, AutoTraderOutput}
+import core.autotrader.Runner.Finished
+import core.eventBus.{MessageEvent, EventBus}
 import server.Configuration
 
 class Monitor(config: Configuration, eventBus: EventBus, subject: ActorRef, marketId: String, selectionId: Long, handicap: Double, subjectId: String) extends Actor {
 
   override def preStart() ={
     subject ! SubscribeTransitionCallBack(self)
+    context watch subject
   }
 
   def broadcast(output: AutoTraderOutput): Unit = {
@@ -21,8 +23,14 @@ class Monitor(config: Configuration, eventBus: EventBus, subject: ActorRef, mark
   }
 
   override def receive = {
-    case CurrentState(actorRef, stateName) => broadcast(StrategyStarted(marketId, selectionId, handicap, subjectId, stateName.toString))
-    case Transition(actorRef, oldState, newState) => broadcast(StrategyStateChange(marketId, selectionId, handicap, subjectId, oldState.toString, newState.toString))
+    case CurrentState(actorRef, stateName) =>
+      broadcast(StrategyStarted(marketId, selectionId, handicap, subjectId, stateName.toString))
+    case Transition(actorRef, oldState, newState) if newState == Finished =>
+      subject ! PoisonPill
+    case Terminated(ref) =>
+      broadcast(StrategyStopped(marketId, selectionId, handicap, subjectId))
+    case Transition(actorRef, oldState, newState) =>
+      broadcast(StrategyStateChange(marketId, selectionId, handicap, subjectId, oldState.toString, newState.toString))
     case x => println("AUTO TRADER MONITOR received: ", x)
   }
 
