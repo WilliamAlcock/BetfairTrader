@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=latex 2015.5.24)  29 MAR 2016 18:32
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  31 MAR 2016 14:34
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**ProfessionConsiderations.tex
-(./ProfessionConsiderations.tex
+**"Professional Considerations.tex"
+(./Professional Considerations.tex
 LaTeX2e <2015/01/01>
 Babel <3.9l> and hyphenation patterns for 79 languages loaded.
 ! Undefined control sequence.
@@ -876,7 +876,7 @@ Your command was ignored.
 Type  I <command> <return>  to replace it with another command,
 or  <return>  to continue without it.
 
-[1]
+[1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 Overfull \hbox (36.81085pt too wide) in paragraph at lines 15--15
 \OT1/cmr/m/it/10 Promote
  []
@@ -5155,17 +5155,17 @@ Missing character: There is no c in font nullfont!
 Missing character: There is no t in font nullfont!
 )
 ! Emergency stop.
-<*> ProfessionConsiderations.tex
-                                
+<*> "Professional Considerations.tex"
+                                     
 *** (job aborted, no legal \end found)
 
  
 Here is how much of TeX's memory you used:
- 14 strings out of 493090
- 303 string characters out of 6134868
- 74196 words of memory out of 5000000
+ 15 strings out of 493089
+ 330 string characters out of 6134842
+ 74199 words of memory out of 5000000
  3596 multiletter control sequences out of 15000+600000
  4294 words of font info for 16 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 20i,4n,26p,297b,176s stack positions out of 5000i,500n,10000p,200000b,80000s
-Output written on ProfessionConsiderations.dvi (1 page, 952 bytes).
+ 20i,4n,26p,302b,176s stack positions out of 5000i,500n,10000p,200000b,80000s
+!  ==> Fatal error occurred, no output PDF file produced!

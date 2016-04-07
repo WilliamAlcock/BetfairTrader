@@ -2,23 +2,59 @@ Questions for Martin:
 
 Development:
 
-Datastore vs 
-More detailed autotrader
-Integrate Decision Tree
+- Datastore						*
+- More detailed autotrader		
+- Integrate Decision Tree		*
 
 Report:
 
 Change the name of the project, drop Automated ?
 
 What level of documentation is expected for my code ?
+	- This could be very time consuming
 
 Can I submit my code as a github link ?
+	- What if I want to continue working on it ? 
+	- can I branch the project and submit the branch ?
 
-What if I want to continue working on it ? can I branch the project and submit the branch ?
-
-What format should I use for diagrams ? do they all need to conform to a specific format
+What format should I use for diagrams ? 
+	- do they all need to conform to a specific format ?
 
 What format should I use for references ?
+
+DEMO:
+
+show gui:
+	- navigation
+	- manual trading
+	- autotrader
+show classifier:
+	- run classifier
+
+discuss project architecture
+
+points of interest for report
+points not of interest for report
+	- Technologies used
+		- Reason for picking them
+		- Other alternatives considered
+		- Experience using them
+		- Reflection on decision considering experience
+	- Server architecture, design and implementation 
+	- Client architecture, desing and implementation
+		 - GUI (Angular)
+		 - Webserver (Data conversion from JSON to server API)
+ 	- Random forest
+ 		- preprocessing of data
+ 		- implementation, Extremely Random Forest
+ 		- issues: memory restrictions
+ 		- further work
+	- Development approach
+		- Unit tests
+		- version control
+		- build system
+
+
 
 
 Notes to self:
@@ -77,7 +113,7 @@ Sections:
 	- Any material that does not fit in the report's Appendix that you deem important can be included in the electronic submission (Although it may not be viewed)
 
 
-Latex Notes
+Latex Notes:
 
 \includegraphics[width=2in]{"Images/ladder".png}
 
@@ -111,9 +147,10 @@ This is left-justified
 This is right-justified
 \end{flushright}
 
-DEMO:
 
 
+		
+			Before the data could be grouped into intervals the 
 
 
 

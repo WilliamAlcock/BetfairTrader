@@ -1,0 +1,77 @@
+	\section{Background}
+		\subsection{Betting exchanges opposed to historical bookmakers}
+			Historically if an individual wanted to bet on the outcome of an event they would go to a bookmaker (usually a company) who would offer them odds at which they could bet on the event. For example:
+			
+			\begin{center}
+			\begin{minipage}{6cm}
+				Event: Swansea vs Arsenal\\
+				Market: Swansea to Win\\
+				Odds: 2/1			
+			\end{minipage}
+			\end{center}
+			
+			In this example the bookmaker is offering odds of 2/1 for the individual to back. The bookmaker stands to lose two units for every one wagered by the individual. Bookmakers would aim to guarantee themselves a profit by offering odds lower than those they predicted to be the true odds of the event.\\
+			
+			Betting exchanges revolutionised the practice of betting by allowing the individual the ability to also offer odds on the outcome of an event, effectively allowing them to become the bookmaker. The proprietor of the betting exchange (in this case Betfair) makes money by taking a small commission on all winning bets by simply providing a forum for individuals to place bets with each other.\\
+			
+			As users of the exchange place orders to back or lay an event, the odds (or price) at which the back and lay orders meet derives the available price for the event.\\
+			
+			\begin{figure}[h]
+			\includegraphics[width=12cm]{"Introduction/Images/Swansea vs Arsenal Match Odds".png}
+			\centering
+			\caption{Example Match Odds: Swansea vs Arsenal}
+    			\label{fig:swanseaArsenalMatchOdds}
+			\centering
+			\end{figure}
+			
+			As you can see in Figure~\ref{fig:swanseaArsenalMatchOdds}, there are lay orders in the market for Swansea to win @ 4.6, 4.7 and 4.8 with back orders for Swansea to win @ 4.9, 5 and  5.1, as such the best available price to back is 4.8 (matching the lay orders), and to lay 4.9 (matching the back orders). Prices on betting exchanges are typically displayed as decimals rather than fractions with 4.8 representing 3.8/1, i.e. $4.8 * stake$ returned.
+			
+		\subsection{Similarities to financial markets}
+		
+			As with financial markets the price of a betting contract will fluctuate depending on the amount of money placed into the market (liquidity) and at what price it is placed.  In this respect the behaviour of the markets available on a betting exchange mirror that of financial markets where for instance, the price of Vodafone stock is derived by the price at which the orders to buy it meet those to sell it.\\
+			
+			Because the price of betting contracts will fluctuate over time users can speculate on the price of an event, potentially profiting by laying when the price is low and backing when the price is high. By predicting the odds of an event or the direction in which they believe the market will move a user can decide what price they want to back or lay a given contract.\\
+			
+			To give an example assume a user has placed the following bets:
+					
+			\begin{table}[h]
+				\centering
+				\begin{tabular}{rcc}
+					Lay Swansea to win&@&2.00\\
+					Back Swansea to win&@&4.00	
+				\end{tabular}\\
+				\vspace{.5cm}									
+				\centering
+				\begin{tabular}{l
+								S[table-format=1.3]
+								S[table-format=1.3]
+								S[table-format=-1.3]
+								S[table-format=-1.3]}
+					\toprule
+					{Side} 	& {Size} 	& {Price}		& \multicolumn{2}{c}{Profit}\\
+					{}		& {}			& {(\pounds)}	& {Win (\pounds)} 		& {Lose (\pounds)}	\\
+					\midrule
+					{Lay}	& 2.00		& 2.00 			& -4.00		& 2.00	\\
+					{Back} 	& 2.00		& 4.00 			& 8.00 		& -2.00 	\\
+					\bottomrule
+					{Total} 	& 			& 				& 4.00 		& 0.00	\\
+				\end{tabular}
+				\caption{Example PnL Breakdown: Swansea vs Arsenal}
+				\label{tab:pnlSwanseaVsArsenal}
+			\end{table}
+			
+			As shown in Table \ref{tab:pnlSwanseaVsArsenal} by placing both these trades the user has removed the downside from their bet. They effectively have a free back bet for Swansea to win @ 2.00. \\
+			
+			This free back bet can then be used to ensure the user wins a lesser amount on all eventualities of the event by backing the other outcomes (Arsenal to Win / The Draw) for a smaller amount.
+			
+		\subsection{Trading as opposed to gambling}
+			
+			The vast majority of individuals who bet on an event are gamblers. They will bet because they think Swansea will win or they may support Swansea or they may want the thrill of betting and potentially winning money. They will be price insensitive and they will almost certainly be backing an outcome rather than laying it.\\
+			
+			 A trader on the other hand will be interested in where the price is compared to where they think the price will move to and this will affect the price at which they are willing to back or lay an event. In contrast to the gambler the trader will probably not keep the bet on by the time the event has been realised having already closed the trade (matching the back bet with a corresponding lay bet or visa versa).
+		
+		\subsection{Automated Trading}
+		
+			Automating the trading of events offers several benefits to manually trading them. An automated system has the potential to place orders faster than a human and to monitor the behaviour of a wider range of markets simultaneously.\\
+			
+			An automated system also has the potential to be more disciplined with its trading strategy than a human as its decisions are never affected by emotion, which can be a common problem with human traders. To give an example a trader will buy at a given price with the intention of exiting the trade for a loss if the market dips below a certain price. But in reality once the market reaches this price emotion can cloud their decision and they will keep the trade on, telling themselves that they know they are right and soon the price will start to climb.

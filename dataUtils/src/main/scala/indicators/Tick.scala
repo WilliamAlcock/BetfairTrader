@@ -17,7 +17,7 @@ object Tick {
     Tick(close, range, volume, getCloseDelta(close, prevData), weightOfMoney)
 
   private def getCloseDelta(close: Double, prevData: List[TickData]): Option[Double] = prevData.headOption match {
-    case Some(x) => Some(close - x.tick.close)
+    case Some(x) => Some((BigDecimal(close) - BigDecimal(x.tick.close)).toDouble)
     case _ => None
   }
 }

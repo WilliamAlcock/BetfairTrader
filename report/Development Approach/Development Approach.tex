@@ -1,0 +1,45 @@
+\chapter{Development Approach}
+
+	\section{Programming Languages}
+		The majority of the project will be written in Scala\cite{Scala} with the exception of the GUI. The main reasons for selecting Scala above other languages were:
+		
+		\begin{itemize}
+			\item Support for both functional and object orientated programming styles will help increase development speed.
+			\item Scala code is compiled to Java Bite Code and runs on the Java Virtual Machine (JVM), as such it will run across multiple platforms and operating systems.
+			\item There are a wide range of mature libraries available for Scala and because Scala runs on the JVM it also has access to all existing Java libraries.
+			\item Scala encourages the use of immutable data types. This will provide an advantage considering the proposed concurrent nature of this project.
+			\item Scala is a statically typed language because of the complex nature of this project it will be advantageous to have type errors caught at compile time.
+		\end{itemize}
+			
+		The Akka library will be used in conjunction with Scala to build the server architecture. Akka is a toolkit and runtime for building highly concurrent distributed and resilient message-driven applications\cite{Akka}. Akka is based on Erlang's Actor model, with some differences\cite{AkkaVsErlang}. An actor provides a container for mutable State or Behaviour. Other parts of the system can communicate with an actor by sending it messages which are queued and actioned one at a time. This means that instead of having to synchronize access to parts of the code using locks, the developer can write your code in an Actor knowing it will only ever be run synchronously\cite{AkkaActors}.\\
+		
+		The GUI will be a implemented in a web browser and as such will be written in JavaScript with HTML 5 and CSS. Because of the well documented difficulties writing complex applications in JavaScript\cite{JavaScriptProblem} CoffeeScript will be used to simplify the code and AngularJS to add structure to the code and increase the declarative nature of the HTML. More in-depth reasons for choosing these technologies will be discussed later.
+	
+	\section{Unit Tests}
+		Due to the complex nature of this project and the financial risks faced by producing trading software with bugs it has been decided that during development there will be emphasis on automated testing.\\ 
+		
+		Unit tests will be produced to accompany the source code using ScalaTest and ScalaMock. The advantages of Unit tests are:
+		
+		\begin{itemize}
+			\item They allow the programmer to prove the output of a given piece of code given a deterministic input.
+			\item They allow the programmer to change existing code or add new code with the confidence that they haven't broken existing functionality code.
+			\item They help document and define what the code is doing, looking at the unit tests gives a clearer indication of what the code is doing.
+			\item Writing unit tests encourages the programmer to write code in small chunks that can be tested independently.
+		\end{itemize}
+		
+		Due to the exploratory nature of the development process, it will be hard to write the unit tests before the code but where possible this will be done. In most cases unit tests will be written alongside the code. When existing code needs to be changed or bugs are found the unit tests will be changed first and then the corresponding code changed to ensure unit tests pass\cite{TestingStatevsInteractions}.\\
+		
+		The Unit tests produced can be broadly split into two types: 
+			
+			\begin{itemize}
+				\item State tests verify that the code under test returns the right results.
+				\item Behaviour tests verify that the code under test calls certain methods with the correct order and with the correct parameters.
+			\end{itemize}				
+		
+	\section{Version Control}
+		Version control will be key to the development of this project. As such I have selected to use GIT\cite{GIT}. GIT is free, reliable, very well documented and has a large support community on the internet. Its also widely used in industry and the author wanted the opportunity to become proficient in using it.
+	\section{Build System}
+		The Scala Build Tool (SBT) will be used to manage dependencies and builds because of its ease of use and integration with all major Scala libraries.
+	\section{IDE}
+		IntelliJ IDEA \cite{Intellij} will be used as the integrated development environment (IDE) to write the code in. The author has previous experience using IntelliJ. JetBrains licence the product for free to students and it provides good support and integration for Scala, GIT and SBT.
+	 

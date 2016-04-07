@@ -1,0 +1,18 @@
+\chapter{Design And Implementation}
+
+It was decided that the system should implement a distributed client-server architecture.\\
+
+The server will provide an interface for the client, respond to commands from the client and broadcast any resulting output. The server should be able to handle connections from  multiple clients at once.\\ 
+
+The client should be able to take many forms i.e. a GUI that takes commands from a user or an automated computer system.\\
+
+The distributed client-server architecture was picked for the following reasons:
+
+	\begin{itemize}
+		\item The client and server can be developed in isolation.
+		\item The server will have central control of data and resources.
+		\item The server can be accessible from any location on any machine.
+	\end{itemize}
+	
+	\input{"Design And Implementation/Server"}
+	\input{"Design And Implementation/Web Server and Client (GUI)"}

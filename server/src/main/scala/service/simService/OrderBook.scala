@@ -91,6 +91,7 @@ case class OrderBook(side: Side,
     }
   }
 
+  // TODO this needs changing to fit with algorithm
   def matchOrders(price: Double): OrderBook = {
     val updatedOrders = orders.map(x => if (x.status == OrderStatus.EXECUTABLE && isMatched(price, x.price)) _matchOrder(x, price) else x)
     val _match = utils.getMatchFromOrders(updatedOrders, side)

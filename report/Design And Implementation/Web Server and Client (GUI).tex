@@ -1,0 +1,80 @@
+\section{Web Server and Client (GUI)}
+
+	As stated earlier in this report the Client will be desgined to run in the browser and will be written in CoffeeScript using AngularJs. CoffeeScript compiles to JavaScript and allows the programmer to achieve more with less code\cite{CoffeeScript}. AngularJs is very well documented and supported by Google and there is a large on-line community providing the answers to most questions, additionally I have already written several medium scale web applications in AngularJs.\\
+	
+	Because the GUI and the Client are not the main focus of this project, but are required to provide interaction between the server and the user, the majority of decisions have been made to increase the speed of development. Initially ScalaFx\cite{ScalaFx} and ScalaJs\cite{ScalaJs} were considered as alternatives but neither are well documented and the author has little experience programming with either which would have increased development time.\\
+	
+	\subsection{Web Server}
+		It was decided that the Web Server be implemented using Play Framework\cite{PlayFramework}. The project already uses Play's ScalaJson library on the server and the framework is built on Scala and Akka. This combined with the ability to compile CoffeeScript in real time as its being developed and handle non-blocking IO over either a RESTful API or a web socket made it an easy decision to make.\\
+		
+		The Web Server communicates with the Core Server's Controller using Akka remoting\cite{AkkaRemoting}. When the Client loads the web page from the Web Server one of the first things it does is request a web-socket for communication with the Web Server. The Web Server then creates an Actor to handle communication with the web socket and passes the Actor a reference to the core server's Controller.\
+		
+		The Web Socket Actor has two responsibilities:
+		
+		\begin{enumerate}
+			\item Convert JSON-RPC requests sent from the the browser, over the web-socket, into Scala case classes and forward them to the Core Server's Controller.
+			\item Convert Scala case classes sent from the core server into JSON-RPC responses and forward them over the web-socket to the browser. 
+		\end{enumerate}
+		
+		The conversions are implemented with very little code using Play's ScalaJson library and because the web-socket is handled by an Akka Actor it can be subscribed by the Core Server's Controller to it's Event Bus. Because communication is conducted over a web socket the Web Server can push data to the client as required.
+		
+			\begin{figure}[H]
+				\includegraphics[width=13cm]{"Design And Implementation/Web Server and Client Images/Web Server and Client Architecture".png}
+				\centering
+				\caption{Web Server and Client Architecture}
+    				\label{fig:webServerClientArchitecture}
+			\end{figure}		
+		
+	\subsection{Client (GUI)}
+		As stated earlier the client is implemented using AngularJs, the Web Server and Client Architecture is depicted in Figure~\ref{fig:webServerClientArchitecture}. An angular service called the Web Socket Service controls all communication with the Web Server. Data within the browser is persisted in three other AngularJs services, AngularJs services are singletons and as such provide the perfect abstracting to share data across the GUI:
+		
+		\begin{itemize}
+			\item The Data Model Service holds all market price data.
+			\item The Order Book Service holds all the orders and matches.
+			\item The Auto Trader Service holds all information about running strategies.		
+		\end{itemize}
+	
+		Additionally the price service contains all logic for calculating Betfair price increments. Betfair increments differ depending on the current price as shown in Figure~\ref{fig:betfairPriceIncrements}.
+		
+			\begin{figure}[H]
+				\includegraphics[width=4cm]{"Design And Implementation/Web Server and Client Images/Betfair Price Increments".png}
+				\centering
+				\caption{Betfair Price Increments}
+    				\label{fig:betfairPriceIncrements}
+			\end{figure}	
+			
+		The rest of the GUI code is implemented using AngularJs Controllers and Directives and HTML views. The amount of logic in the GUI has been kept to a minimum for the following reasons:
+		\begin{itemize}
+			\item JavaScript is not very good at handling numbers, all calculations are handled using floating points and this can lead to inaccuracies\cite{JavaScriptFloatingPoint}.
+			\item It reduces the amount of logic that needs to be duplicated over the Client and the Server. This means if the logic in the Server changes the GUI need not change as its main responsibilities are to display the data received from the Server and communicate input from the user back to the Server.
+		\end{itemize}
+		
+		\subsubsection{Visual Design of the GUI}
+		
+			This project will not go into great depth regarding the graphical design of the GUI as it is clearly not the focus. Because of this and in an effort to increase development speed the styling has been loosely based on Betfair's website. There are two main pages the user can view in the browser:
+			
+			\begin{figure}[H]
+				\includegraphics[width=12cm]{"Design And Implementation/Web Server and Client Images/GUI Main Window".png}
+				\centering
+				\caption{GUI Main Window}
+    				\label{fig:guiMainWindow}
+			\end{figure}	
+			
+			The GUI Main Window shown in Figure~\ref{fig:guiMainWindow} is used to navigate the hierarchy of Betfair events and markets. This window is split into three sections:
+			
+			\begin{itemize}
+				\item The Navigation Window (Left) which allows the user to navigate events and markets.
+				\item The Detail Window (Center) which shows high level price data for events and markets.
+				\item The Position Window (Right) which shows the user's orders and matches grouped by market and selection.		
+			\end{itemize}
+
+			\begin{figure}[H]
+				\includegraphics[width=5cm]{"Design And Implementation/Web Server and Client Images/GUI Ladder Window".png}
+				\centering
+				\caption{GUI Ladder Window}
+    				\label{fig:guiLadderWindow}
+			\end{figure}	
+			
+			The GUI Ladder Window shown in Figure~\ref{fig:guiLadderWindow} allows the user to navigate the full price depth of a market, shows the user information about their PnL and position in a market and allows the user to place or cancel orders in a market
+			
+			\todo[inline]{add section on data store windows once they are implemented, these will implemented using HighCharts\cite{HighCharts}}

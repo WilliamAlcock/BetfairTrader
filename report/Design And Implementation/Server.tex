@@ -1,0 +1,284 @@
+\section{Server}
+
+	As stated earlier in this report, the server will be written in Scala and built using Akka.
+	
+		\begin{figure}[h]
+			\includegraphics[width=4cm]{"Design And Implementation/Images/Server Layers".png}
+			\centering
+			\caption{Server Layers}
+    			\label{fig:serverLayers}
+		\end{figure}
+	
+	As shown in Figure~\ref{fig:serverLayers} the server will be split into two layers: 
+		
+		\begin{itemize}
+			\item A service layer that provides communication with the Betfair NG API.
+			\item The core server that will communicate with the service layer and any external systems.
+		\end{itemize}			
+	
+	This design offers the following advantages and was inspired by the 5 layer internet protocol stack\cite{kurose2007computer}:
+		
+		\begin{itemize}
+			\item Betfair API changes, as it did in 2014\cite{BetfairAPIMigration}. The service layer can be changed without changing the core server.
+			\item If in the future the system needs to be adapted to use another exchange\cite{BettingExchangesCompared} this can be achieved without significant changes to the core server.
+		\end{itemize}
+	
+	 and  With this design if the  in the same context,  This design was inspired by the 5 layer internet protocol stack
+	
+	\subsection{Service Layer}
+		Betfair provide sample code for a number of languages to show how basic interaction with the exchange works\cite{BetfairSampleCode}. The Scala code\cite{BetfairScalaSample} uses Spray\cite{Spray}, which is built on Akka, to send and receive HTTP calls to and from the Betfair NG API. All the data sent and received from the Betfair NG API is encoded as JSON and as such the example code uses Play's ScalaJson library\cite{PlayJSON} to convert JSON to Scala case classes and visa-versa. Both Spray and ScalaJson are well documented, well supported and used by a wide range of commercial products. Spray is built on Akka and as such integrates with existing project choices and ScalaJson provides a very concise API to validate and convert JSON into Scala case classes. For these reasons it was decided to extend the example code, adding all the missing API calls and extending the tests to cover these calls, and use that as the basis for the Service Layer. The examples in this code proved not only a good introduction to the Betfair NG API but also to Scala.\\
+		
+		Betfair provide two environments to query for data: The live environment and a test environment that responds with delayed data. There are a number of limitations with the test environment:
+		\begin{enumerate}
+			\item The test environment returns delayed price data which behaves erratically compared to the live environment.
+			\item The test environment does not allow betting transactions to be performed on it and as such you cannot place or change orders when using it\cite{BetfairDelayedApplicationKeys}.
+		\end{enumerate}
+		 
+		At this point it became obvious that a simulated order book would need to be implemented so the user could test a trading strategy locally without placing orders at the exchange.
+		
+	\subsection{Simulated Service Layer}		
+		
+		% Images of live vs simulated system		
+		\begin{figure}[h]
+			\includegraphics[width=12cm]{"Design And Implementation/Images/Live and Sim Service Layer".png}
+			\centering
+			\caption{Live and Simulated Service Layer}
+    			\label{fig:liveSimServiceLayer}
+		\end{figure}
+		
+		As is shown in Figure~\ref{fig:liveSimServiceLayer} the Live Service Layer makes data requests to the exchange and place orders at the exchange. The Simulated Service Layer places orders in a local order book but still makes data requests to the exchange. Once these data requests have been received by the Simulated Service Layer it consults its order book, updates any orders in its order book that would have been matched and updates the data requests to include those locally held orders. As far as the core server is concerned the resulting data request will look identical to that outputted by the Live Service Layer.\\
+		
+		Because the service layer doesn't have access to the order book at the exchange some assumptions have been made as to how orders were matched.\\
+		
+		At the exchange when an order is placed at a given price it will be assigned a queue position in the volume at that price. 
+		
+		\begin{figure}[H]
+			\includegraphics[width=3cm]{"Design And Implementation/Images/Back Lay Volume".png}
+			\centering
+			\caption{Example Back and Lay Volume}
+    			\label{fig:backLayVolume}
+		\end{figure}
+
+		To give an example: Figure \ref{fig:backLayVolume} shows that there is \pounds12 of back orders in the market @ 19.5 (volume available to Lay) and \pounds18 of lay orders in the market @ 8 (volume available to Back). If you placed a back order for \pounds2 with the exchange @ 19.5 it would be placed at the back of a queue to be matched behind the \pounds12 that is currently there and would not be matched until the volume in the queue before it had been matched, or cancelled. Because the simulated service doesn't know if the volume before it in the queue has been matched or cancelled it will make an assumption that locally held orders are not matched until all the volume at that price has traded and there is an order on the opposite side of the order book at the given price. In this case there would have to be a Lay order @ 19.5 for the order to bet matched. This could result in orders taking longer to match on the Simulated Service Layer if more volume appeared in the queue after your order as it will not be matched until all the volume at the price has traded. In this respect the simulated order book provides the user with a worse case scenario, but this means if a trading strategy proves successful when tested against the Simulated Service Layer it would also have been successful when actioned on the Live Service Layer.\\
+		
+		This functionality was implemented in the Simulated Order Book by	persisting two queues, one of Lay orders in descending price order, and one of Back orders in ascending price order. When the price for a given side (Back or Lay) is updated all unmatched orders in the opposite queue are matched until an order is reached that has a price less than the current price (in the case of Lay orders) or greater than the current price (in the case of Back orders).\\ 
+		
+		Using this algorithm the Simulated Order Book will rarely have to iterate the whole queue when the price updates but in worse cases can match orders in $O(n)$. The queue has been implemented as a double linked list so that inserting new orders can be achieved in $O(n)$ time.\\		
+
+	\subsection{Core Server Architecture}
+	
+		Because all communication with the Betfair NG API, and therefore the service layer occurs asynchronously it was decided that the core server implement an event based architecture.
+		
+		\begin{figure}[H]
+			\includegraphics[width=13.5cm]{"Design And Implementation/Images/Core Server".png}
+			\centering
+			\caption{Core Server Architecture}
+    			\label{fig:coreServerArchitecture}
+		\end{figure}
+		
+		As is shown in Figure~\ref{fig:coreServerArchitecture} the Event Bus lies at the center of the architecture. Each individual component is subscribed to a channel on the Event Bus for instructions and broadcasts output on a different channel. If one of the components needs to send commands to another part of the system (i.e. the Order Manager may need to subscribe to market data updates for a specific market) it makes the request to the controller which will route the request to the correct part of the system and subscribe it to the correct channels. This is also the case for any external parts of the system that will communicate with the server (i.e. the GUI). All requests will be made to the Controller. This design means each part of the system only needs to know about the Event Bus and the Controller.\\
+		
+	This design has several key benefits:
+	
+	\begin{itemize}
+		\item Each part of the system has a low dependency on how the rest of the system is implemented.	
+		\item Each part can be built in isolation as it only relies on the event bus and the API defined by the controller.
+		\item It will be easy to scale as each part of the server can run on independent machines in different locations.
+		\item It will be easy to test as each part of the server can be isolated and assertions made corresponding to each input message.
+		\item It will be easy to change the implementation of any part of the server without affecting the rest of the server as long as the format of the incoming and outgoing messages remain the same.
+	\end{itemize}
+	
+	\subsection{Central Configuration}	
+		What was not shown in Figure~\ref{fig:coreServerArchitecture} is that each component within the server, including the service layer, has access to a predefined configuration file that is loaded when the server is initialised. This file contains, amongst other things, the names of all the channels on the Event Bus and the current session token for connectivity with the Betfair NG API. This file provides a centralised, easy to maintain space to store and track settings.
+		
+	\subsection{The Event Bus}
+		The Event Bus was implemented by extending the existing Akka Event Bus. Rabbit MQ\cite{RabbitMQ} was initially considered as a solution but the decision was made to use the Akka Event Bus because all of the components used in the system that communicate with the Event Bus were written in Scala and Akka and it seemed unnecessary to complicate the system by using an extra piece of technology. If in the future this changed it would be easy to swap out the existing Event Bus for one implemented in Rabbit MQ or a similar technology as the Event Bus only exposes two functions; publish and subscribe.\\
+		
+		The Akka Event Bus was extended to include sub-channels. These sub-channels were implemented in the similar way to a directory structure in Linux.\\ 
+		
+		For example:\\  
+		
+		Market data updates would be broadcast on the channel "MarketUpdates/EventA/MarketB" with "EventA" being the event Id and "MarketB" the market Id of the corresponding market. If a subscriber only wanted to receive updates for "MarketA" they could subscribe to "MarketUpdates/EventA/MarketA", if they wanted to subscribe to "MarketA" but didn't know the event Id of the market they could subscribe to "MarketUpdates/*/MarketA". If a subscriber wanted to receive market data updates for all markets the could subscribe to "MarketUpdates/" and if they wanted to receive updates for all markets in "EventA" they could subscribe to "MarketUpdates/EventA/".\\
+			
+		This system greatly reduces the amount of unwanted messages sent within the Core Server.
+					
+	\subsection{Data Provider}
+		The Data Provider is responsible for making market data requests to the service layer of the server. The two main calls to the Betfair NG API that the Data Provider calls are:
+
+		\subsubsection{ListMarketBook} 
+			Returns a list of dynamic data about markets. Dynamic data includes prices, the status of the market, the status of selections, the traded volume, and the status of any orders you have placed in the market\cite{ListMarketBook}.\\
+			
+			This call is made to retrieve the current state of a given market. As described earlier in this report a market can have multiple selections. This call will return the current exchange prices, orders and matches for each of these selections amongst other data. To make sure the system always has up to date data for a given market multiple calls need to be made every second.\\
+			
+			There are a few issues that needed to be considered when designing this part of the system
+			\begin{enumerate}
+				\item The Betfair NG API states that "Calls to listMarketBook should be made up to a maximum of 5 times per second to a single marketId."\cite{ListMarketBook}. If this limit is exceeded then it can result in either disconnection from the exchange or incur costs, neither is desirable.
+				\item When requesting data for multiple markets it is advised to reduce the number of calls by requesting data for multiple markets in one call. In the case where market data is required for 20 different markets, instead of making independent HTTP calls for each market one call can be made for all the markets. There are however limits on the amount of data that can be made in each call.
+				
+				\item Market data calls can be made for varying levels of data as shown in Figure~\ref{fig:listmMarketBookPriceProjections}, each of these options has an associated weight as shown in Figure~\ref{fig:listmMarketBookDataLimits} and each call to ListMarketBook must not exceed a maximum weighting of 200. The price projection is set for the call and not for each individual market within the call. 
+				
+						\begin{figure}[H]
+							\includegraphics[width=10cm]{"Design And Implementation/Images/ListMarketBook Price Data".png}
+							\centering
+							\caption{ListMarketBook Price Projections}
+    							\label{fig:listmMarketBookPriceProjections}
+						\end{figure}
+
+						\begin{figure}[H]
+							\includegraphics[width=6cm]{"Design And Implementation/Images/ListMarketBook Market Data Limits".png}
+							\centering
+							\caption{ListMarketBook Market Data Limits}
+    							\label{fig:listmMarketBookDataLimits}
+						\end{figure}
+
+				As such calls to ListMarketBook need to be grouped by price projection. The decision was made to only support the combinations of price projections shown in Table~\ref{tab:marketsPerCall}, here you can see the maximum number of markets/call that can be made with each corresponding combination of price projections
+		
+			\begin{table}[h]
+				\centering
+				\begin{tabular}{lllll}
+					Price Projection & Weight & \multicolumn{3}{c}{Number of Markets/Call}\\
+					\toprule					
+					{Ex\_BEST\_OFFERS} 				& 5 		& 200 / 4 	& = & 40\\
+					{EX\_ALL\_OFFERS} 					& 17 	& 200 / 17 	& = & 11\\
+					{EX\_BEST\_OFFERS \& EX\_TRADED}    	& 22		& 200 / 22 	& = & 9\\
+					{EX\_ALL\_OFFERS \& EX\_TRADED}		& 34		& 200 / 34 	& = & 5\\
+				\end{tabular}
+				\caption{Number of markets/call by price projection}
+				\label{tab:marketsPerCall}
+			\end{table}
+			
+				As the weight of the price projection increases so does the amount of data returned and as such they have the following hierarchy:
+				
+				\begin{itemize}
+					\item EX\_BEST\_OFFERS requests market data for each selection to 3 prices in depth.
+					\item EX\_ALL\_OFFERS request market data for each selection for full market depth and is inclusive of EX\_BEST\_OFFERS
+					\item EX\_BEST\_OFFERS \& EX\_TRADED requests market data for each selection to 3 prices in depth and includes traded volume, this is inclusive of EX\_BEST\_OFFERS.
+					\item EX\_ALL\_OFFERS \& EX\_TRADED requests market data for full market depth and includes traded volume, this is inclusive of EX\_ALL\_OFFERS, EX\_ALL\_OFFERS and EX\_BEST\_OFFERS \& EX\_TRADED.	
+				\end{itemize}
+				
+				\item If the Data Provider has multiple requests for the same market's data but at different price projections it needs to be able to request the correct price projection from the service layer. If one of these requesters stops subscribing to data for the given market the Data Provider needs to be able to adjust its call accordingly.							
+			\end{enumerate}
+			
+			To ensure that the Data Provider optimises the ListMarketBook calls whilst addressing all the issues above the following design was implemented:\\
+
+			\begin{itemize}
+				\item When a requester subscribes, via the Controller, to market data for a given market the Controller subscribes them to the corresponding channel on the Event Bus and sends a message to the Data Provider informing it of their subscription.
+				\item The Data Provider maintains a set of all the subscribers for each market and the price projection's they have requested. 
+				\item At a configurable interval of no more than 250 milliseconds, to ensure calls are made less than 5 times a second, the Data Provider produces a list of all the required markets with the lowest weighted price projection necessary to accommodate each markets subscribers.
+				\item This list is then grouped by price projection and split into the maximum sized chunks permissible for each projection.
+				\item These chunks are then sent to an Akka Round Robin router\cite{AkkaRoundRobinRouter} that routes the requests to a pool of actors (the number of actors in this pool is another configurable option).
+				\item These actors send the requests concurrently to the service layer and when the data is received broadcast it on the corresponding market data channel for each market on the Event Bus.
+			\end{itemize}
+			
+			When a subscriber no longer requires data for a given market a message is sent to the Data Provider telling it to remove the subscription from its records. This procedure is repeated as long as the Data Provider has subscribers and is depicted in Figure~\ref{fig:dataProviderPolling}.  
+			
+			\begin{figure}[H]
+				\includegraphics[width=12cm]{"Design And Implementation/Images/Data Provider Polling Pool".png}
+				\centering
+				\caption{Data Provider Polling Mechanism}
+    				\label{fig:dataProviderPolling}
+			\end{figure}			
+			
+		\subsubsection{ListMarketCatalogue}
+			Returns a list of information about published (ACTIVE/SUSPENDED) markets that does not change (or changes very rarely). You use ListMarketCatalogue to retrieve the name of the market, the names of selections and other information about markets\cite{ListMarketCatalogue}.\\
+			
+			This call is made less frequently compared to the ListMarketBook call and when the Data Provider receives this request it calls the service layer immediately and sends the results directly to the requester.\\
+	
+	
+	\subsection{Data Model}
+		The Data Model listens to the channel of market data output from the Data Provider and keeps a record of the last market book data sent by the Data Provider for each market. Each time it receives a new update for a given market it checks if it is different from the copy it already has. If it is different it updates its local copy and broadcasts the new copy on its output channel. These market data updates are the ones that subscribers to the system listen to, not the ones output by the Data Provider. This way subscribers to market data are not spammed with continuous updates for markets that haven't changed.\\
+		
+		The Data Model will also, on request, send out a copy of the currently held market data for a given market directly to the requester. This service is essential because a situation can easily arise where a requester subscribes to market data updates for a given market but the market data does not changing frequently, in this case the subscriber would have to wait an arbitrary amount of time for its initial view of the market data.\\
+		
+		The Data Model, in conjunction with the Data Provider, essentially turn Betfair's NG API, which must be polled for market updates, into one which can be subscribed to and will push new updates to a subscriber when deltas in the market occur.
+		
+	\subsection{Order Manager}
+		\todo[inline]{Order manager updates its list of tracked orders from the service layer on start up and reconciles this list periodically}	
+					
+		The Order Manager is responsible for making requests to Place, Cancel, Update and Replace orders with the service layer. The Order Manager is also responsible for tracking, and broadcasting updates pertaining to, the status of orders once they have been placed with the service layer and keeps a record of the volume of back and lay orders matched for each market and broadcasts updates when these matches occur.\\
+		
+		On start up the Order Manager requests a list of all the currently open orders at the Betfair exchange and creates the initial list of tracked orders from this list. At intervals of a configurable length the Order Manager repeats this process reconciling its tracked orders with the list received from the exchange.
+		
+			\begin{figure}[H]
+				\includegraphics[width=4cm]{"Design And Implementation/Images/Order Life Cycle".png}
+				\centering
+				\caption{Life Cycle of an Order}
+    				\label{fig:orderLifeCycle}
+			\end{figure}			
+		
+		The life cycle of an order is depicted in Figure~\ref{fig:orderLifeCycle}. Once an order has been successfully placed with the service layer the Order Manager adds it to it's list of tracked orders and tells the Controller to subscribe it to market data updates for the given market. As the Order Manager receives these updates it will compare the version of the orders in the update to those it is currently tracking. If there is a difference the Order Manager will broadcast the new status of the order. Once the order has been executed the Order Manager will remove it from its list of tracked orders and, if there are no more tracked orders for that market, tell the Controller to un-subscribe it from further market updates for the given market.\\
+		
+		Market data updates also include the total volume of matched back and lay orders for each selection and the average price they were matched at. The Order Manager keeps a list of these matches and when the matches in the market data update differ from those it holds the Order Manager broadcasts a message alerting subscribers to the update.
+		
+		\todo[inline]{
+		order manager should send out system alerts when the maximum number of orders placed/hour exceeds those imposed by the Betfair NG API
+		}
+		
+	\subsection{Navigation Data Service}
+		The navigation data service was implemented as a response to issues faced while writing the Client. For the Client to be able navigate all the events and markets available on the Betfair exchange it would need to make requests for all the event and market catalogues available on the exchange. It would prove very computationally expensive for the server to request all this data and maintain an up-to-date copy of the hierarchy.\\
+		
+		To solve this problem Betfair provide Navigation Data for Applications in the form of a compressed Json file which can be downloaded from a separate HTTP endpoint. The API states that "The file data is cached and new request for the file one an hour should be suitable for those looking to accurately recreate the Betfair navigation menu."\cite{BetfairNavigationData}\\
+		
+		The Navigation Data Service is responsible for downloading this file on start up, caching a copy of the file locally and updating that cached copy on an hourly basis.\\ 
+		
+		The Navigation Data Service will, on request, will send the requester the navigation data for a given event type (i.e. Football or Horse Racing). The reason the whole file isn't sent is that it exceeds 3 Megabytes in size and would have meant increasing the Akka framesize and the send and receive buffer size. The communication of this file alone was not deemed as a good enough reason to increase these settings.
+
+	\subsection{Data Store}
+		\todo[inline]{
+		To be added before final draft\\
+		MongoDB\cite{MongoDB} is used by the Data Store for persistence and the Reactive Mongo\cite{ReactiveMongo} driver for communication between Scala and MongoDB 				
+		}
+
+	\subsection{Auto Trader}
+		As stated earlier the interim report for this project including objectives to 
+
+		\begin{itemize}
+			\item Define a language so a user can describe a trading strategy.
+			\item Write a parser or compiler to convert a trading strategy written in the above language into steps the trading system can understand.
+			\item Create trading strategies of differing complexities and test and report on their performance	.	
+		\end{itemize}
+		
+		These objectives were sidelined so a larger emphasis could be placed on the machine learning section of the project. This decision was made in part because Akka provides a very concise way of programming a finite state machine and because there was not enough time to implement all the desired functionality in the project.\\
+		
+		 After reading the documentation for the Akka FSM\cite{akkaFSM} it was obvious that it provided the perfect abstraction required to implement a trading strategy similar to that described in the requirements analysis. Additionally the Akka testkit provided some very good tools to test the strategy once written\cite{AkkaFSMTesting}. Using the Akka testkit it was possible to pass a strategy a mock of the servers Controller, and assert the state transitions and internal data changes the strategy would make in each of its states given all possible received events.\\
+		
+		The Auto trader 	is comprised of three parts:
+		
+		\subsubsection{The Auto Trader}
+			The main Auto Trader Actor listens to the Event Bus for three types of messages:
+			
+				\begin{itemize}
+					\item Start Strategy which starts a strategy on a given market with a given set of settings
+					\item Stop Strategy which stops a strategy with a given id running on a given market
+					\item List Running Strategies which sends the requester a list of all the currently running strategies and which states they are in.
+				\end{itemize}
+				
+			When the Auto Trader receives a message to start a new instance of a trading strategy on a market it creates a new FSM actor for the strategy and creates another Actor to monitor and broadcast updates on the status of the strategy as it transitions from state to state. This Actor is described below. The Auto Trader maintains a list of all running strategies and their corresponding monitors, removing entries when the strategies are finished or are stopped.
+			
+		\subsubsection{The Monitor}
+			A new monitor Actor is created for every instance of a strategy running. The reason for designing the system this way is so that responsibility for reporting can be kept separate from them trading strategy to keep the logic as simple as possible and make it easier to test. Keeping the monitor separate also means it can be reused over different types of strategy.\\
+			
+			The monitor broadcasts messages on the Event Bus to subscribers when the Auto Trader is started, when it changes states and when it finishes. The monitor is a also responsible for clean shutting down of the strategy once it has finished.
+			
+		\subsubsection{The Strategy}
+			To test the above infrastructure works the basic strategy trading strategy described in the appendix was built using an Akka FSM. The strategy has access to the Core Server's Controller and essentially acts as a headless client, requesting order and market updates and placing and cancelling orders with the Core Server. Later in the report a more detailed strategy will be implemented using the machine learning model trained in the second section of this project
+				
+			\todo[inline]{add basic trading strategy to the appendix}
+						
+	\subsection{Controller}
+		As stated earlier all requests to the server are placed with the Controller. The Controller has three main responsibilities: 
+
+		\begin{enumerate}
+			\item To subscribe and un-subscribe actors to and from the correct channels on the Event Bus. The Controller supports the following types of subscription:
+				\begin{itemize}
+					\item Market Data updates
+					\item Order updates
+					\item Auto Trader updates
+					\item System Alerts				
+				\end{itemize}
+				When an actor requests subscription for a specific market's data updates a message is also sent to the Data Provider on their behalf informing it of their subscription.
+			\item To watch subscribers for termination and in the event of termination un-subscribe them from all channels on the Event Bus and tell the Data Provider to cancel any subscriptions that were made on their behalf for market data.
+			\item To route commands to the correct parts of the core server. The commands handled by the Controller are documented in the Appendix
+			\todo[inline]{add Controller API documentation to Appendix}
+		\end{enumerate}				
+

@@ -74,43 +74,39 @@ class CSVReader extends CSVDataUtils with MarketDocumentUtils with IntervalFacto
     })
   }
 
-  def getPostFix(interval: Long): String = "_i_" + interval + "_ticks_w"
+  def getPostFix(interval: Long, postfix: String): String = "_i_" + interval + "_" + postfix
 
-  def writeIndicators(year: String, interval: Long /* Milliseconds */) = {
+  def writeIndicators(year: String, interval: Long /* Milliseconds */, postfix: String) = {
     var totalSelections = 0
     var totalIntervals = 0
     var totalMarkets = 0
-    val lookup = getLookup()
 
     onMarkets(year, (year: String, market: String) => {
-      if (lookup.contains(getMarket(market))) {
-        val col = dbIO.getCollection(year, market)
-        val csvData = Await.result(col.find(BSONDocument()).sort(BSONDocument("timestamp" -> 1)).cursor[CSVData]().collect[List](), Duration.Inf)
+      val col = dbIO.getCollection(year, market)
+      // read market data from mongodb, sort by timestamp
+      val csvData = Await.result(col.find(BSONDocument()).sort(BSONDocument("timestamp" -> 1)).cursor[CSVData]().collect[List](), Duration.Inf)
 
-        var marketSelections = 0
-        var marketIntervals = 0
+      var marketSelections = 0
+      var marketIntervals = 0
 
-        csvData.groupBy(_.selectionId).foreach { case (selectionId, data) => {
-          if (lookup(getMarket(market)).contains(selectionId)) {
-            marketSelections += 1
-            Await.result(Future.sequence(indicatorsFromCSVData(
-              data,
-              getIntervalStartTime(data.head.timestamp.getMillis, data.head.startTime.getMillis, interval),
-              interval,
-              getTicks
-            ).map(x => dbIO.writeIndicators(x, year, market, getPostFix(interval)))), Duration.Inf) match {
-              case x if x.forall(_.ok) =>
-                marketIntervals += x.size
-                println("Writing Indicators for market: " + market + " selection: " + selectionId + " SUCCEEDED intervals: " + x.size)
-              case _ => println("Writing Indicators for market: " + market + " selection: " + selectionId + " FAILED")
-            }
-          }
-        }}
-        println("MARKET: " + market + " #selections: " + marketSelections)
-        totalSelections += marketSelections
-        totalIntervals += marketIntervals
-        totalMarkets += 1
-      }
+      csvData.groupBy(_.selectionId).foreach { case (selectionId, data) => {
+        marketSelections += 1
+        Await.result(Future.sequence(indicatorsFromCSVData(
+          data,
+          getIntervalStartTime(data.head.timestamp.getMillis, data.head.startTime.getMillis, interval),
+          interval,
+          probLose//(x: Double) => x
+        ).map(x => dbIO.writeIndicators(x, year, market, getPostFix(interval, postfix)))), Duration.Inf) match {
+          case x if x.forall(_.ok) =>
+            marketIntervals += x.size
+            println("Writing Indicators for market: " + market + " selection: " + selectionId + " SUCCEEDED intervals: " + x.size)
+          case _ => println("Writing Indicators for market: " + market + " selection: " + selectionId + " FAILED")
+        }
+      }}
+      println("MARKET: " + market + " #selections: " + marketSelections)
+      totalSelections += marketSelections
+      totalIntervals += marketIntervals
+      totalMarkets += 1
     })
     println("TOTAL MARKETS: " + totalMarkets + " TOTAL SELECTIONS: " + totalSelections + " TOTAL INTERVALS: " + totalIntervals)
   }
@@ -130,6 +126,7 @@ class CSVReader extends CSVDataUtils with MarketDocumentUtils with IntervalFacto
     var totalMarkets = 0
     var totalSelections = 0
     var totalIntervals = 0
+
     markets.map(market => {
       var marketSelections = 0
       var marketIntervals = 0
@@ -157,37 +154,37 @@ class CSVReader extends CSVDataUtils with MarketDocumentUtils with IntervalFacto
 
   def getMarket(s: String): String = s.substring(6)
 
-  def buildDataSet(db: String, markets: List[String], saveName: String, inplay: Boolean, minsBefore: Option[Int], lookup: Map[String, Set[Long]]): Unit = {
-    var totalMarkets = 0
-    var totalSelections = 0
-    var totalIntervals = 0
-
-    markets.filter(x => lookup.contains(getMarket(x))).map(market => {
-      var marketSelections = 0
-      var marketIntervals = 0
-
-      val selections = lookup(getMarket(market))
-
-      val indicators: Map[Long, List[Indicators]] = Await.result(dbIO.getCollection(db, market).find(BSONDocument()).sort(BSONDocument("timestamp" -> -1)).cursor[JsObject]().collect[List]().map(x => {
-        x.map(_.validate[Indicators].get).filter(x => selections.contains(x.selectionId) && isValid(x, inplay, minsBefore)).groupBy(_.selectionId)
-      }), Duration.Inf)
-
-      indicators.foreach{case (selection, _indicators) =>
-        marketSelections += 1
-        val instances = indicatorsToInstances(_indicators)
-        marketIntervals += instances.size
-        println("Writing Indicators for market: " + market + " selection: " + selection + " SUCCEEDED intervals: " + instances.size)
-        instances.map(x => {
-          dbIO.writeInstance(x, db, saveName)
-        })
-      }
-      println("MARKET: " + market + " #selections: " + marketSelections + " #intervals " + marketIntervals)
-      totalSelections += marketSelections
-      totalIntervals += marketIntervals
-      totalMarkets += 1
-    })
-    println("DATASET: " + saveName + " #markets " + totalMarkets + " #selections " +  totalSelections + " #totalIntervals " + totalIntervals)
-  }
+//  def buildDataSet(db: String, markets: List[String], saveName: String, inplay: Boolean, minsBefore: Option[Int], lookup: Map[String, Set[Long]]): Unit = {
+//    var totalMarkets = 0
+//    var totalSelections = 0
+//    var totalIntervals = 0
+//
+//    markets.filter(x => lookup.contains(getMarket(x))).map(market => {
+//      var marketSelections = 0
+//      var marketIntervals = 0
+//
+//      val selections = lookup(getMarket(market))
+//
+//      val indicators: Map[Long, List[Indicators]] = Await.result(dbIO.getCollection(db, market).find(BSONDocument()).sort(BSONDocument("timestamp" -> -1)).cursor[JsObject]().collect[List]().map(x => {
+//        x.map(_.validate[Indicators].get).filter(x => selections.contains(x.selectionId) && isValid(x, inplay, minsBefore)).groupBy(_.selectionId)
+//      }), Duration.Inf)
+//
+//      indicators.foreach{case (selection, _indicators) =>
+//        marketSelections += 1
+//        val instances = indicatorsToInstances(_indicators)
+//        marketIntervals += instances.size
+//        println("Writing Indicators for market: " + market + " selection: " + selection + " SUCCEEDED intervals: " + instances.size)
+//        instances.map(x => {
+//          dbIO.writeInstance(x, db, saveName)
+//        })
+//      }
+//      println("MARKET: " + market + " #selections: " + marketSelections + " #intervals " + marketIntervals)
+//      totalSelections += marketSelections
+//      totalIntervals += marketIntervals
+//      totalMarkets += 1
+//    })
+//    println("DATASET: " + saveName + " #markets " + totalMarkets + " #selections " +  totalSelections + " #totalIntervals " + totalIntervals)
+//  }
 
 
   def getLookup(): Map[String, Set[Long]] = {
@@ -205,18 +202,31 @@ class CSVReader extends CSVDataUtils with MarketDocumentUtils with IntervalFacto
   def buildTrainingAndTestSets(db: String, trainingStr: String, testingStr: String, inplay: Boolean, minutesBefore: Option[Int] = None) = {
     val markets = Await.result(dbIO.listMarkets(db), Duration.Inf)
 
-    buildDataSet(db, markets.filter(_.startsWith(trainingStr)), "training", inplay, minutesBefore)
-    buildDataSet(db, markets.filter(_.startsWith(testingStr)), "testing", inplay, minutesBefore)
+    println("Settings: inplay = ", inplay, " minsBefore = ", minutesBefore)
+
+    buildDataSet(db, markets.filter(_.startsWith(trainingStr)), "training_20", inplay, minutesBefore)
+    buildDataSet(db, markets.filter(_.startsWith(testingStr)), "testing_20", inplay, minutesBefore)
   }
 
-  def trainClassifier(dbName: String, collectionName: String, leafSize: Int, features: Int, numberOfTrees: Int) = {
-    val col = dbIO.getCollection(dbName, collectionName)
-    val data = Await.result(col.find(BSONDocument()).cursor[JsObject]().collect[List](), Duration.Inf).map(_.as[Instance])
-
-    println("#trees: " + numberOfTrees + ", leafSize: " + leafSize + ", #features: " + features + ", startTime: " + DateTime.now())
-    crossValidateForest(numberOfTrees = numberOfTrees, leafSize = leafSize, numberOfFeatures = features, new ExtremelyRandomForest(), data)
-    println("endTime " + DateTime.now())
+  private def loadDataSet(db: String, col: String) = {
+    Await.result(dbIO.getCollection(db, col).find(BSONDocument()).cursor[JsObject]().collect[List](), Duration.Inf).map(_.as[Instance])
   }
+
+  def crossValidateClassifier(dbName: String, collectionName: String, leafSize: Int, features: Int, numberOfTrees: Int) = {
+    val data = loadDataSet(dbName, collectionName)
+
+    List(50, 100, 200, 500, 1000).foreach(_numberOfTrees => {
+      println("#trees: " + _numberOfTrees + ", leafSize: " + leafSize + ", #features: " + features + ", startTime: " + DateTime.now())
+      crossValidateForest(numberOfTrees = _numberOfTrees, leafSize = leafSize, numberOfFeatures = features, new ExtremelyRandomForest(), data)
+      println("endTime " + DateTime.now())
+    })
+  }
+
+  def trainAndTestClassifier(dbName: String, trainingCollection: String, testingCollection: String, leafSize: Int, features: Int, numberOfTrees: Int) = {
+    val forest = new ExtremelyRandomForest().trainForest(numberOfTrees, leafSize, features, loadDataSet(dbName, trainingCollection))
+    println(testForest(forest, loadDataSet(dbName, testingCollection)))
+  }
+
 }
 
 //object CSVReader extends App with CrossValidator {

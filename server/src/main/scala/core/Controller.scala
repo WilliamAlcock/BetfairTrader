@@ -76,6 +76,7 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
       eventBus.subscribe(sender(), channel)
       system.log.info("Subscribing " + sender() + " to " + channel)
 
+    // TODO I think it is un-necessary to watch senders who send commands, they only need to be watched if they are subscribing to channels
     case x: Command =>
       watch(sender())
       eventBus.publish(MessageEvent(getCommandChannel(x), x, sender()))

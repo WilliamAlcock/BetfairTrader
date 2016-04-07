@@ -30,7 +30,7 @@ case class CSVData(eventId: String,
     case Some(x) =>
       val backSize = x.availableToBack.map(_.size).sum
       val totalSize = backSize + x.availableToLay.map(_.size).sum
-      if (totalSize == 0.0) totalSize else (backSize / totalSize)
+      if (totalSize == 0.0) totalSize else backSize / totalSize
     case None => 0.0
   }
 

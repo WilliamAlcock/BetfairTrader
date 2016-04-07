@@ -7,6 +7,19 @@
 \usepackage{array}
 \usepackage{titlesec}
 \usepackage[backend=biber, style=numeric-comp,url=true,isbn=true]{biblatex}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage[]{algorithm2e}
+\usepackage[color=yellow]{todonotes}
+\hypersetup{
+    colorlinks,
+    citecolor=blue,
+    filecolor=black,
+    linkcolor=blue,
+    urlcolor=blue
+}
 \addbibresource{bibfile.bib}
 
 \makeatletter
@@ -23,6 +36,8 @@
 \makeatother
  
 \titleformat{\chapter}[display]{\normalfont\bfseries}{}{0pt}{\Huge}
+
+\newcolumntype{R}{S[color=green,negative-color=red]}
   
 %\usepackage{lipsum} 
 
@@ -38,27 +53,35 @@
 \maketitle
 
 % Tidy up
-\input{"Statement of Originality"}
+\input{"Statement of Originality/Statement of Originality"}
 
 % Tidy up, add detail
-\input{"Acknowledgements"}
+\input{"Acknowledgements/Acknowledgements"}
 
-\chapter{Summary}
+% What Betfair exchange, betting exchange,
+% Similarity to financial markets
+% Trading system
+% Automated Trading System - machine learning
+% Results
+\input{"Summary/Summary"}
 
 \tableofcontents
+\listoffigures
+\listoftables
 
-\chapter{Introduction}
-	\section{Motivation}
+% Tidy up, add primary objects
+\input{"Introduction/Introduction"}
 	
 % Tidy up, add paragraph on how they were addressed
-\input{"Professional Considerations"}
+\input{"Professional Considerations/Professional Considerations"}
 
-\chapter{Project Aims and Objectives}
+\input{"Requirements Analysis/Requirements Analysis"}
 
-\chapter{Body of Report}
-	\section{Requirements Analysis}
-	\section{Design and Development}
-\chapter{Conclusion}
+\input{"Development Approach/Development Approach"}
+
+\input{"Design And Implementation/Design And Implementation"}
+	
+\input{"Predicting Price Movement/Predicting Price Movement"}
 
 \chapter{Appendices}
 

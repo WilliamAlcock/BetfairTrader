@@ -38,28 +38,40 @@ object Main {
       c.copy(mode = "writeIndicators")
     } text "build intervals from tick data" children(
       arg[String]("<db name>") required() action { (x, c) => c.copy(db = x) } text "database name",
-      arg[Long]("<interval>") required() action { (x, c) => c.copy(interval = x) } text "interval length in milliseconds"
+      arg[Long]("<interval>") required() action { (x, c) => c.copy(interval = x) } text "interval length in milliseconds",
+      arg[String]("<new db postfix>") required() action { (x, c) => c.copy(file = x) } text "output database postfix"
     )
 
     cmd("buildDataSet") action { (_, c) =>
       c.copy(mode = "buildDataSet")
     } text "build training and test data from the contents of a db" children(
-      opt[Unit]("<inplay>") abbr("ip") action { (x, c) => c.copy(inplay = true)} text "use inplay intervals",
+      opt[Unit]("<inplay>") abbr("ip") action { (x, c) => c.copy(inplay = false)} text "use inplay intervals",
       arg[String]("<db name>") required() action { (x, c) => c.copy(db = x) } text "database name",
       arg[String]("<training set>") required() action { (x, c) => c.copy(trainingStr = x) } text "training collections prefix",
       arg[String]("<testing set>") required() action { (x, c) => c.copy(testingStr = x) } text "testing collections prefix",
       arg[Int]("<minsBefore>") optional() action { (x, c) => c.copy(minsBefore = Some(x)) } text "minutes before race to take intervals"
     )
 
-    cmd("trainClassifier") action { (_, c) =>
-      c.copy(mode = "trainClassifier")
-    } text "trains a classifier" children(
+    cmd("crossValidateClassifier") action { (_, c) =>
+      c.copy(mode = "crossValidateClassifier")
+    } text "trains and tests a classifier using crossValidation on a dataset" children(
       arg[String]("<db name>") required() action { (x, c) => c.copy(db = x) } text "database name",
       arg[String]("<training set>") required() action { (x, c) => c.copy(file = x) } text "training set collection name",
       arg[Int]("<leaf size>") required() action { (x, c) => c.copy(leafSize= x) } text "final leaf size",
       arg[Int]("<# features to split>") required() action { (x, c) => c.copy(features = x) } text "number of features to split on",
       arg[Int]("<# trees>") required() action { (x, c) => c.copy(numberOfTrees = x) } text "number of trees in forest"
     )
+
+    cmd("trainAndTestClassifier") action { (_, c) =>
+      c.copy(mode = "trainAndTestClassifier")
+    } text "trains and tests a classifier using crossValidation on a dataset" children(
+      arg[String]("<db name>") required() action { (x, c) => c.copy(db = x) } text "database name",
+      arg[String]("<training set>") required() action { (x, c) => c.copy(file = x) } text "training set collection name",
+      arg[String]("<testing set>") required() action { (x, c) => c.copy(testingStr = x) } text "testing set collection name",
+      arg[Int]("<leaf size>") required() action { (x, c) => c.copy(leafSize= x) } text "final leaf size",
+      arg[Int]("<# features to split>") required() action { (x, c) => c.copy(features = x) } text "number of features to split on",
+      arg[Int]("<# trees>") required() action { (x, c) => c.copy(numberOfTrees = x) } text "number of trees in forest"
+      )
   }
 
   def main(args: Array[String]) = {
@@ -68,9 +80,10 @@ object Main {
         case "readFile" => new CSVReader().readFile(config.file)
         case "buildIndexes" => new CSVReader().buildIndexes(config.db)
         case "buildCatalogues" => new CSVReader().buildCatalogues(config.db)
-        case "writeIndicators" => new CSVReader().writeIndicators(config.db, config.interval)
+        case "writeIndicators" => new CSVReader().writeIndicators(config.db, config.interval, config.file)
         case "buildDataSet" => new CSVReader().buildTrainingAndTestSets(config.db, config.trainingStr, config.testingStr, config.inplay, config.minsBefore)
-        case "trainClassifier" => new CSVReader().trainClassifier(config.db, config.file, config.leafSize, config.features, config.numberOfTrees) //, config.numberOfTrees, config.leafSize)
+        case "crossValidateClassifier" => new CSVReader().crossValidateClassifier(config.db, config.file, config.leafSize, config.features, config.numberOfTrees)
+        case "trainAndTestClassifier" => new CSVReader().trainAndTestClassifier(config.db, config.file, config.testingStr, config.leafSize, config.features, config.numberOfTrees)
         case _ => // should never reach this point
       }
       case None =>

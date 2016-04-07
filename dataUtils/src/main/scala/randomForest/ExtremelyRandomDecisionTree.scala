@@ -24,10 +24,10 @@ class ExtremelyRandomDecisionTree extends DecisionTreeBuilder with InstanceUtils
     if (stopSplit(leafSize, data)) {
       LeafNode(getDistribution(data))
     } else {
-      val randomFeatures = getRandomNonConstantFeatures(numberOfFeatures, data)
-      val randomThresholds: List[(Int, Double)] = randomFeatures.map(x => (x, getRandomThreshold(x, data)))
-      val randomSplits = randomThresholds.map(x => (x._1, x._2, splitData(x._1, x._2, data)))
-      val bestSplit = randomSplits.minBy(x => getEntropyOfSplit(x._3, data))
+      val bestSplit = getRandomNonConstantFeatures(numberOfFeatures, data)
+        .map(x => (x, getRandomThreshold(x, data)))
+        .map(x => (x._1, x._2, splitData(x._1, x._2, data)))
+        .minBy(x => getEntropyOfSplit(x._3, data))
 
       if (bestSplit._3._1.isEmpty || bestSplit._3._2.isEmpty) {
         println("SPLIT IS BAD: ")
