@@ -1,0 +1,8 @@
+sbt dataUtils/"run trainAndTestClassifier 2014_i_60000_probability training_20 testing_20 2 3 100"
+sbt dataUtils/"run trainAndTestClassifier 2014_i_60000_probability training_20 testing_20 2 3 200"
+sbt dataUtils/"run trainAndTestClassifier 2014_i_60000_probability training_20 testing_20 2 3 500"
+sbt dataUtils/"run trainAndTestClassifier 2014_i_60000_probability training_20 testing_20 2 3 1000"
+sbt dataUtils/"run trainAndTestClassifier 2014_i_60000_probability training_20 testing_20 2 4 100"
+sbt dataUtils/"run trainAndTestClassifier 2014_i_60000_probability training_20 testing_20 2 5 100"
+sbt dataUtils/"run trainAndTestClassifier 2014_i_60000_probability training_20 testing_20 2 6 100"
+sbt dataUtils/"run trainAndTestClassifier 2014_i_60000_probability training_20 testing_20 2 7 100"

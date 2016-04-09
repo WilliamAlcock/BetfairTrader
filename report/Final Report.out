@@ -48,14 +48,24 @@
 \BOOKMARK [1][-]{section.9.1}{Technical Analysis}{chapter.9}% 48
 \BOOKMARK [1][-]{section.9.2}{Historical Market Data}{chapter.9}% 49
 \BOOKMARK [1][-]{section.9.3}{Preprocessing the Data}{chapter.9}% 50
-\BOOKMARK [2][-]{subsection.9.3.1}{Betfair Price Data}{section.9.3}% 51
-\BOOKMARK [2][-]{subsection.9.3.2}{Technical Analysis Indicators}{section.9.3}% 52
-\BOOKMARK [1][-]{section.9.4}{Choosing a Model}{chapter.9}% 53
-\BOOKMARK [2][-]{subsection.9.4.1}{Random Forest}{section.9.4}% 54
-\BOOKMARK [1][-]{section.9.5}{Implementation}{chapter.9}% 55
-\BOOKMARK [2][-]{subsection.9.5.1}{Extremely Random Forest}{section.9.5}% 56
-\BOOKMARK [1][-]{section.9.6}{Optimisation}{chapter.9}% 57
-\BOOKMARK [1][-]{section.9.7}{Results}{chapter.9}% 58
-\BOOKMARK [1][-]{section.9.8}{Integration With The Trading System}{chapter.9}% 59
-\BOOKMARK [0][-]{chapter.10}{Appendices}{}% 60
-\BOOKMARK [0][-]{chapter*.24}{Bibliography}{}% 61
+\BOOKMARK [2][-]{subsection.9.3.1}{Grouping The Data Into Intervals}{section.9.3}% 51
+\BOOKMARK [2][-]{subsection.9.3.2}{Converting Prices to Implied Probabilities}{section.9.3}% 52
+\BOOKMARK [2][-]{subsection.9.3.3}{Technical Analysis Indicators}{section.9.3}% 53
+\BOOKMARK [1][-]{section.9.4}{Choosing a Model}{chapter.9}% 54
+\BOOKMARK [2][-]{subsection.9.4.1}{Decision Trees}{section.9.4}% 55
+\BOOKMARK [2][-]{subsection.9.4.2}{Random Forest}{section.9.4}% 56
+\BOOKMARK [2][-]{subsection.9.4.3}{Extremely Random Forest}{section.9.4}% 57
+\BOOKMARK [1][-]{section.9.5}{Implementation}{chapter.9}% 58
+\BOOKMARK [1][-]{section.9.6}{Optimisation}{chapter.9}% 59
+\BOOKMARK [2][-]{subsection.9.6.1}{Out-Of-Bag Error}{section.9.6}% 60
+\BOOKMARK [2][-]{subsection.9.6.2}{Optimisation}{section.9.6}% 61
+\BOOKMARK [1][-]{section.9.7}{Results}{chapter.9}% 62
+\BOOKMARK [0][-]{chapter.10}{Integration With The Trading System}{}% 63
+\BOOKMARK [0][-]{chapter.11}{Conclusion}{}% 64
+\BOOKMARK [1][-]{section.11.1}{Overall Assessment of the final product}{chapter.11}% 65
+\BOOKMARK [1][-]{section.11.2}{Review of the project objectives}{chapter.11}% 66
+\BOOKMARK [1][-]{section.11.3}{Suggestions for future extensions}{chapter.11}% 67
+\BOOKMARK [1][-]{section.11.4}{Review of the technologies used during the project}{chapter.11}% 68
+\BOOKMARK [0][-]{section*.47}{Appendices}{}% 69
+\BOOKMARK [0][-]{Appendix.1.A}{test appendix}{}% 70
+\BOOKMARK [0][-]{chapter*.48}{Bibliography}{}% 71

@@ -2280,14 +2280,18 @@
     <bcf:citekey order="43">coldTradingOnBetfair</bcf:citekey>
     <bcf:citekey order="44">googleSearchHorseRacing</bcf:citekey>
     <bcf:citekey order="45">technicalIndicators</bcf:citekey>
-    <bcf:citekey order="46">breiman2001random</bcf:citekey>
+    <bcf:citekey order="46">Flach:2012:MLA:2490546</bcf:citekey>
     <bcf:citekey order="47">Flach:2012:MLA:2490546</bcf:citekey>
-    <bcf:citekey order="48">entropy</bcf:citekey>
+    <bcf:citekey order="48">breiman2001random</bcf:citekey>
     <bcf:citekey order="49">entropy</bcf:citekey>
     <bcf:citekey order="50">quinlan2014c4</bcf:citekey>
-    <bcf:citekey order="51">spark</bcf:citekey>
+    <bcf:citekey order="51">geurts2006extremely</bcf:citekey>
     <bcf:citekey order="52">geurts2006extremely</bcf:citekey>
-    <bcf:citekey order="53">geurts2006extremely</bcf:citekey>
+    <bcf:citekey order="53">spark</bcf:citekey>
+    <bcf:citekey order="54">Sklearn</bcf:citekey>
+    <bcf:citekey order="55">CallingPythonFromScala</bcf:citekey>
+    <bcf:citekey order="56">chen2004using</bcf:citekey>
+    <bcf:citekey order="57">breiman1996out</bcf:citekey>
   </bcf:section>
   <bcf:sortlist section="0" name="nty" type="entry" sortscheme="nty">
   <bcf:sorting>

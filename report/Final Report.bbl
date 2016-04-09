@@ -95,6 +95,23 @@
       \verb https://www.jetbrains.com/idea/
       \endverb
     \endentry
+    \entry{breiman1996out}{report}{}
+      \name{author}{1}{}{%
+        {{hash=132b7100417675d55d5d4d8b244f7a34}{Breiman}{B\bibinitperiod}{Leo}{L\bibinitperiod}{}{}{}{}}%
+      }
+      \list{institution}{1}{%
+        {Citeseer}%
+      }
+      \strng{namehash}{132b7100417675d55d5d4d8b244f7a34}
+      \strng{fullhash}{132b7100417675d55d5d4d8b244f7a34}
+      \field{sortinit}{B}
+      \field{sortinithash}{4ecbea03efd0532989d3836d1a048c32}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Out-of-bag estimation}
+      \field{type}{techreport}
+      \field{year}{1996}
+    \endentry
     \entry{breiman2001random}{article}{}
       \name{author}{1}{}{%
         {{hash=132b7100417675d55d5d4d8b244f7a34}{Breiman}{B\bibinitperiod}{Leo}{L\bibinitperiod}{}{}{}{}}%
@@ -133,6 +150,41 @@
       \field{year}{2016}
       \verb{url}
       \verb http://www.highcharts.com/
+      \endverb
+    \endentry
+    \entry{chen2004using}{article}{}
+      \name{author}{3}{}{%
+        {{hash=531c7be3c2524682e36a7baa8d7ab92f}{Chen}{C\bibinitperiod}{Chao}{C\bibinitperiod}{}{}{}{}}%
+        {{hash=ee295e0da4839bf52318f9d0907272db}{Liaw}{L\bibinitperiod}{Andy}{A\bibinitperiod}{}{}{}{}}%
+        {{hash=132b7100417675d55d5d4d8b244f7a34}{Breiman}{B\bibinitperiod}{Leo}{L\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{31054f6c2ce3a483c8be257a14b3d202}
+      \strng{fullhash}{31054f6c2ce3a483c8be257a14b3d202}
+      \field{sortinit}{C}
+      \field{sortinithash}{59f25d509f3381b07695554a9f35ecb2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{University of California, Berkeley}
+      \field{title}{Using random forest to learn imbalanced data}
+      \field{year}{2004}
+    \endentry
+    \entry{CallingPythonFromScala}{online}{}
+      \name{author}{1}{}{%
+        {{hash=9aa121dfd66182882fba668880f6543c}{Chou}{C\bibinitperiod}{Jerry}{J\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{9aa121dfd66182882fba668880f6543c}
+      \strng{fullhash}{9aa121dfd66182882fba668880f6543c}
+      \field{sortinit}{C}
+      \field{sortinithash}{59f25d509f3381b07695554a9f35ecb2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{How to integrate python into a scala stack to build realtime predictive models}
+      \field{urlday}{31}
+      \field{urlmonth}{03}
+      \field{urlyear}{2016}
+      \field{year}{2014}
+      \verb{url}
+      \verb http://www.slideshare.net/JerryChou4/how-to-integrate-python-into-a-scala-stack-to-build-realtime-predictive-models-v2-nomanuscript
       \endverb
     \endentry
     \entry{CoffeeScript}{online}{}
@@ -461,6 +513,25 @@
       \field{year}{2016}
       \verb{url}
       \verb http://spray.io/
+      \endverb
+    \endentry
+    \entry{Sklearn}{online}{}
+      \name{author}{1}{}{%
+        {{hash=33543b3b48546110d4354673c91ef8d1}{INRIA}{I\bibinitperiod}{}{}{}{}{}{}}%
+      }
+      \strng{namehash}{33543b3b48546110d4354673c91ef8d1}
+      \strng{fullhash}{33543b3b48546110d4354673c91ef8d1}
+      \field{sortinit}{I}
+      \field{sortinithash}{25e99d37ba90f7c4fb20baf4e310faf3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{SciKit-learn}
+      \field{urlday}{31}
+      \field{urlmonth}{03}
+      \field{urlyear}{2016}
+      \field{year}{2016}
+      \verb{url}
+      \verb http://scikit-learn.org/stable/
       \endverb
     \endentry
     \entry{BCSCodeOfConduct}{online}{}

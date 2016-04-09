@@ -3,24 +3,27 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Example Match Odds: Swansea vs Arsenal}}{9}{figure.4.1}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Example Match Odds: Swansea vs Arsenal\relax }}{9}{figure.caption.5}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {8.1}{\ignorespaces Server Layers}}{17}{figure.8.1}
-\contentsline {figure}{\numberline {8.2}{\ignorespaces Live and Simulated Service Layer}}{19}{figure.8.2}
-\contentsline {figure}{\numberline {8.3}{\ignorespaces Example Back and Lay Volume}}{19}{figure.8.3}
-\contentsline {figure}{\numberline {8.4}{\ignorespaces Core Server Architecture}}{20}{figure.8.4}
-\contentsline {figure}{\numberline {8.5}{\ignorespaces ListMarketBook Price Projections}}{22}{figure.8.5}
-\contentsline {figure}{\numberline {8.6}{\ignorespaces ListMarketBook Market Data Limits}}{22}{figure.8.6}
-\contentsline {figure}{\numberline {8.7}{\ignorespaces Data Provider Polling Mechanism}}{24}{figure.8.7}
-\contentsline {figure}{\numberline {8.8}{\ignorespaces Life Cycle of an Order}}{26}{figure.8.8}
-\contentsline {figure}{\numberline {8.9}{\ignorespaces Web Server and Client Architecture}}{30}{figure.8.9}
-\contentsline {figure}{\numberline {8.10}{\ignorespaces Betfair Price Increments}}{31}{figure.8.10}
-\contentsline {figure}{\numberline {8.11}{\ignorespaces GUI Main Window}}{31}{figure.8.11}
-\contentsline {figure}{\numberline {8.12}{\ignorespaces GUI Ladder Window}}{32}{figure.8.12}
+\contentsline {figure}{\numberline {8.1}{\ignorespaces Server Layers\relax }}{17}{figure.caption.8}
+\contentsline {figure}{\numberline {8.2}{\ignorespaces Live and Simulated Service Layer\relax }}{19}{figure.caption.9}
+\contentsline {figure}{\numberline {8.3}{\ignorespaces Example Back and Lay Volume\relax }}{19}{figure.caption.10}
+\contentsline {figure}{\numberline {8.4}{\ignorespaces Core Server Architecture\relax }}{20}{figure.caption.11}
+\contentsline {figure}{\numberline {8.5}{\ignorespaces ListMarketBook Price Projections\relax }}{22}{figure.caption.13}
+\contentsline {figure}{\numberline {8.6}{\ignorespaces ListMarketBook Market Data Limits\relax }}{22}{figure.caption.14}
+\contentsline {figure}{\numberline {8.7}{\ignorespaces Data Provider Polling Mechanism\relax }}{24}{figure.caption.16}
+\contentsline {figure}{\numberline {8.8}{\ignorespaces Life Cycle of an Order\relax }}{26}{figure.caption.18}
+\contentsline {figure}{\numberline {8.9}{\ignorespaces Web Server and Client Architecture\relax }}{30}{figure.caption.26}
+\contentsline {figure}{\numberline {8.10}{\ignorespaces Betfair Price Increments\relax }}{31}{figure.caption.27}
+\contentsline {figure}{\numberline {8.11}{\ignorespaces GUI Main Window\relax }}{31}{figure.caption.29}
+\contentsline {figure}{\numberline {8.12}{\ignorespaces GUI Ladder Window\relax }}{32}{figure.caption.30}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {9.1}{\ignorespaces Decision Tree for Mammal Classification}}{35}{figure.9.1}
-\contentsline {figure}{\numberline {9.2}{\ignorespaces Algorithm for growing a Decision Tree for an Extremely Random Forest}}{37}{figure.9.2}
+\contentsline {figure}{\numberline {9.1}{\ignorespaces Decision Tree for Mammal Classification\relax }}{35}{figure.caption.34}
+\contentsline {figure}{\numberline {9.2}{\ignorespaces Algorithm for growing a Decision Tree for an Extremely Random Forest\relax }}{37}{figure.caption.35}
+\contentsline {figure}{\numberline {9.3}{\ignorespaces Graphs of Optimisation Results\relax }}{40}{figure.caption.39}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
 \addvspace {10\p@ }

@@ -1,10 +1,17 @@
 package randomForest
 
-case class RandomForest(trees: List[DecisionTree]) {
-  def getClassification(data: List[Double]): String = trees.map(x => x.classify(data)).groupBy(y => y) match {
-    case answers if answers.isEmpty => ""
-    case answers => answers.maxBy{case(k,v) => v.size}._1
+import scala.util.Random
+
+case class RandomForest(trees: List[DecisionTree], oobError: Double) {
+  private def getMaxClass(results: Map[String, List[String]]): String = results match {
+    case answers if results.isEmpty => ""
+    case answers =>
+      val maxValue = answers.map{case (k,v) => v.size}.max
+      val output = answers.filter{case (k,v) => v.size == maxValue}.keys.toArray
+      output(Random.nextInt(output.length))
   }
+
+  def getClassification(data: List[Double]): String = getMaxClass(trees.map(x => x.classify(data)).groupBy(y => y))
 }
 
 trait RandomForestBuilder {

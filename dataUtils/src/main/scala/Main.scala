@@ -49,6 +49,7 @@ object Main {
       arg[String]("<db name>") required() action { (x, c) => c.copy(db = x) } text "database name",
       arg[String]("<training set>") required() action { (x, c) => c.copy(trainingStr = x) } text "training collections prefix",
       arg[String]("<testing set>") required() action { (x, c) => c.copy(testingStr = x) } text "testing collections prefix",
+      arg[String]("<output postfix>") required() action { (x, c) => c.copy(file = x) } text "output collections, postfix",
       arg[Int]("<minsBefore>") optional() action { (x, c) => c.copy(minsBefore = Some(x)) } text "minutes before race to take intervals"
     )
 
@@ -81,7 +82,7 @@ object Main {
         case "buildIndexes" => new CSVReader().buildIndexes(config.db)
         case "buildCatalogues" => new CSVReader().buildCatalogues(config.db)
         case "writeIndicators" => new CSVReader().writeIndicators(config.db, config.interval, config.file)
-        case "buildDataSet" => new CSVReader().buildTrainingAndTestSets(config.db, config.trainingStr, config.testingStr, config.inplay, config.minsBefore)
+        case "buildDataSet" => new CSVReader().buildTrainingAndTestSets(config.db, config.trainingStr, config.testingStr, config.file, config.inplay, config.minsBefore)
         case "crossValidateClassifier" => new CSVReader().crossValidateClassifier(config.db, config.file, config.leafSize, config.features, config.numberOfTrees)
         case "trainAndTestClassifier" => new CSVReader().trainAndTestClassifier(config.db, config.file, config.testingStr, config.leafSize, config.features, config.numberOfTrees)
         case _ => // should never reach this point

@@ -193,8 +193,6 @@
 		The Data Model, in conjunction with the Data Provider, essentially turn Betfair's NG API, which must be polled for market updates, into one which can be subscribed to and will push new updates to a subscriber when deltas in the market occur.
 		
 	\subsection{Order Manager}
-		\todo[inline]{Order manager updates its list of tracked orders from the service layer on start up and reconciles this list periodically}	
-					
 		The Order Manager is responsible for making requests to Place, Cancel, Update and Replace orders with the service layer. The Order Manager is also responsible for tracking, and broadcasting updates pertaining to, the status of orders once they have been placed with the service layer and keeps a record of the volume of back and lay orders matched for each market and broadcasts updates when these matches occur.\\
 		
 		On start up the Order Manager requests a list of all the currently open orders at the Betfair exchange and creates the initial list of tracked orders from this list. At intervals of a configurable length the Order Manager repeats this process reconciling its tracked orders with the list received from the exchange.

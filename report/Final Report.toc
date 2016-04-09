@@ -36,33 +36,43 @@
 \contentsline {subsection}{\numberline {8.1.4}Central Configuration}{21}{subsection.8.1.4}
 \contentsline {subsection}{\numberline {8.1.5}The Event Bus}{21}{subsection.8.1.5}
 \contentsline {subsection}{\numberline {8.1.6}Data Provider}{21}{subsection.8.1.6}
-\contentsline {subsubsection}{ListMarketBook}{21}{subsubsection*.6}
-\contentsline {subsubsection}{ListMarketCatalogue}{24}{subsubsection*.7}
+\contentsline {subsubsection}{ListMarketBook}{21}{subsubsection*.12}
+\contentsline {subsubsection}{ListMarketCatalogue}{24}{subsubsection*.17}
 \contentsline {subsection}{\numberline {8.1.7}Data Model}{25}{subsection.8.1.7}
 \contentsline {subsection}{\numberline {8.1.8}Order Manager}{25}{subsection.8.1.8}
 \contentsline {subsection}{\numberline {8.1.9}Navigation Data Service}{26}{subsection.8.1.9}
 \contentsline {subsection}{\numberline {8.1.10}Data Store}{27}{subsection.8.1.10}
 \contentsline {subsection}{\numberline {8.1.11}Auto Trader}{27}{subsection.8.1.11}
-\contentsline {subsubsection}{The Auto Trader}{27}{subsubsection*.11}
-\contentsline {subsubsection}{The Monitor}{28}{subsubsection*.12}
-\contentsline {subsubsection}{The Strategy}{28}{subsubsection*.13}
+\contentsline {subsubsection}{The Auto Trader}{27}{subsubsection*.21}
+\contentsline {subsubsection}{The Monitor}{28}{subsubsection*.22}
+\contentsline {subsubsection}{The Strategy}{28}{subsubsection*.23}
 \contentsline {subsection}{\numberline {8.1.12}Controller}{28}{subsection.8.1.12}
 \contentsline {section}{\numberline {8.2}Web Server and Client (GUI)}{29}{section.8.2}
 \contentsline {subsection}{\numberline {8.2.1}Web Server}{29}{subsection.8.2.1}
 \contentsline {subsection}{\numberline {8.2.2}Client (GUI)}{30}{subsection.8.2.2}
-\contentsline {subsubsection}{Visual Design of the GUI}{31}{subsubsection*.16}
+\contentsline {subsubsection}{Visual Design of the GUI}{31}{subsubsection*.28}
 \contentsline {chapter}{\numberline {9}Predicting Price Movement}{33}{chapter.9}
 \contentsline {section}{\numberline {9.1}Technical Analysis}{33}{section.9.1}
 \contentsline {section}{\numberline {9.2}Historical Market Data}{33}{section.9.2}
 \contentsline {section}{\numberline {9.3}Preprocessing the Data}{33}{section.9.3}
-\contentsline {subsection}{\numberline {9.3.1}Betfair Price Data}{34}{subsection.9.3.1}
-\contentsline {subsection}{\numberline {9.3.2}Technical Analysis Indicators}{34}{subsection.9.3.2}
+\contentsline {subsection}{\numberline {9.3.1}Grouping The Data Into Intervals}{34}{subsection.9.3.1}
+\contentsline {subsection}{\numberline {9.3.2}Converting Prices to Implied Probabilities}{34}{subsection.9.3.2}
+\contentsline {subsection}{\numberline {9.3.3}Technical Analysis Indicators}{34}{subsection.9.3.3}
 \contentsline {section}{\numberline {9.4}Choosing a Model}{35}{section.9.4}
-\contentsline {subsection}{\numberline {9.4.1}Random Forest}{36}{subsection.9.4.1}
-\contentsline {section}{\numberline {9.5}Implementation}{36}{section.9.5}
-\contentsline {subsection}{\numberline {9.5.1}Extremely Random Forest}{36}{subsection.9.5.1}
-\contentsline {section}{\numberline {9.6}Optimisation}{37}{section.9.6}
-\contentsline {section}{\numberline {9.7}Results}{37}{section.9.7}
-\contentsline {section}{\numberline {9.8}Integration With The Trading System}{38}{section.9.8}
-\contentsline {chapter}{\numberline {10}Appendices}{39}{chapter.10}
-\contentsline {chapter}{Bibliography}{40}{chapter*.24}
+\contentsline {subsection}{\numberline {9.4.1}Decision Trees}{35}{subsection.9.4.1}
+\contentsline {subsection}{\numberline {9.4.2}Random Forest}{36}{subsection.9.4.2}
+\contentsline {subsection}{\numberline {9.4.3}Extremely Random Forest}{37}{subsection.9.4.3}
+\contentsline {section}{\numberline {9.5}Implementation}{37}{section.9.5}
+\contentsline {section}{\numberline {9.6}Optimisation}{39}{section.9.6}
+\contentsline {subsection}{\numberline {9.6.1}Out-Of-Bag Error}{39}{subsection.9.6.1}
+\contentsline {subsection}{\numberline {9.6.2}Optimisation}{39}{subsection.9.6.2}
+\contentsline {section}{\numberline {9.7}Results}{40}{section.9.7}
+\contentsline {chapter}{\numberline {10}Integration With The Trading System}{42}{chapter.10}
+\contentsline {chapter}{\numberline {11}Conclusion}{43}{chapter.11}
+\contentsline {section}{\numberline {11.1}Overall Assessment of the final product}{43}{section.11.1}
+\contentsline {section}{\numberline {11.2}Review of the project objectives}{43}{section.11.2}
+\contentsline {section}{\numberline {11.3}Suggestions for future extensions}{43}{section.11.3}
+\contentsline {section}{\numberline {11.4}Review of the technologies used during the project}{43}{section.11.4}
+\contentsline {chapter}{Appendices}{44}{section*.47}
+\contentsline {chapter}{\numberline {A}test appendix}{45}{Appendix.1.A}
+\contentsline {chapter}{Bibliography}{46}{chapter*.48}

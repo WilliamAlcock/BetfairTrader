@@ -1,5 +1,10 @@
 \documentclass[11pt]{report}
-
+\usepackage{siunitx}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=newest}
+\usepackage{csvsimple}
+\usepackage{subcaption}
 \usepackage[margin=1in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage{amsfonts}
 \usepackage{graphicx}
@@ -7,12 +12,13 @@
 \usepackage{array}
 \usepackage{titlesec}
 \usepackage[backend=biber, style=numeric-comp,url=true,isbn=true]{biblatex}
-\usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage{hyperref}
 \usepackage{float}
 \usepackage[]{algorithm2e}
+\usepackage[toc,page]{appendix}
 \usepackage[color=yellow]{todonotes}
+\usepackage{multirow}
 \hypersetup{
     colorlinks,
     citecolor=blue,
@@ -21,6 +27,10 @@
     urlcolor=blue
 }
 \addbibresource{bibfile.bib}
+
+\makeatletter
+\protected\def\tikz@nonactivecolon{\ifmmode\mathrel{\mathop\ordinarycolon}\else:\fi} 
+\makeatother
 
 \makeatletter
 \def\ttl@mkchap@i#1#2#3#4#5#6#7{%
@@ -83,7 +93,14 @@
 	
 \input{"Predicting Price Movement/Predicting Price Movement"}
 
-\chapter{Appendices}
+\chapter{Integration With The Trading System}
+		The trained model will be serialised to mongoDB and made available to use by the auto trader 	
+
+\input{"Conclusion/Conclusion"}
+
+\begin{appendices}
+	\chapter{test appendix}
+\end{appendices}
 
 \printbibliography[heading=bibintoc]
 

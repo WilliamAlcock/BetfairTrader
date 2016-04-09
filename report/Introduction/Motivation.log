@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  4 APR 2016 15:43
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  9 APR 2016 15:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -544,16 +544,6 @@ Missing character: There is no u in font nullfont!
 Missing character: There is no e in font nullfont!
 Missing character: There is no o in font nullfont!
 Missing character: There is no f in font nullfont!
-! Undefined control sequence.
-l.4 ...ion bets a year, with a trading value of \Â
-                                                  £56 billion\cite{ABettingR...
-The control sequence at the end of the top line
-of your error message was never \def'ed. If you have
-misspelled it (e.g., `\hobx'), type `I' and the correct
-spelling (e.g., `I\hbox'). Otherwise just continue,
-and I'll forget about whatever was undefined.
-
-Missing character: There is no £ in font nullfont!
 Missing character: There is no 5 in font nullfont!
 Missing character: There is no 6 in font nullfont!
 Missing character: There is no b in font nullfont!
@@ -568,7 +558,7 @@ Missing character: There is no [ in font nullfont!
 ! Undefined control sequence.
 <write> ...: Citation `\@citeb ' on page \thepage 
                                                   \space undefined\on@line .
-l.4 ...e of \Â£56 billion\cite{ABettingRevolution}
+l.4 ...\pounds 56 billion\cite{ABettingRevolution}
                                                   \\
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -584,6 +574,11 @@ Missing character: There is no ] in font nullfont!
 
 Overfull \hbox (20.0pt too wide) in paragraph at lines 4--5
 []
+ []
+
+
+Overfull \hbox (6.94444pt too wide) in paragraph at lines 4--5
+\OT1/cmr/m/ui/10 $
  []
 
 
@@ -1115,11 +1110,11 @@ Missing character: There is no . in font nullfont!
 
  
 Here is how much of TeX's memory you used:
- 10 strings out of 493089
- 230 string characters out of 6134842
+ 13 strings out of 493089
+ 263 string characters out of 6134842
  53199 words of memory out of 5000000
- 3594 multiletter control sequences out of 15000+600000
- 3948 words of font info for 15 fonts, out of 8000000 for 9000
+ 3596 multiletter control sequences out of 15000+600000
+ 4243 words of font info for 16 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 20i,2n,26p,480b,94s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 17i,2n,21p,485b,94s stack positions out of 5000i,500n,10000p,200000b,80000s
 !  ==> Fatal error occurred, no output PDF file produced!

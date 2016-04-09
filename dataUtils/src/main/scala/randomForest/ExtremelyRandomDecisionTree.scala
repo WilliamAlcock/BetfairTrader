@@ -3,7 +3,7 @@ package randomForest
 class ExtremelyRandomDecisionTree extends DecisionTreeBuilder with InstanceUtils {
 
   def stopSplit(leafSize: Int, data: List[Instance]): Boolean =
-    data.size <= leafSize || attributesAreConstant(data) || outputIsConstant(data)
+    data.size < leafSize || attributesAreConstant(data) || outputIsConstant(data)
 
   def getRandomThreshold(feature: Int, data: List[Instance]): Double = {
     val d = data.map(_.features(feature)).sorted
