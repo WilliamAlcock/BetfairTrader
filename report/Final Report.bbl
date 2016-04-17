@@ -19,25 +19,6 @@
 
 \refsection{0}
   \sortlist{nty}{nty}
-    \entry{AkkaActors}{online}{}
-      \name{author}{1}{}{%
-        {{hash=1565c979ff6d5255fd3c81f57219fffc}{Akka}{A\bibinitperiod}{}{}{}{}{}{}}%
-      }
-      \strng{namehash}{1565c979ff6d5255fd3c81f57219fffc}
-      \strng{fullhash}{1565c979ff6d5255fd3c81f57219fffc}
-      \field{sortinit}{A}
-      \field{sortinithash}{b685c7856330eaee22789815b49de9bb}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Akka Actors}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{http://doc.akka.io/docs/akka/2.4.2/general/actors.html}
-      \verb{url}
-      \verb 2016
-      \endverb
-    \endentry
     \entry{ABettingRevolution}{online}{}
       \name{author}{1}{}{%
         {{hash=a8c9e39ef7323f481020698c1dd928b3}{Betfair}{B\bibinitperiod}{}{}{}{}{}{}}%
@@ -57,7 +38,7 @@
       \verb http://corporate.betfair.com/about-us/a-betting-revolution.aspx
       \endverb
     \endentry
-    \entry{coldTradingOnBetfair}{online}{}
+    \entry{WhatIsBetfair}{online}{}
       \name{author}{1}{}{%
         {{hash=a8c9e39ef7323f481020698c1dd928b3}{Betfair}{B\bibinitperiod}{}{}{}{}{}{}}%
       }
@@ -67,13 +48,13 @@
       \field{sortinithash}{4ecbea03efd0532989d3836d1a048c32}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{Cold Trading On Betfair}
+      \field{title}{What is Betfair}
       \field{urlday}{31}
       \field{urlmonth}{03}
       \field{urlyear}{2016}
       \field{year}{2016}
       \verb{url}
-      \verb https://betting.betfair.com/cold-trading-on-betfair.html
+      \verb https://betting.betfair.com/what-is-betfair.html
       \endverb
     \endentry
     \entry{Intellij}{online}{}
@@ -133,25 +114,6 @@
       \field{pages}{5\bibrangedash 32}
       \range{pages}{28}
     \endentry
-    \entry{HighCharts}{online}{}
-      \name{author}{1}{}{%
-        {{hash=48fa276feb568cc95e61c506c97af6df}{Charts}{C\bibinitperiod}{High}{H\bibinitperiod}{}{}{}{}}%
-      }
-      \strng{namehash}{48fa276feb568cc95e61c506c97af6df}
-      \strng{fullhash}{48fa276feb568cc95e61c506c97af6df}
-      \field{sortinit}{C}
-      \field{sortinithash}{59f25d509f3381b07695554a9f35ecb2}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{High Charts}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2016}
-      \verb{url}
-      \verb http://www.highcharts.com/
-      \endverb
-    \endentry
     \entry{chen2004using}{article}{}
       \name{author}{3}{}{%
         {{hash=531c7be3c2524682e36a7baa8d7ab92f}{Chen}{C\bibinitperiod}{Chao}{C\bibinitperiod}{}{}{}{}}%
@@ -187,25 +149,6 @@
       \verb http://www.slideshare.net/JerryChou4/how-to-integrate-python-into-a-scala-stack-to-build-realtime-predictive-models-v2-nomanuscript
       \endverb
     \endentry
-    \entry{CoffeeScript}{online}{}
-      \name{author}{1}{}{%
-        {{hash=e202768a214526a7f5a668e711464e80}{CoffeeScript.org}{C\bibinitperiod}{}{}{}{}{}{}}%
-      }
-      \strng{namehash}{e202768a214526a7f5a668e711464e80}
-      \strng{fullhash}{e202768a214526a7f5a668e711464e80}
-      \field{sortinit}{C}
-      \field{sortinithash}{59f25d509f3381b07695554a9f35ecb2}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{CoffeeScript overview}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2016}
-      \verb{url}
-      \verb http://coffeescript.org/#overview
-      \endverb
-    \endentry
     \entry{BetfairAPIMigration}{online}{}
       \name{author}{1}{}{%
         {{hash=e5e8e5b991cda0b3f0a4f42362eb50a6}{community}{c\bibinitperiod}{Betfair}{B\bibinitperiod}{}{}{}{}}%
@@ -225,23 +168,23 @@
       \verb http://community.betfair.com/service/go/thread/view/94166/30402691/api-ng-migration-update
       \endverb
     \endentry
-    \entry{ReactiveMongo}{online}{}
+    \entry{stackExchangeOverfitting}{online}{}
       \name{author}{1}{}{%
-        {{hash=68696d385a7eec9a7e19ba157f65c023}{contributors}{c\bibinitperiod}{Stephane\bibnamedelimb Godbillon\bibnamedelima \&}{S\bibinitperiod\bibinitdelim G\bibinitperiod\bibinitdelim \\bibinitperiod}{}{}{}{}}%
+        {{hash=bef6afedf5ffc2d9fe2d4e894dba4ead}{Exchange}{E\bibinitperiod}{Stack}{S\bibinitperiod}{}{}{}{}}%
       }
-      \strng{namehash}{68696d385a7eec9a7e19ba157f65c023}
-      \strng{fullhash}{68696d385a7eec9a7e19ba157f65c023}
-      \field{sortinit}{c}
-      \field{sortinithash}{59f25d509f3381b07695554a9f35ecb2}
+      \strng{namehash}{bef6afedf5ffc2d9fe2d4e894dba4ead}
+      \strng{fullhash}{bef6afedf5ffc2d9fe2d4e894dba4ead}
+      \field{sortinit}{E}
+      \field{sortinithash}{fefc5210ef4721525b2a478df41efcd4}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{Reactive Mongo}
+      \field{title}{Overfitting}
       \field{urlday}{31}
       \field{urlmonth}{03}
       \field{urlyear}{2016}
       \field{year}{2016}
       \verb{url}
-      \verb http://reactivemongo.org/
+      \verb http://stats.stackexchange.com/questions/192007/what-measures-you-look-at-the-determine-over-fitting-in-linear-regression
       \endverb
     \endentry
     \entry{Flach:2012:MLA:2490546}{book}{}
@@ -363,42 +306,23 @@
       \verb https://git-scm.com
       \endverb
     \endentry
-    \entry{googleSearchHorseRacing}{online}{}
+    \entry{GitGettingStarted}{online}{}
       \name{author}{1}{}{%
-        {{hash=8b36e9207c24c76e6719268e49201d94}{Google}{G\bibinitperiod}{}{}{}{}{}{}}%
+        {{hash=0bcc70105ad279503e31fe7b3f47b665}{Git}{G\bibinitperiod}{}{}{}{}{}{}}%
       }
-      \strng{namehash}{8b36e9207c24c76e6719268e49201d94}
-      \strng{fullhash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{namehash}{0bcc70105ad279503e31fe7b3f47b665}
+      \strng{fullhash}{0bcc70105ad279503e31fe7b3f47b665}
       \field{sortinit}{G}
       \field{sortinithash}{1c854ef9177a91bf894e66485bdbd3ed}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{Betfiar Horse Racing pre race trading Google search}
+      \field{title}{Getting Started About Version Control}
       \field{urlday}{31}
       \field{urlmonth}{03}
       \field{urlyear}{2016}
       \field{year}{2016}
       \verb{url}
-      \verb https://www.google.co.uk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=betfair+horse+racing+pre+race+trading
-      \endverb
-    \endentry
-    \entry{JavaScriptProblem}{online}{}
-      \name{author}{1}{}{%
-        {{hash=d903b370d18c189472260c016d49a30d}{Haskell.org}{H\bibinitperiod}{}{}{}{}{}{}}%
-      }
-      \strng{namehash}{d903b370d18c189472260c016d49a30d}
-      \strng{fullhash}{d903b370d18c189472260c016d49a30d}
-      \field{sortinit}{H}
-      \field{sortinithash}{82012198d5dfa657b8c4a168793268a6}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{The JavaScript Problem}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2015}
-      \verb{url}
-      \verb https://wiki.haskell.org/The_JavaScript_Problem
+      \verb https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control
       \endverb
     \endentry
     \entry{Akka}{online}{}
@@ -418,6 +342,25 @@
       \field{year}{2016}
       \verb{url}
       \verb http://akka.io/
+      \endverb
+    \endentry
+    \entry{AkkaFSM}{online}{}
+      \name{author}{1}{}{%
+        {{hash=1a6134cafdb2ea25b2e2a55f62fd8d11}{Inc}{I\bibinitperiod}{Lightbend}{L\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{1a6134cafdb2ea25b2e2a55f62fd8d11}
+      \strng{fullhash}{1a6134cafdb2ea25b2e2a55f62fd8d11}
+      \field{sortinit}{I}
+      \field{sortinithash}{25e99d37ba90f7c4fb20baf4e310faf3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Akka FSM}
+      \field{urlday}{31}
+      \field{urlmonth}{03}
+      \field{urlyear}{2016}
+      \field{year}{2016}
+      \verb{url}
+      \verb http://doc.akka.io/docs/akka/2.4.2/scala/fsm.html#the-fsm-trait-and-object
       \endverb
     \endentry
     \entry{AkkaRemoting}{online}{}
@@ -456,44 +399,6 @@
       \field{year}{2016}
       \verb{url}
       \verb http://doc.akka.io/docs/akka/snapshot/scala/routing.html#RoundRobinPool_and_RoundRobinGroup
-      \endverb
-    \endentry
-    \entry{AkkaFSMTesting}{online}{}
-      \name{author}{1}{}{%
-        {{hash=1a6134cafdb2ea25b2e2a55f62fd8d11}{Inc}{I\bibinitperiod}{Lightbend}{L\bibinitperiod}{}{}{}{}}%
-      }
-      \strng{namehash}{1a6134cafdb2ea25b2e2a55f62fd8d11}
-      \strng{fullhash}{1a6134cafdb2ea25b2e2a55f62fd8d11}
-      \field{sortinit}{I}
-      \field{sortinithash}{25e99d37ba90f7c4fb20baf4e310faf3}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Testing and Debugging Finite State Machines}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2016}
-      \verb{url}
-      \verb http://doc.akka.io/docs/akka/2.4.2/scala/fsm.html#testing-and-debugging-finite-state-machines
-      \endverb
-    \endentry
-    \entry{MongoDB}{online}{}
-      \name{author}{1}{}{%
-        {{hash=c1620b3fc177ad1c188bfc196ffcbb26}{Inc}{I\bibinitperiod}{MongoDB}{M\bibinitperiod}{}{}{}{}}%
-      }
-      \strng{namehash}{c1620b3fc177ad1c188bfc196ffcbb26}
-      \strng{fullhash}{c1620b3fc177ad1c188bfc196ffcbb26}
-      \field{sortinit}{I}
-      \field{sortinithash}{25e99d37ba90f7c4fb20baf4e310faf3}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{MongoDB}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2016}
-      \verb{url}
-      \verb https://www.mongodb.com/
       \endverb
     \endentry
     \entry{Spray}{online}{}
@@ -572,23 +477,6 @@
       \verb https://www.scala-js.org/
       \endverb
     \endentry
-    \entry{kurose2007computer}{book}{}
-      \name{author}{2}{}{%
-        {{hash=366dfea52e724054c5ccfdbf4dc23892}{Kurose}{K\bibinitperiod}{James\bibnamedelima F}{J\bibinitperiod\bibinitdelim F\bibinitperiod}{}{}{}{}}%
-        {{hash=bc000bd3f271bdf554bcc65485739886}{Ross}{R\bibinitperiod}{Keith\bibnamedelima W}{K\bibinitperiod\bibinitdelim W\bibinitperiod}{}{}{}{}}%
-      }
-      \list{publisher}{1}{%
-        {Addison-Wesley}%
-      }
-      \strng{namehash}{bd64573ef8d41a710b341fbb7c7e0f9a}
-      \strng{fullhash}{bd64573ef8d41a710b341fbb7c7e0f9a}
-      \field{sortinit}{K}
-      \field{sortinithash}{a7d5b3aec5a0890aae7baf85a209abfc}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Computer networking: a top-down approach}
-      \field{year}{2007}
-    \endentry
     \entry{Scala}{online}{}
       \name{author}{1}{}{%
         {{hash=2c2daff17170fa678690f989c6766b06}{Lausanne\bibnamedelima (EPFL)}{L\bibinitperiod\bibinitdelim (\bibinitperiod}{Ecole\bibnamedelimb Polytechnique\bibnamedelima Federale}{E\bibinitperiod\bibinitdelim P\bibinitperiod\bibinitdelim F\bibinitperiod}{de}{d\bibinitperiod}{}{}}%
@@ -608,6 +496,23 @@
       \verb http://www.scala-lang.org/
       \endverb
     \endentry
+    \entry{Cohn_2010}{book}{}
+      \name{author}{1}{}{%
+        {{hash=9621ba6b8993b3f589f05921bc295a92}{Mike}{M\bibinitperiod}{Cohn}{C\bibinitperiod}{}{}{}{}}%
+      }
+      \list{publisher}{1}{%
+        {Addison-Wesley}%
+      }
+      \strng{namehash}{9621ba6b8993b3f589f05921bc295a92}
+      \strng{fullhash}{9621ba6b8993b3f589f05921bc295a92}
+      \field{sortinit}{M}
+      \field{sortinithash}{2684bec41e9697b92699b46491061da2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Succeeding with Agile: software development using Scrum}
+      \field{volume}{The Addison-Wesley signature series}
+      \field{year}{2010}
+    \endentry
     \entry{murphy1999technical}{book}{}
       \name{author}{1}{}{%
         {{hash=7733c6098d4323e40ff9215309da8b38}{Murphy}{M\bibinitperiod}{John\bibnamedelima J}{J\bibinitperiod\bibinitdelim J\bibinitperiod}{}{}{}{}}%
@@ -624,23 +529,23 @@
       \field{title}{Technical analysis of the financial markets: A comprehensive guide to trading methods and applications}
       \field{year}{1999}
     \endentry
-    \entry{AkkaVsErlang}{online}{}
+    \entry{machineLearning}{online}{}
       \name{author}{1}{}{%
-        {{hash=928a3e3d99440ed892dda5028159a3aa}{Overflow}{O\bibinitperiod}{Stack}{S\bibinitperiod}{}{}{}{}}%
+        {{hash=bdb4d740fc9548d1c32a62103c30169d}{Ng}{N\bibinitperiod}{Andrew}{A\bibinitperiod}{}{}{}{}}%
       }
-      \strng{namehash}{928a3e3d99440ed892dda5028159a3aa}
-      \strng{fullhash}{928a3e3d99440ed892dda5028159a3aa}
-      \field{sortinit}{O}
-      \field{sortinithash}{7803d2715d5e795e70382b084ab8d00e}
+      \strng{namehash}{bdb4d740fc9548d1c32a62103c30169d}
+      \strng{fullhash}{bdb4d740fc9548d1c32a62103c30169d}
+      \field{sortinit}{N}
+      \field{sortinithash}{925374ca63e7594de7fafdb83e64d41d}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{how-does-akka-compare-to-erlang}
+      \field{title}{Machine Learning}
       \field{urlday}{31}
       \field{urlmonth}{03}
       \field{urlyear}{2016}
-      \field{year}{2010}
+      \field{year}{2016}
       \verb{url}
-      \verb http://stackoverflow.com/questions/4491039/how-does-akka-compare-to-erlang
+      \verb http://online.stanford.edu/course/machine-learning-1
       \endverb
     \endentry
     \entry{RabbitMQ}{online}{}
@@ -662,7 +567,7 @@
       \verb https://www.rabbitmq.com/
       \endverb
     \endentry
-    \entry{BetfairDelayedApplicationKeys}{online}{}
+    \entry{ApplicationKeys}{online}{}
       \name{author}{1}{}{%
         {{hash=44eb0203d77cb6e6ed8a24e786d350fd}{Program}{P\bibinitperiod}{Betfair\bibnamedelima Developer}{B\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
       }
@@ -679,6 +584,25 @@
       \field{year}{2016}
       \verb{url}
       \verb https://api.developer.betfair.com/services/webapps/docs/display/1smk3cen4v3lu3yomq5qye0ni/Application+Keys
+      \endverb
+    \endentry
+    \entry{betfairAPI}{online}{}
+      \name{author}{1}{}{%
+        {{hash=44eb0203d77cb6e6ed8a24e786d350fd}{Program}{P\bibinitperiod}{Betfair\bibnamedelima Developer}{B\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{44eb0203d77cb6e6ed8a24e786d350fd}
+      \strng{fullhash}{44eb0203d77cb6e6ed8a24e786d350fd}
+      \field{sortinit}{P}
+      \field{sortinithash}{c0a4896d0e424f9ca4d7f14f2b3428e7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Betfair API Overview}
+      \field{urlday}{31}
+      \field{urlmonth}{03}
+      \field{urlyear}{2016}
+      \field{year}{2016}
+      \verb{url}
+      \verb https://api.developer.betfair.com/services/webapps/docs/display/1smk3cen4v3lu3yomq5qye0ni/API+Overview
       \endverb
     \endentry
     \entry{BetfairScalaSample}{online}{}
@@ -700,7 +624,26 @@
       \verb https://github.com/city81/betfair-service-ng
       \endverb
     \endentry
-    \entry{ListMarketBook}{online}{}
+    \entry{betfairTypeDefinitions}{online}{}
+      \name{author}{1}{}{%
+        {{hash=44eb0203d77cb6e6ed8a24e786d350fd}{Program}{P\bibinitperiod}{Betfair\bibnamedelima Developer}{B\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{44eb0203d77cb6e6ed8a24e786d350fd}
+      \strng{fullhash}{44eb0203d77cb6e6ed8a24e786d350fd}
+      \field{sortinit}{P}
+      \field{sortinithash}{c0a4896d0e424f9ca4d7f14f2b3428e7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Betting Type Definitions}
+      \field{urlday}{31}
+      \field{urlmonth}{03}
+      \field{urlyear}{2016}
+      \field{year}{2016}
+      \verb{url}
+      \verb https://api.developer.betfair.com/services/webapps/docs/display/1smk3cen4v3lu3yomq5qye0ni/Betting+Type+Definitions
+      \endverb
+    \endentry
+    \entry{listMarketBook}{online}{}
       \name{author}{1}{}{%
         {{hash=44eb0203d77cb6e6ed8a24e786d350fd}{Program}{P\bibinitperiod}{Betfair\bibnamedelima Developer}{B\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
       }
@@ -719,7 +662,7 @@
       \verb https://api.developer.betfair.com/services/webapps/docs/display/1smk3cen4v3lu3yomq5qye0ni/listMarketBook
       \endverb
     \endentry
-    \entry{ListMarketCatalogue}{online}{}
+    \entry{loginSessionManagement}{online}{}
       \name{author}{1}{}{%
         {{hash=44eb0203d77cb6e6ed8a24e786d350fd}{Program}{P\bibinitperiod}{Betfair\bibnamedelima Developer}{B\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
       }
@@ -729,13 +672,32 @@
       \field{sortinithash}{c0a4896d0e424f9ca4d7f14f2b3428e7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
-      \field{title}{List Market Catalogue}
+      \field{title}{Login and Session Management}
       \field{urlday}{31}
       \field{urlmonth}{03}
       \field{urlyear}{2016}
       \field{year}{2016}
       \verb{url}
-      \verb https://api.developer.betfair.com/services/webapps/docs/display/1smk3cen4v3lu3yomq5qye0ni/listMarketCatalogue
+      \verb https://api.developer.betfair.com/services/webapps/docs/pages/viewpage.action?pageId=3834909
+      \endverb
+    \endentry
+    \entry{dataRequestLimits}{online}{}
+      \name{author}{1}{}{%
+        {{hash=44eb0203d77cb6e6ed8a24e786d350fd}{Program}{P\bibinitperiod}{Betfair\bibnamedelima Developer}{B\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
+      }
+      \strng{namehash}{44eb0203d77cb6e6ed8a24e786d350fd}
+      \strng{fullhash}{44eb0203d77cb6e6ed8a24e786d350fd}
+      \field{sortinit}{P}
+      \field{sortinithash}{c0a4896d0e424f9ca4d7f14f2b3428e7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Market Data Request Limits}
+      \field{urlday}{31}
+      \field{urlmonth}{03}
+      \field{urlyear}{2016}
+      \field{year}{2016}
+      \verb{url}
+      \verb https://api.developer.betfair.com/services/webapps/docs/display/1smk3cen4v3lu3yomq5qye0ni/Market+Data+Request+Limits
       \endverb
     \endentry
     \entry{BetfairNavigationData}{online}{}
@@ -756,41 +718,6 @@
       \verb{url}
       \verb https://api.developer.betfair.com/services/webapps/docs/display/1smk3cen4v3lu3yomq5qye0ni/Navigation+Data+For+Applications
       \endverb
-    \endentry
-    \entry{BetfairSampleCode}{online}{}
-      \name{author}{1}{}{%
-        {{hash=44eb0203d77cb6e6ed8a24e786d350fd}{Program}{P\bibinitperiod}{Betfair\bibnamedelima Developer}{B\bibinitperiod\bibinitdelim D\bibinitperiod}{}{}{}{}}%
-      }
-      \strng{namehash}{44eb0203d77cb6e6ed8a24e786d350fd}
-      \strng{fullhash}{44eb0203d77cb6e6ed8a24e786d350fd}
-      \field{sortinit}{P}
-      \field{sortinithash}{c0a4896d0e424f9ca4d7f14f2b3428e7}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Sample Code}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2016}
-      \verb{url}
-      \verb https://api.developer.betfair.com/services/webapps/docs/display/1smk3cen4v3lu3yomq5qye0ni/Sample+Code
-      \endverb
-    \endentry
-    \entry{quinlan2014c4}{book}{}
-      \name{author}{1}{}{%
-        {{hash=84c19b0e503ab5b309fd3993cca6dcbe}{Quinlan}{Q\bibinitperiod}{J\bibnamedelima Ross}{J\bibinitperiod\bibinitdelim R\bibinitperiod}{}{}{}{}}%
-      }
-      \list{publisher}{1}{%
-        {Elsevier}%
-      }
-      \strng{namehash}{84c19b0e503ab5b309fd3993cca6dcbe}
-      \strng{fullhash}{84c19b0e503ab5b309fd3993cca6dcbe}
-      \field{sortinit}{Q}
-      \field{sortinithash}{15867262911a166ca2270ec58a0e3fe9}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{C4. 5: programs for machine learning}
-      \field{year}{2014}
     \endentry
     \entry{BettingExchangesCompared}{online}{}
       \name{author}{1}{}{%
@@ -870,84 +797,7 @@
       \verb http://spark.apache.org/docs/latest/mllib-ensembles.html
       \endverb
     \endentry
-    \entry{TheFutureofComputerTradinginFinancialMarkets}{online}{}
-      \name{author}{1}{}{%
-        {{hash=240d9730a82eee737fdab43bd1cf7639}{The\bibnamedelimb Government\bibnamedelimb Office\bibnamedelimb for\bibnamedelima Science}{T\bibinitperiod\bibinitdelim G\bibinitperiod\bibinitdelim O\bibinitperiod\bibinitdelim f\bibinitperiod\bibinitdelim S\bibinitperiod}{London}{L\bibinitperiod}{}{}{}{}}%
-      }
-      \strng{namehash}{240d9730a82eee737fdab43bd1cf7639}
-      \strng{fullhash}{240d9730a82eee737fdab43bd1cf7639}
-      \field{sortinit}{T}
-      \field{sortinithash}{423d138a005a533b47e6475e39378bf2}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{The Future of Computer Trading in Financial Markets (2012)}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2012}
-      \verb{url}
-      \verb https://www.gov.uk/government/uploads/system/uploads/attachment_data/file/289431/12-1086-future-of-computer-trading-in-financial-markets-report.pdf
-      \endverb
-    \endentry
-    \entry{TestingStatevsInteractions}{online}{}
-      \name{author}{1}{}{%
-        {{hash=6282a6c8a9acb4f0144af9058be0ac83}{Trenk}{T\bibinitperiod}{Andrew}{A\bibinitperiod}{}{}{}{}}%
-      }
-      \strng{namehash}{6282a6c8a9acb4f0144af9058be0ac83}
-      \strng{fullhash}{6282a6c8a9acb4f0144af9058be0ac83}
-      \field{sortinit}{T}
-      \field{sortinithash}{423d138a005a533b47e6475e39378bf2}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Testing on the Toilet: Testing State vs. Testing Interactions}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2013}
-      \verb{url}
-      \verb http://googletesting.blogspot.co.uk/2013/03/testing-on-toilet-testing-state-vs.html
-      \endverb
-    \endentry
-    \entry{JavaScriptFloatingPoint}{online}{}
-      \name{author}{1}{}{%
-        {{hash=f720a680d506aac61de0a2d35532cf01}{Web}{W\bibinitperiod}{Modern}{M\bibinitperiod}{}{}{}{}}%
-      }
-      \strng{namehash}{f720a680d506aac61de0a2d35532cf01}
-      \strng{fullhash}{f720a680d506aac61de0a2d35532cf01}
-      \field{sortinit}{W}
-      \field{sortinithash}{99e3ba1b3f78bb6f073e7fa7ac11636b}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{JavaScript floating point numbers}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2016}
-      \verb{url}
-      \verb http://modernweb.com/2014/02/17/what-every-javascript-developer-should-know-about-floating-points/
-      \endverb
-    \endentry
-    \entry{entropy}{online}{}
-      \name{author}{1}{}{%
-        {{hash=7395368c1c8ce3ed2543b5c97edbac19}{World}{W\bibinitperiod}{Wolfram\bibnamedelima Math}{W\bibinitperiod\bibinitdelim M\bibinitperiod}{}{}{}{}}%
-      }
-      \strng{namehash}{7395368c1c8ce3ed2543b5c97edbac19}
-      \strng{fullhash}{7395368c1c8ce3ed2543b5c97edbac19}
-      \field{sortinit}{W}
-      \field{sortinithash}{99e3ba1b3f78bb6f073e7fa7ac11636b}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{title}{Entropy}
-      \field{urlday}{31}
-      \field{urlmonth}{03}
-      \field{urlyear}{2016}
-      \field{year}{2016}
-      \verb{url}
-      \verb http://mathworld.wolfram.com/Entropy.html
-      \endverb
-    \endentry
   \endsortlist
-  \missing{akkaFSM}
 \endrefsection
 \endinput
 

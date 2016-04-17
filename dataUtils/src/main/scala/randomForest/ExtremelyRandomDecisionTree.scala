@@ -20,9 +20,14 @@ class ExtremelyRandomDecisionTree extends DecisionTreeBuilder with InstanceUtils
       output.toList
   }
 
+  private def getClasses(distribution: Map[String, Int]): List[String] = {
+    val maxValue = distribution.values.max
+    distribution.filter(_._2 == maxValue).keys.toList
+  }
+
   def getDecisionTree(leafSize: Int, numberOfFeatures: Int, data: List[Instance]): DecisionTree = {
     if (stopSplit(leafSize, data)) {
-      LeafNode(getDistribution(data))
+      LeafNode(getClasses(getDistribution(data)))
     } else {
       val bestSplit = getRandomNonConstantFeatures(numberOfFeatures, data)
         .map(x => (x, getRandomThreshold(x, data)))

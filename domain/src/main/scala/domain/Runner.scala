@@ -22,7 +22,13 @@ case class Runner(selectionId: Long,
   lazy val hedgeStake: Double = Runner.getHedgeStake(position.backReturn - position.layLiability, layPrice, backPrice)
   lazy val hedge: Double = Runner.getHedge(hedgeStake, position.sumBacked, position.sumLaid)
 
-//  lazy val weightOfMoney: WeightOfMoney = Runner.getWeightOfMoney(ex)
+  def getWeightOfMoney: Double = ex match {
+    case Some(x) =>
+      val backSize = x.availableToBack.map(_.size).sum
+      val totalSize = backSize + x.availableToLay.map(_.size).sum
+      if (totalSize == 0.0) totalSize else backSize / totalSize
+    case None => 0.0
+  }
 }
 
 object Runner {

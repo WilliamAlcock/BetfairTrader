@@ -1,5 +1,6 @@
 \documentclass[11pt]{report}
 \usepackage{siunitx}
+\usepackage{booktabs}
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
 \pgfplotsset{compat=newest}
@@ -7,18 +8,22 @@
 \usepackage{subcaption}
 \usepackage[margin=1in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage{amsfonts}
+\usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[nottoc,numbib]{tocbibind}
 \usepackage{array}
 \usepackage{titlesec}
 \usepackage[backend=biber, style=numeric-comp,url=true,isbn=true]{biblatex}
-\usepackage{booktabs}
 \usepackage{hyperref}
 \usepackage{float}
 \usepackage[]{algorithm2e}
 \usepackage[toc,page]{appendix}
 \usepackage[color=yellow]{todonotes}
 \usepackage{multirow}
+\usepackage{pdflscape}
+\usepackage{adjustbox,lipsum}
+\usepackage{hyperref}
+
 \hypersetup{
     colorlinks,
     citecolor=blue,
@@ -79,28 +84,16 @@
 \listoffigures
 \listoftables
 
-% Tidy up, add primary objects
 \input{"Introduction/Introduction"}
-	
-% Tidy up, add paragraph on how they were addressed
 \input{"Professional Considerations/Professional Considerations"}
-
-\input{"Requirements Analysis/Requirements Analysis"}
-
 \input{"Development Approach/Development Approach"}
-
-\input{"Design And Implementation/Design And Implementation"}
-	
-\input{"Predicting Price Movement/Predicting Price Movement"}
-
-\chapter{Integration With The Trading System}
-		The trained model will be serialised to mongoDB and made available to use by the auto trader 	
+\input{"Requirements Analysis/Requirements Analysis"}
+\input{"Part 1/The Trading System"}
+\input{"Part 2/Predicting Price Movement"}
 
 \input{"Conclusion/Conclusion"}
 
-\begin{appendices}
-	\chapter{test appendix}
-\end{appendices}
+\input{"Appendix/Appendices"}
 
 \printbibliography[heading=bibintoc]
 

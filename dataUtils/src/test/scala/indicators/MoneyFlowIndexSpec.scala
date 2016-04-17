@@ -46,7 +46,7 @@ class MoneyFlowIndexSpec extends FlatSpec with Matchers with TestHelpers {
                       override val range: Range,
                       override val volume: Double,
                       override val closeDelta: Option[Double],
-                      override val typicalPrice: Double) extends Tick(close, range, volume, closeDelta, 0.0)
+                      override val typicalPrice: Double) extends Tick(close, range, volume, closeDelta, 0.0, None)
 
   def getTestTick(tick: Tick, typicalPrice: Double): TestTick = new TestTick(tick.close, tick.range, tick.volume, tick.closeDelta, typicalPrice)
 

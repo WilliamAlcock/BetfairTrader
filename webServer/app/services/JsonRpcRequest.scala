@@ -13,8 +13,6 @@ case class JsonrpcRequest(jsonrpc: String = "2.0", method: String, id: Int, para
     case "updateOrders"               => params.as[UpdateOrders]
     case "cancelOrders"               => params.as[CancelOrders]
 
-    case "listEvents"                 => params.as[ListEvents]
-    case "listEventTypes"             => params.as[ListEventTypes]
     case "listMarketCatalogue"        => params.as[ListMarketCatalogue]
     case "listMarketBook"             => params.as[ListMarketBook]
     case "listCurrentOrders"          => params.as[ListCurrentOrders]
@@ -24,7 +22,6 @@ case class JsonrpcRequest(jsonrpc: String = "2.0", method: String, id: Int, para
     case "subscribeToMarkets"         => params.as[SubscribeToMarkets]
     case "unSubscribeFromMarkets"     => params.as[UnSubscribeFromMarkets]
     case "unSubscribe"                => UnSubscribe
-    case "stopPollingAllMarkets"      => StopPollingAllMarkets
 
     case "subscribeToOrderUpdates"    => params.as[SubscribeToOrderUpdates]
 

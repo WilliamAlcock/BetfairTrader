@@ -1,0 +1,74 @@
+\begin{appendices}
+	\input{"Appendix/Glossary of terms"}	
+	\input{"Appendix/Controller API"}
+	\input{"Appendix/Betfair Price Increments"}	
+	\chapter{Historical Data Schema}
+		\label{appendix:historicalDataSchema}	
+		\begin{table}[h]
+			\centering
+			\begin{tabular}{ll}
+				Field 				& Type \\
+				\toprule					
+				Event ID				& String\\
+				Name of market		& String\\
+				Market ID			& String\\
+				Date					& Date\\
+				Course				& String\\
+				Race time			& Date\\
+				Time stamp			& Date\\
+				Inplay flag			& Boolean\\
+				Market status		& String\\
+				selection id			& String\\
+				selection			& String\\
+				total matched		& Double\\
+				last price matched	& Double\\
+				back price1			& Double\\
+				back price2			& Double\\
+				back price3			& Double\\
+				back vol1			& Double\\
+				back vol2			& Double\\
+				back vol3			& Double\\
+				lay price1			& Double\\
+				lay price2			& Double\\
+				lay price3			& Double\\
+				lay vol1				& Double\\
+				lay vol2				& Double\\
+				lay vol3				& Double\\
+			\end{tabular}
+		\end{table}
+	\begin{landscape}
+	\chapter{Technical Analysis Indicators}
+		\label{appendix:technicalAnalysisIndicators}
+		\noindent\adjustbox{max width=0.8\paperheight}{%
+		\begin{tabular}{ll}
+			Name & Link\\
+			\toprule
+			Accumulation Distribution Line 	& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:accumulation_distribution_line}\\
+			Chaikin Oscillator 				& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:chaikin_oscillator}\\
+			Commodity Channel Index 			& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:commodity_channel_index_cci}\\
+			MACD 							& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:macd-histogram}\\
+			Money Flow Index 				& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:money_flow_index_mfi}\\
+			Rate Of Change 					& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:rate_of_change_roc_and_momentum}\\
+			Relative Strength Index (RSI) 	& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:relative_strength_index_rsi}\\
+			Stochastic Oscillator Percent K 	& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:stochastic_oscillator_fast_slow_and_full}\\
+			Stochastic Oscillator Percent D 	& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:stochastic_oscillator_fast_slow_and_full}\\
+			Stochastic Oscillator Slow Percent D & \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:stochastic_oscillator_fast_slow_and_full}\\
+			Williams Percent R 				& \url{http://stockcharts.com/school/doku.php?id=chart_school:technical_indicators:williams_r}\\	
+		\end{tabular}}
+	\end{landscape}
+	
+	\chapter{Future Work}
+	\label{appendix:futureWork}
+	\noindent\adjustbox{max width=1.0\linewidth}{%
+		\pgfplotstabletypeset[
+			col sep=comma,
+			string type,
+			columns/Area/.style={column name=Area, column type={l}},
+			columns/Importance/.style={column name=Importance, column type={l}},
+			columns/Description/.style={column name=Description, column type={l}},
+			every head row/.style={before row=\toprule,after row=\midrule},
+			every last row/.style={after row=\bottomrule}
+		]{Appendix/Data/Issue Trackers.csv}}
+
+		
+\end{appendices}

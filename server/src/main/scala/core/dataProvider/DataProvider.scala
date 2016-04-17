@@ -60,18 +60,6 @@ class DataProvider(config: Configuration,
     }
   }
 
-  private def listEventTypes(marketFilter: MarketFilter, subscriber: ActorRef) = betfairService.listEventTypes(sessionToken, marketFilter) onComplete {
-    case Success(Some(listEventTypeResultContainer)) => subscriber ! listEventTypeResultContainer
-    case Success(None) => // TODO handle event where betfair returns empty response
-    case Failure(error) => throw new DataProviderException("call to listEventTypes failed")
-  }
-
-  private def listEvents(marketFilter: MarketFilter, subscriber: ActorRef) = betfairService.listEvents(sessionToken, marketFilter) onComplete {
-    case Success(Some(listEventResultContainer)) => sender ! listEventResultContainer
-    case Success(None) => // TODO handle event where betfair returns empty response
-    case Failure(error) => throw new DataProviderException("call to listEvents failed")
-  }
-
   private def listMarketCatalogue(marketFilter: MarketFilter, sort: MarketSort, subscriber: ActorRef):Unit = {
     betfairService.listMarketCatalogue(
       sessionToken,
@@ -106,13 +94,10 @@ class DataProvider(config: Configuration,
     markets.foreach(x => pollingGroups = pollingGroups.removeSubscriber(x, subscriber.toString(), pollingGroup))
 
   def receive = {
-    case ListEventTypes(marketFilter)                   => listEventTypes(marketFilter, sender())
-    case ListEvents(marketFilter)                       => listEvents(marketFilter, sender())
     case ListMarketCatalogue(marketFilter, sort)        => listMarketCatalogue(marketFilter, sort, sender())
     case SubscribeToMarkets(markets, pollingGroup)      => subscribeToMarkets(markets, pollingGroup, sender())
     case UnSubscribeFromMarkets(markets, pollingGroup)  => unSubscribeFromMarkets(markets, pollingGroup, sender())
     case UnSubscribe                                    => pollingGroups = pollingGroups.removeSubscriber(sender().toString())
-    case StopPollingAllMarkets                          => pollingGroups = pollingGroups.removeAllSubscribers()
     case Tick                                           => tick()
     case _ => throw new DataProviderException("unknown call to data provider")
   }

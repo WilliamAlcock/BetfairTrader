@@ -19,4 +19,3 @@ object DBConnector extends DBConnector {
   sys.addShutdownHook(connection.close())
   sys.addShutdownHook(driver.close())
 }
-

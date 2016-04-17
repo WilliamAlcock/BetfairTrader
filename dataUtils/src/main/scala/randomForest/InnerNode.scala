@@ -1,8 +1,14 @@
 package randomForest
 
-case class InnerNode(feature: Int, threshold: Double, leftNode: DecisionTree, rightNode: DecisionTree) extends DecisionTree {
-  def classify(data: List[Double]): String = data(feature) match {
-    case x if x <= threshold => leftNode.classify(data)
-    case x => rightNode.classify(data)
+import play.api.libs.json.Json
+
+case class InnerNode(f: Int, t: Double, l: DecisionTree, r: DecisionTree) extends DecisionTree {
+  def classify(data: List[Double]): String = data(f) match {
+    case x if x <= t => l.classify(data)
+    case x => r.classify(data)
   }
+}
+
+object InnerNode {
+  implicit val readInnerNode = Json.reads[InnerNode]
 }

@@ -1,34 +1,72 @@
 \chapter{Requirements Analysis}
+This section lists brief functional (what the system shall do) and non-functional (how the system shall do it) requirements for each part of the project. Because this is an Agile project this is not an exhaustive list and new requirements will be incorporated as they are discovered during the development process.  
 
-The requirements were formed firstly by looking at the Betfair website and existing commercially available trading systems for electronic betting exchanges. Secondly by looking at the Betfair NG API and thirdly by looking at a basic betting strategy and formulating some requirements for a language to describe that strategy. This section will discuss pros and cons of existing solutions, what an ideal solution would entail and what parts of that solution can feasibly be implemented in the given time frame and should therefore be included in the project.\\
+\subsection{Part 1 - Building a Trading System}
+The requirements were formed by considering the requirements of a trader and the constraints imposed by the Betfair Exchange's API\cite{betfairAPI}.\\
 
-\section{The Users}
-
-The users of the system will be traders. Their primary objective will be to effectively trade a chosen market thereby maximising profits and minimising loses.\\
-
-\textbf{Manually trading}\\
-	\begin{itemize}
-		\item Ability to navigate markets
-		\item Receive fast and regular updates on market activity. 
-		\item Ability to quickly place and alter orders in a given market 
-		\item Quick and accurate notifications when orders are matched.
-	\end{itemize}
-
-\textbf{Automated trading}\\
+The requirements of a trader are that they must be able to:
 
 	\begin{itemize}
-		\item A simple and consistent way to describe a strategy that the system can understand and process. 
-		\item Ability to test a strategies behaviour without placing orders in a live market. 
-		\item Ability to review what orders the system has placed and when and why it placed those orders. 
-		\item Ability to review and replay the systems behaviour after the fact.
+		\item Navigate markets on the exchange.
+		\item Receive real time updates for markets on the exchange.
+		\item Place and cancel orders across all markets on the exchange.
+		\item Receive real time updates on the status of their orders on the exchange.
+		\item Record data for selected markets on the exchange.
+		\item Test a trading strategy without placing orders on the exchange.
+		\item Action an automated strategy on markets on the exchange.
 	\end{itemize}
 
-The software will need to be well tested and bug free as any unexpected behaviour could result in substantial financial loses.
+The constraints imposed by the Betfair Exchange's API are that:
 
-	\todo[inline]{This section will be rewritten before the final draft. I would like to completely rewrite the requirements analysis from the interim report and I am unsure how to proceed.\\
+	\begin{itemize}
+		\item Navigation data for applications must be retrieved in the form of a compressed file\cite{BetfairNavigationData}.
+		\item The exchange must be polled at regular intervals for market data updates.
+		\item The exchange must be polled at regular intervals for order updates.
+		\item The number of requests for a single market's data must not exceed 5 per second\cite{listMarketBook}.
+		\item The amount of data requested in each call to the exchange must be within a maximum weighting\cite{dataRequestLimits}.
+		\item Any party making calls to the exchange must first authenticate\cite{loginSessionManagement}.
+		\item All subsequent calls to the exchange must contain a session token and application key\cite{ApplicationKeys}.
+		\item The exchange provides a service with delayed data for testing but does not allow betting transactions.
+	\end{itemize}
+		
+As a result\\
+
+The functional requirements are the system must:
+	\begin{itemize}
+		\item Poll the exchange for data on selected markets and notify the user when the data changes.
+		\item Place and cancel orders at the exchange.
+		\item Poll the exchange for data on the markets with unmatched orders and notify the user when their status changes.
+		\item Provide the user with a means to navigate markets on the exchange.
+		\item Let the user record data for selected markets.
+		\item On request action an automated trading strategy on selected markets.
+		\item Let the user test an automated strategy on selected markets.
+	\end{itemize}
 	
-	How closely should I stick to the interim report ?\\ 
-	The GUI comparison of existing systems in the interim report seems unnecessary.\\ 
-	I want to remove the section about creating a programming language for the user to define a trading strategy as this hasn't been included in the implementation.\\
-	What format is required ? I would like to keep it brief outlining some functional and non functional requirements in bullet point form.\\
-	}
+The non-functional requirements are the system must:
+	\begin{itemize}
+		\item Download Navigation data on start-up.
+		\item Authenticate to the exchange on start-up.
+		\item Store the session token and application key and apply them to all exchange calls.
+		\item Poll the exchange for updates at regular intervals not exceeding 5 calls per second per market.
+		\item Group calls to the exchange so that data request limits are not exceeded.
+		\item Implement a local order book to simulate the placement of orders in a test environment.
+		\item Make and receive calls asynchronously without blocking.
+	\end{itemize}
+\newpage
+\subsection{Part 2 - Building a Predictive Model}
+Betfair and their third party data provider Fracsoft supplied one months market data for horse racing markets from the 11th October 2014 to the 10th November 2014 showing sub-second deltas in the market. The requirements were formed by considering the requirements of a trader from a predictive model and by looking at the constraints imposed by the historical data.\\
+
+The requirements of a trader from a predictive model are that it must:
+	\begin{itemize}
+		\item Produce accurate results
+		\item Run in real time
+	\end{itemize}
+
+The constraints imposed by the historical Betfair Exchange data are it must:
+	\begin{itemize}
+		\item Be separated by market (Race) and selection (Runner)
+		\item Be grouped into intervals so technical analysis indicators can be applied
+		\item Transformed into a format where it can be sorted and rearranged
+	\end{itemize}
+
+As a result the functional requirement of the model is that it make accurate predictions and the non-functional that it return predictions in real time.

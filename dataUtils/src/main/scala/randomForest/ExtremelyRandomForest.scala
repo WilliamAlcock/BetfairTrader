@@ -6,7 +6,7 @@ import scala.concurrent.{Await, Future}
 import scala.util.Random
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ExtremelyRandomForest extends RandomForestBuilder {
+class ExtremelyRandomForest extends RandomForestBuilder with ClassificationUtils {
 
   val treeBuilder: DecisionTreeBuilder = new ExtremelyRandomDecisionTree()
 
@@ -22,27 +22,13 @@ class ExtremelyRandomForest extends RandomForestBuilder {
     byLabel.map{case (k,v) => getSampleWithReplacement(v, size)}.flatten.toList
   }
 
-  private def getMaxClass(results: List[Classification]): String = results match {
-    case answers if results.isEmpty => ""
-    case answers =>
-      val values = answers.groupBy(x => x.classification).mapValues(_.size)
-      val maxValue = values.map{case (k,v) => v}.max
-      val output = values.filter{case (k,v) => v == maxValue}.keys.toArray
-      output(Random.nextInt(output.length))
-  }
-
-//  def classifiyInstance(data: Instance, trees: List[(DecisionTree, Set[Instance])]): String = {
-//    getMaxClass(trees.filter{case (tree,subsample) => !subsample.contains(data)}.map(_._1.classify(data.features)).groupBy(x => x))
-//  }
-
-  private def isError(instance: Instance, index: Int, classifications: List[Classification]): Boolean = {
-    getMaxClass(classifications) != instance.label
+  def isError(instance: Instance, index: Int, classifications: List[Classification]): Boolean = {
+    getMaxClass(classifications.map(_.classification).groupBy(x => x)) != instance.label
   }
 
   def getOOBError(data: List[Instance], trees: List[(DecisionTree, List[Classification])]): Double = {
     val classifications:Map[Int, List[Classification]] = trees.map{case(k,v) => v}.flatten.groupBy(x => x.i)
     val errors: Int = data.zipWithIndex.map{case(instance, index) => isError(instance, index, classifications.getOrElse(index, List.empty[Classification]))}.count(x => x)
-//    val errors = data.count(instance => classifiyInstance(instance, trees) != instance.label)
     val errorRate = errors / data.size.toDouble
     println("OOB Error Rate, Number of Errors: ", errors, " ErrorRate: ", errorRate)
     errorRate
@@ -66,7 +52,6 @@ class ExtremelyRandomForest extends RandomForestBuilder {
     var completed = 0
 
     // Throttle the futures into groups of 8, same size as thread pool
-
     val trees:List[(DecisionTree, List[Classification])] = List.range(0, numberOfTrees).grouped(8).map(x => {
       val output = runBatch(x.size, leafSize, numberOfFeatures, data)
       completed += x.size
@@ -74,30 +59,6 @@ class ExtremelyRandomForest extends RandomForestBuilder {
       output
     }).toList.flatten
 
-
-//      x => Future{
-//      val subsample = sampleDataSet(data)
-//      val tree = treeBuilder.getDecisionTree(leafSize, numberOfFeatures, subsample)
-//      completed += 1
-//      print("Trees Trained: " + completed + "\r")
-//      (tree, subsample.toSet)
-//    })
-//    val trees:List[(DecisionTree, Set[Instance])] = Await.result(Future.sequence(futures), Duration.Inf)
-
-
     RandomForest(trees.map(_._1), getOOBError(data, trees))
-
-//      .foldLeft(List.empty[List[DecisionTree]])((trees, batch) => {
-//      Await.result(Future.sequence(x => Future {
-//        val subsample = sampleDataSet(data)
-//        val oobSample = subsample.toSet.diff(data.toSet)
-//        val tree = treeBuilder.getDecisionTree(leafSize, numberOfFeatures, subsample)
-//        completed += 1
-//        print("Trees Trained: " + completed + "\r")
-//        (tree, oobSample)
-//      }), Duration.Inf) :: trees
-//    }).flatten
-
-
   }
 }

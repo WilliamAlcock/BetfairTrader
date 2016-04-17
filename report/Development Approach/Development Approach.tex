@@ -1,45 +1,126 @@
 \chapter{Development Approach}
 
-	\section{Programming Languages}
-		The majority of the project will be written in Scala\cite{Scala} with the exception of the GUI. The main reasons for selecting Scala above other languages were:
-		
-		\begin{itemize}
-			\item Support for both functional and object orientated programming styles will help increase development speed.
-			\item Scala code is compiled to Java Bite Code and runs on the Java Virtual Machine (JVM), as such it will run across multiple platforms and operating systems.
-			\item There are a wide range of mature libraries available for Scala and because Scala runs on the JVM it also has access to all existing Java libraries.
-			\item Scala encourages the use of immutable data types. This will provide an advantage considering the proposed concurrent nature of this project.
-			\item Scala is a statically typed language because of the complex nature of this project it will be advantageous to have type errors caught at compile time.
-		\end{itemize}
-			
-		The Akka library will be used in conjunction with Scala to build the server architecture. Akka is a toolkit and runtime for building highly concurrent distributed and resilient message-driven applications\cite{Akka}. Akka is based on Erlang's Actor model, with some differences\cite{AkkaVsErlang}. An actor provides a container for mutable State or Behaviour. Other parts of the system can communicate with an actor by sending it messages which are queued and actioned one at a time. This means that instead of having to synchronize access to parts of the code using locks, the developer can write your code in an Actor knowing it will only ever be run synchronously\cite{AkkaActors}.\\
-		
-		The GUI will be a implemented in a web browser and as such will be written in JavaScript with HTML 5 and CSS. Because of the well documented difficulties writing complex applications in JavaScript\cite{JavaScriptProblem} CoffeeScript will be used to simplify the code and AngularJS to add structure to the code and increase the declarative nature of the HTML. More in-depth reasons for choosing these technologies will be discussed later.
+	\section{Waterfall Vs. Agile}
 	
-	\section{Unit Tests}
-		Due to the complex nature of this project and the financial risks faced by producing trading software with bugs it has been decided that during development there will be emphasis on automated testing.\\ 
+	\subsection{Waterfall}
+		\begin{figure}[H]
+			\includegraphics[width=0.8\linewidth]{"Development Approach/Images/Waterfall Development".png}
+			\centering
+			\caption{Waterfall Development Process}
+    			\label{fig:waterfallMethod}
+		\end{figure}		
 		
-		Unit tests will be produced to accompany the source code using ScalaTest and ScalaMock. The advantages of Unit tests are:
+	Figure ~\ref{fig:waterfallMethod} shows the stages of the Waterfall model for software development. In the Waterfall model each stage feeds down into the next one. Waterfall development employs a sequential design process from start to end and requires intensive planning and documentation, specifying that all aspects of the system are designed upfront before they are implemented with the testing coming last.\\
+	
+	The advantages of the Waterfall model are:
+	\begin{itemize}
+		\item Easy forward planning and implementation.
+		\item Easier to estimate and adhere to deadlines, budgets and rigid customer specifications.
+		\item Ability to see and communicate the projects status.
+		\item Better documentation of each stage
+	\end{itemize}
+	
+	The disadvantages of the Waterfall model are:
+	\begin{itemize}
+		\item Inflexible partitioning of each stage makes it hard to incorporate changes during a project.
+		\item No working product until the end of the project.
+		\item Any dependency delays can halt development.
+	\end{itemize}
+	
+	\subsection{Agile}
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=1.0\linewidth]{"Development Approach/Images/Agile Development".png}
+			\caption{Agile Development Process}
+    			\label{fig:agileMethod}
+		\end{figure}		
+	
+	The Agile method proposes an incremental and iterative approach to software development. The development process is broken into sprints as shown in Figure ~\ref{fig:agileMethod}, each sprint focusing on a small module of the system. Once each module is completed and tested it is integrated into the rest of the system and all system tests run to ensure the existing functionality has not been affected.\\
+	
+	The advantages of the Agile model are:
+	\begin{itemize}
+		\item Projects benefit from the flexibility and ability to quickly incorporate changes.
+		\item Continuous improvement as lessons are learnt from each stage.
+		\item There is a working version of the system at the end of each sprint.
+	\end{itemize}		
+	
+	The disadvantages of the Agile model are:
+	\begin{itemize}
+		\item Its more difficult to predict the cost and delivery date upfront.
+		\item Large projects can become unmanageable if the development life cycle is unclear at the beginning.
+		\item It is harder to co-ordinate changes with large teams working over different locations.
+	\end{itemize}
+	
+	This project would be best suited to an Agile development process because:
+	\begin{itemize}
+		\item It is relatively small with only one developer working on it.
+		\item It is the first time the developer has written such a system and not all of the requirements of the system are known at the initial stage.
+		\item There will always be a working version of the system from the last iteration reducing the risk of not having a working system when development comes to an end.
+	\end{itemize}
+	
+	\section{Testing}
+	The Agile process places an emphasis on continuous testing, this section outlines the projects approach to testing.	
+	
+		\subsection{Test Driven Development}
+		 Test Driven Development (TDD) stipulates that the unit tests for each module are written before the code. This requires giving consideration to the functionality and desired output of the code before it is written. The tests will fail before the code is written and pass once the code has met the requirements.\\ 
+		 
+		 This project will use TDD where possible but because the developer has not written a trading system before, or used some of the technologies involved before, part of the development will be more exploratory. In these cases tests will be written after each module has been completed. The disadvantage of this approach is that during testing the code may need re-factoring so that it can be more easily tested.\\
+		 	
+		The advantages of testing is:		
 		
 		\begin{itemize}
-			\item They allow the programmer to prove the output of a given piece of code given a deterministic input.
-			\item They allow the programmer to change existing code or add new code with the confidence that they haven't broken existing functionality code.
-			\item They help document and define what the code is doing, looking at the unit tests gives a clearer indication of what the code is doing.
-			\item Writing unit tests encourages the programmer to write code in small chunks that can be tested independently.
+			\item It proves the output of a given piece of code given a deterministic input.
+			\item It allows the programmer to re-factor code with confidence existing functionality has not been broken.
+			\item It helps document code - looking at the tests gives a clearer indication of what the code is doing.
+			\item It encourages the programmer to write modular code.	
+		\end{itemize}				
+		 	
+		\subsection{End-to-end vs Unit Tests}
+			\begin{figure}[htp]
+				\centering
+				\includegraphics[width=0.4\linewidth]{"Development Approach/Images/Testing Pyramid".png}
+				\caption{The Testing Pyramid}
+    				\label{fig:theTestingPyramid}
+			\end{figure}	
+
+		The Testing Pyramid shown in Figure~\ref{fig:theTestingPyramid} was developed by Mike Cohn in the book 'Succeeding with Agile'\cite{Cohn_2010}. The pyramid shows that there should be more low-level unit tests than high-level GUI (end-to-end) tests.\\
+		
+		End-to-end tests are harder to write and maintain because each one covers a larger area of the system and need to be changed every time the system does whereas each unit test only concerns a small piece of the code. Other external pieces of code are replaced in the test with mocks. The advantage of this approach is it is easy:
+		
+		\begin{itemize}
+			\item To maintain the code as only the tests for the unit of code being modified will need changing.
+			\item To extend the software as new units of code and tests can be added without affecting existing ones.
+			\item To identify which unit is failing as the failing test will identify the relevant unit of code.
 		\end{itemize}
 		
-		Due to the exploratory nature of the development process, it will be hard to write the unit tests before the code but where possible this will be done. In most cases unit tests will be written alongside the code. When existing code needs to be changed or bugs are found the unit tests will be changed first and then the corresponding code changed to ensure unit tests pass\cite{TestingStatevsInteractions}.\\
+		When an end-to-end test fails its hard to identify the piece of code responsible because the test covers a wider part of the code.\\
 		
-		The Unit tests produced can be broadly split into two types: 
+		For these reasons the project will focus on writing unit tests and some integration tests to ensure modules communicate correctly.
+		
+		\subsection{Unit Testing: State vs Behaviour}				
+		Unit tests can be split into two types:
+		
+		\begin{itemize}
+			\item State tests - assert that given a deterministic input a unit of code returns a deterministic output
+			\item Behaviour tests - given a deterministic input a unit of code makes the correct calls to external parts of code. The behaviour is verified by replacing the external parts of code with mocks and making assertions on when they are called and with what parameters.
+		\end{itemize}				
+		
+		This project uses a combination of state and behaviour tests. The implementation section includes a description of how each part of the system was tested.
 			
-			\begin{itemize}
-				\item State tests verify that the code under test returns the right results.
-				\item Behaviour tests verify that the code under test calls certain methods with the correct order and with the correct parameters.
-			\end{itemize}				
-		
 	\section{Version Control}
-		Version control will be key to the development of this project. As such I have selected to use GIT\cite{GIT}. GIT is free, reliable, very well documented and has a large support community on the internet. Its also widely used in industry and the author wanted the opportunity to become proficient in using it.
-	\section{Build System}
-		The Scala Build Tool (SBT) will be used to manage dependencies and builds because of its ease of use and integration with all major Scala libraries.
-	\section{IDE}
-		IntelliJ IDEA \cite{Intellij} will be used as the integrated development environment (IDE) to write the code in. The author has previous experience using IntelliJ. JetBrains licence the product for free to students and it provides good support and integration for Scala, GIT and SBT.
-	 
+	Version control is a system that records changes to a file or a set of files over time so that you can recall specific versions later\cite{GitGettingStarted}. Changes to a file or set of files can be grouped as commits and pushed to a central repository. The central repository provides a backup of the files and allows multiple developers access to the same code facilitating collaboration.\\
+	
+	To support the iterative Agile development process this project will use GIT\cite{GIT} version control software and GitHub to host the central repository. GIT is free, reliable, well documented, widely used in industry and has a large support community on the internet.	 Although this project has only one developer hosting the project on GitHub will aid in providing supervisors with reports on the projects progress.
+				
+	\section{Programming Languages}
+		The majority of the project will be written in Scala\cite{Scala}. The main reasons for choosing Scala above other languages are:
+		
+		\begin{itemize}
+			\item The support for both functional and object orientated programming styles will increase development speed.
+			\item Scala code will run across multiple operating systems as it compiles to Java Byte Code and runs on the Java Virtual Machine (JVM).
+			\item There are a wide range of mature libraries available for Scala and it provides access to all existing Java libraries because it runs on the JVM.
+			\item Scala encourages the use of immutable data types providing an advantage when writing multi-threaded code.
+			\item Because Scala is a statically typed language errors can be caught at compile time.
+		\end{itemize}
+
+	Tests will be written using ScalaTest and ScalaMock. The Scala Build Tool (SBT) will be used to manage dependencies and builds and the code will be writen using IntelliJ IDEA \cite{Intellij}

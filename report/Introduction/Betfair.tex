@@ -1,0 +1,137 @@
+\section{The Betfair Exchange}
+
+	\subsection{What is The Betfair Exchange}
+Betfair was launched in June 2000 as the world's first betting exchange\cite{WhatIsBetfair}.\\
+
+Traditionally High Street bookmakers offer you odds on an event happening and you only have the choice of backing the event at those odds or not.\\
+
+The Betfair Exchange allows gamblers to choose the odds at which they want to back or lay an event. Betfair proposes the markets that can be bet on and matches peoples bets making a 5\% (or less) commission on any winning bet. This is comparable to the way a financial exchange allows people to choose the price at which they buy and sell securities and matches their orders.\\
+
+Betting exchanges generally have better odds than traditional bookmakers although it should be noted that commissions are not included in those odds.\\
+
+Although subsequently other companies have launched betting exchanges, Betfair remains the biggest\cite{BettingExchangesCompared}. Today Betfair's Exchange processes over 1.2 billion bets a year, with a trading value of \pounds56 billion; more transactions than all the major European Stock Exchanges combined\cite{ABettingRevolution}.
+
+	\subsection{An Example of a Betfair Market}
+	
+		\begin{figure}[H]
+			\includegraphics[width=1.0\linewidth]{"Introduction/Images/Match Odds S vs A".png}
+			\centering
+			\caption{Annotated Betfair Market, Match odds: Swansea vs Arsenal}
+    			\label{fig:annotatedMatchOdds}
+		\end{figure}		
+		
+Figure~\ref{fig:annotatedMatchOdds} shows an example of a Betfair market for the match odds of a football match between Swansea and Arsenal.\\
+
+The market is split into three selections, one for each possible outcome: 
+
+	\begin{itemize}
+		\item Swansea winning.
+		\item Arsenal winning.
+		\item A draw.
+	\end{itemize}
+
+The odds for each outcome are split into two sides:
+
+	\begin{itemize}
+		\item Prices available to Back - because of unmatched Lay bets in the market.
+		\item Prices available to Lay - because of unmatched Back bets in the market.
+	\end{itemize}		
+		 
+Displayed underneath each price is the total size (or volume) of all the unmatched bets at that price. The best available prices to back and lay are coloured blue and pink respectively.\\
+
+A punter looking to Back a selection would want the highest possible price to maximise the return on their stake. A punter looking to Lay a selection would want the lowest possible price to minimise liability. The selection's current price is where the price of the unmatched Back and Lay bets meet.
+
+	\subsection{Trading a Betfair Market}	
+Just as prices on financial markets fluctuate over time so will the prices on Betfair's markets.\\
+
+A trader can profit by laying a selection when the price is low and backing when the price is high or visa-versa. To further explain this consider the following scenarios: 
+
+	\subsubsection{Scenario 1}
+	A trader has backed Swansea to win for \pounds10 at odds of 5.0 before the match starts. By half time the score is 2-0 to Swansea and the available price to back is now 1.49 and to lay 1.5 because the probability of Swansea winning is now much higher than it was before the match started. The trader now makes a lay bet for the selection at the lower price of 1.5.
+
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{l
+								S[table-format=2.3,table-space-text-pre={\pounds}]
+								S[table-format=1.3]
+								S[table-format=2.3,table-space-text-pre={\pounds}]
+								S[table-format=2.3,table-space-text-pre={\pounds}]}
+					\toprule
+					{Bet} 	& {Size} 			& {Price}		& {Profit} 			& {Liability} \\
+					\midrule
+					{Back} 	& {\pounds}10.00		& 5.00 			& {\pounds}40.00 	& {\pounds}10.00 \\
+					{Lay}	& {\pounds}10.00		& 1.50 			& {\pounds}10.00		& {\pounds}5.00 \\
+				\end{tabular}
+				\caption{Scenario 1, Potential Profit and Liability}
+				\label{tab:pnlSwanseaVsArsenal}
+			\end{table}
+
+	Table~\ref{tab:pnlSwanseaVsArsenal} shows the potential profit and liability from placing these bets. 
+
+	\begin{itemize}
+		\item If Swansea win the trader will profit \pounds40.00 from the back bet but will be liable to a \pounds5.00 loss from the lay bet, leaving an overall return of \pounds35.00.
+		\item If Swansea lose the trader will profit \pounds10.00 from the lay bet but will be liable to a \pounds10.00 loss from the back bet, leaving an overall return of \pounds0.00.
+	\end{itemize}
+	
+	By placing both bets the trader has ensured that whatever the outcome they will not lose any money.
+
+	\subsubsection{Scenario 2}
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{l
+								S[table-format=2.3,table-space-text-pre={\pounds}]
+								S[table-format=1.3]
+								S[table-format=2.3,table-space-text-pre={\pounds}]
+								S[table-format=2.3,table-space-text-pre={\pounds}]}
+					\toprule
+					{Bet} 	& {Size} 			& {Price}		& {Profit} 			& {Liability} \\
+					\midrule
+					{Back} 	& {\pounds}10.00		& 5.00 			& {\pounds}40.00 	& {\pounds}10.00 \\
+					{Lay}	& {\pounds}40.00		& 1.50 			& {\pounds}40.00		& {\pounds}20.00 \\
+				\end{tabular}
+				\caption{Scenario 2, Potential Profit and Liability}
+				\label{tab:pnlSwanseaVsArsenal2}
+			\end{table}	
+	
+	A trader has backed Swansea to win before the match as in scenario 1 but this time the trader places a larger lay bet of \pounds40.00 at 1.5.\\
+	
+	Table~\ref{tab:pnlSwanseaVsArsenal2} shows the potential profit and liability from placing these bets.
+	
+	\begin{itemize}
+		\item If Swansea win the trader will profit \pounds40.00 from the back bet but will be liable to a \pounds20.00 loss from the lay bet, leaving an overall return of \pounds20.00.
+		\item If Swansea lose the trader will profit \pounds40.00 from the lay bet but will be liable to a \pounds10.00 loss from the back bet, leaving an overall return of \pounds30.00.
+	\end{itemize}		
+	
+	In this scenario the trader has ensured that whatever the outcome they are guaranteed a return, \pounds20.00 if Swansea win and \pounds30.00 if Swansea lose. This process is known in gambling terms as "cashing out" or "greening up".\\
+
+	\subsubsection{Scenario 3}
+			\begin{table}[H]
+				\centering
+				\begin{tabular}{l
+								S[table-format=2.3,table-space-text-pre={\pounds}]
+								S[table-format=1.3]
+								S[table-format=2.3,table-space-text-pre={\pounds}]
+								S[table-format=2.3,table-space-text-pre={\pounds}]}
+					\toprule
+					{Bet} 	& {Size} 			& {Price}		& {Profit} 			& {Liability} \\
+					\midrule
+					{Back} 	& {\pounds}10.00		& 5.00 			& {\pounds}40.00 	& {\pounds}10.00 \\
+					{Lay}	& {\pounds}3.00		& 16.00 			& {\pounds}3.00		& {\pounds}45.00 \\
+				\end{tabular}
+				\caption{Scenario 3, Potential Profit and Liability}
+				\label{tab:pnlSwanseaVsArsenal3}
+			\end{table}
+		
+	A trader has backed Swansea to win for \pounds10.00 at odds of 5.0 before the match starts but in this scenario at half time the score is 2-0 to Arsenal and the available price to back and lay Swansea is much higher at 15.00 to back and 16.00 to lay because the probability of Swansea winning is now lower. The trader now makes a lay bet of \pounds3.00 at 16.00 to reduce the size of their potential loss.\\ 
+	
+	Table~\ref{tab:pnlSwanseaVsArsenal3} shows the potential profit and liability from placing these bets.
+
+	\begin{itemize}
+		\item If Swansea win the trader will profit \pounds40.00 from the back bet but will be liable to a \pounds45.00 loss from the lay bet, leaving an overall loss of \pounds5.00.
+		\item If Swansea lose the trader will profit \pounds3.00 from the lay bet but will be liable to a \pounds10.00 loss from the back bet, leaving an overall loss of \pounds7.00.
+	\end{itemize}
+	
+	In this scenario the trader has minimised the potential loss from the initial back bet, this process is known as stopping out of a trade.
+	
+	
+

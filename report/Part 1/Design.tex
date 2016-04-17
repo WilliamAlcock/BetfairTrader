@@ -1,0 +1,213 @@
+\section{Design}
+
+		\begin{figure}[H]
+			\centering
+			\includegraphics[height=0.7\textheight]{"Part 1/Images/Trading System Architecture".png}
+			\caption{Trading System Architecture}
+    			\label{fig:tradingSystemArchitecture}
+		\end{figure}	
+		
+	The trading system implements a distributed Client-Server Architecture shown in Figure~\ref{fig:tradingSystemArchitecture} and detailed below.
+		
+		\begin{enumerate}
+			\item The Client is a thin client, running in a web browser and provides a graphical user interface (GUI).
+			\item The client pages are served by a web-server which facilitates communication from the client to the core-server through the core-server's controller.
+			\item The Core Server implements an event driven architecture managed by a central event manager.
+			\item The Core Server communicates with the Betfair Exchange through a service layer. The service layer is responsible for making Http calls to the Betfair Exchanges API adn abstracting those calls into a simpler API which it exposes to the Core-Server.
+		\end{enumerate}
+		
+\subsection{Client-Server Vs Peer-to-Peer Architecture}	
+	A Client-Server Architecture, shown in Figure~\ref{fig:clientServer}, separates the client from the server. The Client and the server communicate over a wire protocol which is kept to a minimum. The Client sends messages called requests to the Server, which processes these messages and returns requested information to the Client.\\
+
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.35\linewidth]{"Part 1/Images/Client Server Architecture".png}
+			\caption{Client-Server Architecture}
+    			\label{fig:clientServer}
+		\end{figure}	
+
+	The most common alternative to a Client-Server Architecture is a Peer-to-Peer Architecture, shown in Figure~\ref{fig:peertoPeer}. A Peer-to-Peer Architecture distinguishes itself by its distribution of power and function. In a Peer-to-Peer Architecture all the nodes have the same capabilities and responsibilities and communicate with each other rather than with a server.\\
+	
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.35\linewidth]{"Part 1/Images/Peer to Peer Architecture".png}
+			\caption{Peer-to-Peer Architecture}
+    			\label{fig:peertoPeer}
+		\end{figure}	
+		
+	A Client-Server Architecture was chosen because:
+	
+		\begin{itemize}
+			\item It enforces modularity - because the Client and Server are connected through a small wire protocol they can be developed in isolation as long as each one adheres to the protocol. The implementation for either the Server or Client can be changed without affecting the other as long as the wire protocol is adhered to.
+			\item The server has central control of the data and resources and administers their access by the client. Although there is a downside to that as the server is a central point of failure, this project focuses on adding functionality opposed to ensuring resilience.
+			\item Scalability - New changes, services and resources can be integrated with ease by upgrading the server, Peer-to-Peer Architecture does not scale well as the number of nodes increase because all the nodes need to be connected. 
+			\item Because the majority of processing happens on the server client machines don't need the same processor speed and resources as the Server. 
+		\end{itemize}
+
+\subsection{Client and WebServer}
+	\subsubsection{Thin Client Vs. Thick Client}
+		A thick client is one that will perform the bulk of the processing in a client-server application and is less dependent on communication with the server. 
+		\begin{itemize}
+			\item A thick client requires lower server resources but the client needs to have more processing power and resources to run.
+			\item Clients may be able to work off-line only requiring intermittent communication with the server.
+			\item It is harder to deploy and make changes to a system that implements a thick client as changes need to be duplicated across all clients.
+		\end{itemize}				
+
+		A thin client is designed to be especially small so that the bulk of the processing occurs on the server. 
+		
+		\begin{itemize}
+			\item A thin client is easier to deploy requiring little installation.
+			\item A system with a thin client is easier to change because the majority of processing logic is on the server.
+			\item A thin client is reliant on constant communication from the server, if the server is down the client won't wok.
+			\item A thin client requires less resources from the machine it is running on so a wider range of devices can be used as clients.
+		\end{itemize}
+
+It was decided this system implement a thin client because:
+
+	\begin{itemize}
+		\item The processing logic does not have to be duplicated on both the client and server.
+		\item The client needs to receive constant updates from the exchange and therefore lends itself the design.
+		\item Its easy to deploy and change the client.
+	\end{itemize}		
+		
+	Implementing the client in a web browser lends itself to this design because no code needs to be deployed on the clients' devices, instead it is sent dynamically, page at a time to the client on request. If the client needs to be changed the change only needs to be made once on the Web-Server. If the number of clients needs to be scaled up then the Web-Server can be assigned extra resources. Another advantage of a client implemented in a web browser is that it is platform independent and can run on many different operating systems.\\
+	
+	A more in-depth explanation of how the communication between the client, Web-Server and Core-Server works is included in the implementation section.
+	
+	\subsubsection{GUI Visual Design}
+	This project does not focus on visual design. To increase development speed the styling has been based on Betfair's website. The GUI currently consists of two pages.\\
+	
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=1.0\linewidth]{"Part 1/Images/GUI Main Window".png}
+			\caption{GUI Main Window}
+    			\label{fig:guiMainWindow}
+		\end{figure}	
+
+	The GUI Main window shown in Figure~\ref{fig:guiMainWindow} is split into three sections:
+		
+	\begin{itemize}
+		\item The Navigation Window - lets the user navigate events and markets on the exchange and select the content of the detail window.
+		\item The Detail Window - shows high level price data for events and markets selected using the navigation window.
+		\item The Position Window - shows the user's unmatched bets and matched bets grouped by market and selection.
+	\end{itemize}
+
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.65\linewidth]{"Part 1/Images/GUI Ladder Window".png}
+			\caption{GUI Ladder Window}
+    			\label{fig:guiLadderWindow}
+		\end{figure}	
+	
+	The GUI Ladder Window shown in Figure~\ref{fig:guiLadderWindow} lets the user navigate the full price depth of a selection. The upper section of the window shows information about the user's position. The lower section shows price information, each row relates to a different price, with the columns showing the following information in regard to that price:
+	
+	\begin{enumerate}
+		\item The size of the users unmatched lay bets at the exchange.
+		\item The size of all the unmatched lay bets (or the size available to back) at the exchange.
+		\item The price
+		\item The size of all the unmatched back bets (or the size available to lay) at the exchange.
+		\item The size of the users unmatched back bets at the exchange.
+		\item The total volume trader since the market opened.
+	\end{enumerate}
+		
+\subsection{The Core Server}		
+	\subsubsection{Event Based Architecture}
+	An Event Based Architecture (EDA) is a framework that orchestrates behaviour around the production, detection and consumption of events and the responses they evoke. An EDA consists of:
+	
+	\begin{itemize}
+		\item Creators - the source of the event.
+		\item Consumers - entities that need to know an event has occurred.
+		\item The Event Manager - an intermediary that, by applying rules, passes events to consumers.
+	\end{itemize}
+	
+	The Event Manager decouples Creators and Consumers allowing them to broadcast and subscribe to different categories called channels. When an event occurs the Creator broadcasts the event on the Event Manager using a specific channel. A Consumer can subscribes to any number of channels on the Event Manager depending on events it needs to know about. When the Event Manager receives an event on a channel it sends the message to all the Consumers subscribed to that channel.\\
+	
+	An EDA is especially suited to systems where the flow is determined by events that occur concurrently as opposed to a sequence of processes, where each process does not start until the one before it finishes.\\
+	
+	A trading system lends itself to an EDA because: 
+
+		\begin{itemize}
+			\item Changes in market data, orders and user commands can all occur concurrently - by expressing them as events the relevant part of the system can react with greater responsiveness.
+			\item Each part of the system is decoupled from the rest of the system - this makes it easy to change each part without affecting the rest of it and to test each part independently by sending it events and making assertions on its behaviour.
+			\item Each part of the system can be distributed over different locations and hardware - as the system changes each part of it can be scaled independently.
+		\end{itemize}			
+	
+	One of the disadvantages of an EDA is that the flexibility can lead to complexity as the system grows. A single event could trigger a number of Consumers making it hard to track the flow of the system. The design of the Core-Server tries to mitigate this issue by assigning distinct responsibilities to each part of the system.
+	
+	\subsubsection{Responsibilities of the Core-Server Components}
+	
+	\textbf{Controller}\\
+	All commands to the Core-Server are placed with the controller. The controller:
+		\begin{itemize}
+			\item Subscribes processes to the correct channels on the Event Manager when they request information.
+			\item Un-Subscribes processes from channels on the Event Manager when they terminate or no longer require notification of specific updates.
+			\item Routes commands to the correct parts of the Core-Server by broadcasting them on the correct channels on the Event Manager. Appendix~\ref{appendix:controllerAPI} contains a list of all the commands supported by the controller.
+		\end{itemize}
+	
+	\textbf{Auto Trader}\\
+	The Auto Trader:
+		\begin{itemize}
+			\item Runs automated trading strategies on selected markets.
+			\item Broadcasts updates on the strategies state and progress.
+			\item On request broadcasts a list of all running strategies.
+		\end{itemize}
+		
+	\textbf{Data Store}\\
+	The Data Store:
+		\begin{itemize}
+			\item Records market data by saving it to the database.
+			\item Replays stored market data by loading it from the database and broadcasting it.
+			\item Records trading activity by saving it to the database.
+			\item Replays stored trading activity by loading it from the database and broadcasting it.
+		\end{itemize}			
+			
+	\textbf{Data Provider}\\	
+	The Data Provider:
+		\begin{itemize}
+			\item Polls the service layer for market data updates and broadcasts these updates to the Data Model.
+			\item Ensures that all the markets currently subscribed to by other processes are being polled for updates.
+			\item Ensures that the frequency of market data requests to the service layer do not exceed 5 per second per market.
+			\item Groups the requests for market data so that the minimum number of requests are sent to the service layer but that the size of these requests does not exceed the exchange's market data limits\cite{dataRequestLimits}.
+		\end{itemize}			
+		
+	\textbf{Data Model}\\
+	\label{section:dataModel}
+	The Data Model 
+		\begin{itemize}
+			\item Listens to market data updates from the Data Provider and stores the latest copy for each market.
+			\item Every time data for a market is received that is different from the copy stored locally the Data Model broadcasts the new data. This ensures that subscribers to market data do not receive unnecessary updates when the state of a market hasn't changed.
+			\item On request the Data Model will send a copy of a market's data to a requester. This ensures that new subscribers to a market don't have to wait till the next time the data changes to receive the market's data.
+		\end{itemize}			
+	
+	\textbf{Order Manager}\\
+	The Order Manager:
+		\begin{itemize}
+			\item Places and cancels orders with service layer.
+			\item Subscribes to updates for all markets with unmatched orders and broadcasting events when these orders are updated or matched.
+			\item On request broadcasts a list of all the user's unmatched orders. 
+		\end{itemize}
+	
+	\textbf{Navigation Data Service}\\
+	The Navigation Data Service:
+		\begin{itemize}
+			\item Downloads and stores the Betfair Application Navigation Data from the service layer.
+			\item Periodically updates the Betfair Application Navigation Data by downloading a new copy from the service layer - this is essential as over time new markets are added and expire on the exchange.
+			\item On request broadcasts the Betfair Application Navigation Data.
+		\end{itemize}
+		
+	The Betfair Application Navigation Data is a data structure containing the hierarchy of all the events, markets and selections on the Betfair Exchange. It is required so the user can navigate and select which markets to trade.
+			
+\subsection{The Service Layer}
+The Service Layer separates the Core-Server from the Betfair Exchange API and exposes a set of commands to the Core-Server. When the Core-Server actions one of these commands the Service Layer makes the required calls to the Betfair Exchange and returns any responses back to the Core-Server. By separating the Core-Server from the Betfair Exchange it decouples the Betfair Exchange's API from the Core-Server.\\
+
+The advantages of this are:
+	\begin{itemize}
+		\item If the Betfair Exchange's API changes, as it did in 2014\cite{BetfairAPIMigration}, only the Service Layer needs to be changed.
+		\item Any future need for the trading system to communicate with another betting exchange could be achieved by only changing the Service Layer.
+		\item Calls to the Betfair Exchange can be tested independently from the Core-Server.
+		\item Modules in the Core-Server communicating with the Service Layer can be tested in isolation from the Betfair Exchange by replacing the Service Layer with a mock. Assertions can be made on the calls made to the Service Layer and the behaviour of the module based on the responses.
+	\end{itemize}
+
+One of the requirements of the trading system is that it must be able to test a trading strategy without placing orders at the exchange. This is achieved by replacing the Service Layer with a Test Service Layer which manages all the orders placed by the Core-Server locally. As this provides the same set of commands to the Core Sever as the normal Service Layer to the Core Server the Core-Server's implementation does not need to be changed in order to conduct the test.\\
+
+An explanation of how these orders are managed by the Test Service Layer is included in the implementation section.

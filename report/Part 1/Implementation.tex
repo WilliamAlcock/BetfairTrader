@@ -1,0 +1,395 @@
+\section{Implementation}
+
+	The Core-Server is written in Scala and built on Akka. Akka is a toolkit and runtime for building highly concurrent distributed and resilient message-driven applications\cite{Akka}. Akka is based on Erlang’s Actor model. An Actor provides a container for mutable state or behaviour. Other parts of the system can communicate with an Actor by sending it messages which are queued and actioned one at a time. This has two key benefits:
+	
+	\begin{enumerate}
+		\item It is not possible gain access to an Actor's mutable state from the outside unless the Actor publishes it so it is not necessary to synchronize access to parts of the code using locks. The developer can write code in an Actor without worrying about concurrency.
+		\item An Actor can communicate remotely with other Actors in different locations and in different applications so it is easy to distribute a system over resources.
+	\end{enumerate}
+
+	Akka provides a toolkit for testing Akka components which includes mocks that can be used to mimic implementations of all the components and an environment where messages can be sent between Actors in sequence and assertions made on the nature and timing of the messages.\\
+		
+	Each module in the Core Server is implemented as an Akka Actor. On initialisation the server completes the following tasks:
+	\begin{itemize}
+		\item Loads the Central Configuration file.
+		\item Initialises the Service Layer.
+		\item Authenticates to the Betfair Exchange and stores the session token.
+		\item Initialises the Event Manager.
+		\item Initialises the other modules passing them the central configuration and when required the session token.
+		\item Subscribes each of the modules to the correct channels on the Event Manager.
+	\end{itemize}	 
+
+	\subsection{Central Configuration}
+	Every module on the server has an immutable configuration object injected into it. This object provides a central place to list the servers settings and an easy way to mock those settings. It includes: 
+	
+		\begin{itemize}
+			\item Names of the channels used on the Event Manager.
+			\item The session key and application key for communication with the Betfair Exchange.
+			\item The URLs for the Betfair Exchange.
+		\end{itemize}
+
+	\subsection{Service Layer}
+		\begin{figure}[H]
+			\centering
+			\includegraphics[height=0.5\linewidth]{"Part 1/Images/Service Layer".png}
+			\caption{Service Layer Message Flow}
+			\label{fig:serviceLayer}
+		\end{figure}
+			
+	The Service Layers message flow is shown in Figure~\ref{fig:serviceLayer}. The Service Layer's implementation is split into three parts:
+		\begin{itemize}
+			\item Domain code - a package of Scala case classes, one for every type defined in the Betfair Exchange's API documentation\cite{betfairTypeDefinitions}.
+			\item Service class - implements the interface exposed to the Core Server. When called this class creates a Json RPC request object using the Domain code and calls the Command class.
+			\item Command class - posts http requests to the Betfair Exchange and converts the responses from Json to the correct Scala classes using the Domain code. All requests to the Betfair Exchange are sent as Json remote procedure call (RPC) requests and all responses received as Json RPC responses.
+		\end{itemize}	
+		
+		\subsubsection{Test Service Layer}
+		\begin{figure}[H]
+			\centering		
+			\includegraphics[height=0.5\linewidth]{"Part 1/Images/Test Service Layer".png}
+			\caption{Test Service Layer Message Flow}
+			\label{fig:testServiceLayer}
+		\end{figure}
+				
+		A second version of the Service Layer called the Test Service Layer was implemented so that a trading strategy could be tested without placing orders at the Betfair Exchange. The message flow for the Test Service Layer is shown in Figure~\ref{fig:testServiceLayer}.\\
+		
+		\begin{itemize}
+			\item All calls to the Test Service Layer to place, cancel, or change orders are sent to a locally maintained order book instead of to the exchange.
+			\item Every time the Test Service Layer receives market data from the exchange it matches any orders that would have been matched based on the market data.
+			\item All market data responses to the Core Server are amended to include the orders in the local order book.
+		\end{itemize}
+		
+		This behaviour ensures that responses to the Core Server from the Test Service Layer are identical to those that would have been received if the orders were placed at the exchange. On start-up the Server decides which service layer to use based on a setting in the central configuration.
+		
+		\subsubsection{Local Order Book}
+		When orders are placed at the exchange at a given price the are queued behind the orders placed previously. Orders are matched using a first in, first out (FIFO) method with orders at the front of the queue being filled first and those at the back last.\\ 
+		
+		Because the local order book doesn't have access to the exchanges order book it cannot calculate the queue position of its orders. When the order was placed there may have been a volume of \pounds500 before it but as this volume changes the local order book doesn't know if the volume was matched or cancelled. So the local order book assumes its orders are at the back of the queue and only matches orders when the market data shows unmatched orders on the opposite side of the book. This provides a 'worse case' scenario when testing a trading strategy as local orders can take longer to get matched than those at the exchange.\\
+		
+		The local order book maintains two queues for each market, one of Lay and one of Back orders. When the market data updates the local order book compares these queues to the market data, matches orders and updates the market data accordingly.\\
+		
+		The Service Layer was implemented by extending the Betfair Scala example code\cite{BetfairScalaSample} which demonstrates several of the Http calls to the exchange. The code uses Spray\cite{Spray}, a Scala toolkit for building REST/Http calls built on Akka, to send calls to the exchange. The conversions and validation from JSON to Scala case classes and visa-versa are implemented using Play's ScalaJson library\cite{PlayJSON}.\\
+		
+		The domain code was tested using ScalaCheck to assert that a Scala case class converted to JSON and then converted back to a Scala case class still has the same properties after the process as before. ScalaCheck allows the programmer to make asserts on functions using randomly generated data as opposed to conventional unit test where the data used is deterministic and outlined in the test.\\
+		
+		The Command Class was tested by
+			\begin{itemize}
+				\item Mocking the central configuration, changing the exchange URL, so the request is sent to a socket on the local host, not the exchange.
+				\item Asserting that the requests contained the session token and application key passed to them.
+			\end{itemize} 
+		
+		The Service Class was tested by
+			\begin{itemize}
+				\item Mocking the Command class
+				\item Asserting that correct calls were made to the Command class based on the calls to the Service class.
+			\end{itemize}
+			
+		\begin{figure}[H]
+			\centering		
+			\includegraphics[height=0.45\linewidth]{"Part 1/Images/Local Order Book".png}
+			\caption{Local Order Book Hierarchy of Objects}
+			\label{fig:localOrderBook}
+		\end{figure}
+			
+		As shown in Figure~\ref{fig:localOrderBook} the local order book is built from a hierarchy of objects.
+		\begin{itemize}
+			\item State tests were written for the Back/Lay book asserting that they persisted and matched orders correctly.
+			\item Behaviour tests were written for all the objects above them, mocking the layer below and asserting that for each call the correct calls are made to the mocks below them.			
+		\end{itemize}
+
+	\subsection{Event Manager}
+	The Event Manager was implemented by extending the Akka Event Bus. The main limitation of using the Akka Event Bus is that it can only communicate with other Akka Actors. Rabbit MQ\cite{RabbitMQ} was initially considered as a solution but rejected as an unnecessary dependency because all the components that communicate with the Event Manager are implemented as Actors.\\
+	
+	Extra functionality was added to the Akka Event Bus to support sub-channels with wild-cards allowing an Actor to subscribe to a subset of a channels data. For example:
+	
+	\begin{itemize}
+		\item Market data for Market\_B in Event\_A are broadcast on the channel MarketUpdates/Event\_A/Market\_B
+		\item If a subscriber only requires updates for Market\_B they subscribe to MarketUpdates/Event\_A/Market\_B
+		 \item If the subscriber requires updates for Market\_B but don't know the event Id they can subscribe to MarketUpdates/*/Market\_B
+		 \item If the subscriber requires updates for all markets the subscribe to MarketUpdates/
+		 \item If the subscriber requires updates for all markets in Event\_A they subscribe to MarketUpdates/Event\_A/
+	\end{itemize}
+	
+	This system reduces the amount of unwanted messages sent by the Event Manager.\\
+	
+	The Event Manager was tested by subscribing a mock Actor to different channels, broadcasting events on a range of channels and asserting that the mock Actor only receive the correct events.
+
+	\subsection{Controller}
+	All requests to the Core Server are sent to the Controller. The controller broadcasts received commands on the correct channels on the Event Manager and subscribes Actors to the correct channels.\\
+	
+	When the Controller receives a message to subscribe an Actor for market data updates it 
+		\begin{itemize}
+			\item Subscribes the Actor to the required channel on the Event Manager.
+			\item Broadcasts a message to the Data Provider informing it of the Actors subscription.
+		\end{itemize}			
+
+	This behaviour ensures that the Data Provider knows who requires what market data and therefore knows which markets to poll for data.\\
+	
+	When the Controller receives a command it starts watching the sender for termination. This is a facility provided by Akka where one Actor can request a message when another terminates. When the controller receives a termination messages it
+		\begin{itemize}
+			\item Un-subscribes the terminated Actor from all channels on the Event Manager.
+			\item Broadcasts a message to the Data Provider, telling it to cancel their subscriptions.
+		\end{itemize}			
+	
+	 and  
+		
+	The Controller was tested by mocking the Event Manager, sending the Controller messages and asserting that correct events were broadcast on the Event Manager.
+	
+	\subsection{Data Provider}
+	The Data Provider is responsible for polling the service layer for market data. The Data Provider supports calls for two types of data:
+		\begin{itemize}
+			\item Market book data - dynamic data about markets, including:
+				\begin{itemize}
+					\item Prices.
+					\item Status of the market.
+					\item Status of the selections.
+					\item Traded volume.
+					\item Current exchange prices for each selection in the market
+					\item Status of any of the systems orders for each selection in the market.
+				\end{itemize}
+				This call needs to be made at sub-second intervals to ensure the system has accurate market data.
+			\item Market Catalogue data - a list of information about a published market that does not change, including
+				\begin{itemize}
+					\item Name of the market.
+					\item Name of all the selections in the market.
+					\item Start time of the market.
+				\end{itemize}
+				This call only needs to be made once for each market.
+		\end{itemize}
+	
+	Requests for market catalogue data are sent on demand when ever the Data Provider receives a command. Requests for market book data need to be throttled and grouped to ensure the exchanges limits aren't exceeded.
+	
+	\subsubsection{Market Book Data}
+	The Betfair Exchange Documentation states:
+		\begin{itemize}
+			\item Calls should be made up to a maximum of 5 times per second to a single marketId\cite{listMarketBook}.
+			\item The number of calls be reduced by requesting data for multiple markets in one call - but there are limits on the amount of data that can be returned in one request. 
+		\end{itemize}
+	
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=10cm]{"Appendix/Images/ListMarketBook Price Projections".png}
+			\caption{Market Book Price Projections}
+    			\label{fig:marketBookPriceProjections}
+		\end{figure}
+
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=6cm]{"Appendix/Images/ListMarketBook Market Data Limits".png}
+			\caption{Market Book Market Data Limits}
+    			\label{fig:marketBookDataLimits}
+		\end{figure}
+	
+	The amount of data returned in a request is defined by the price projection, which is passed as a parameter to the exchange when a request is made. It stipulates the level of data to be returned for each market in that call. Figure~\ref{fig:marketBookPriceProjections} shows the price projections permitted by the exchange and Figure~\ref{fig:marketBookDataLimits} shows the market data limits imposed by the exchange for each price projection. The Data Provider supports the combinations of price projection shown in Table~\ref{tab:marketsPerCall}
+	
+		\begin{table}[h]
+			\centering
+			\begin{tabular}{ll}
+				Price Projection 					& Markets/Call\\
+				\toprule					
+				{EX\_BEST\_OFFERS} 					& 40\\
+				{EX\_ALL\_OFFERS} 					& 11\\
+				{EX\_BEST\_OFFERS \& EX\_TRADED}    	& 9\\
+				{EX\_ALL\_OFFERS \& EX\_TRADED}		& 5\\
+			\end{tabular}
+			\caption{Number of markets/call by price projection}
+			\label{tab:marketsPerCall}
+		\end{table}
+		
+		Table~\ref{tab:priceProjectionHierarchy} shows the amount of data returned the hierarchy of the combinations of price projections.
+		
+		\begin{table}[h]
+			\centering
+			\noindent\adjustbox{max width=1\textwidth}{%	
+			\begin{tabular}{lll}
+				Price Projection 					& Amount of market data 				& Inclusive of\\
+				\toprule					
+				{EX\_BEST\_OFFERS} 					& 3 prices deep 						& \\
+				\midrule
+				{EX\_ALL\_OFFERS} 					& full price depth					& {EX\_BEST\_OFFERS}\\
+				\midrule
+				{EX\_BEST\_OFFERS \& EX\_TRADED}    	& 3 prices deep and traded volume	& {EX\_BEST\_OFFERS}\\
+				\midrule
+				{EX\_ALL\_OFFERS \& EX\_TRADED}		& full price depth and traded volume & {EX\_BEST\_OFFERS}\\
+				& &	{EX\_ALL\_OFFERS} \\
+				& & {EX\_BEST\_OFFERS \& EX\_TRADED}\\
+			\end{tabular}}
+			\caption{Price projection hierarchy}
+			\label{tab:priceProjectionHierarchy}
+		\end{table}
+		
+		To ensure the Data Provider does not exceed data limits or the number of calls per second and requests the correct price projection for each market it implements the following process:
+		\begin{itemize}
+			\item The Data Provider maintains a set of all the subscribers for each market and the price projections requested.
+			\item At a configurable interval of no more than 250 milliseconds the Data Provider produces a list of all the required markets with the lowest weighted price projection necessary to accommodate each market's subscribers.
+			\item This list is grouped by price projection and split into the maximum sized chunks permissible for each projection.
+			\item The chunks are sent via an Akka Round Robin router\cite{AkkaRoundRobinRouter} to a pool of Actors shown in Figure~\ref{fig:dataProvider} (the number of Actors is set in the central configuration).
+			\item These Actors send the requests concurrently to the Service Layer and when the data is received broadcast it on the corresponding channel on the Event Manager.
+		\end{itemize}
+
+		\begin{figure}[H]
+			\centering		
+			\includegraphics[height=0.45\linewidth]{"Part 1/Images/Data Provider".png}
+			\caption{Data Provider Polling Mechanism}
+			\label{fig:dataProvider}
+		\end{figure}
+	
+	Each component in this process has been unit tested to ensure it correctly implements the process.	
+	
+	\subsection{Data Model}
+	The Data Model is implemented as an Actor which subscribes to the channel of market data on the Event Manager broadcast by the Data Provider and implements the behaviour described in the design section ~\ref{section:dataModel}.\\
+	
+	The Data Model in conjunction with the Data Provider ensures that an Actor can subscribe to market data updates and receive updates in real time when the data changes.
+
+	\subsection{Web Server and Client}		
+		\begin{figure}[H]
+			\centering
+			\includegraphics[height=0.5\textheight]{"Part 1/Images/Web Server and Client Architecture".png}
+			\caption{Web Server and Client Architecture}
+    			\label{fig:webServerAndClientArchitecture}
+		\end{figure}	
+
+	The Web Server and Client Architecture is shown in Figure~\ref{fig:webServerAndClientArchitecture}.
+	\begin{itemize}
+		\item The Web Server communicates with the Core Server’s Controller using Akka remoting\cite{AkkaRemoting}.
+		\item When the Client loads the web page from the Web Server it requests a web-socket for future communication.
+		\item The Web Server creates an Actor to handle communication over the web-socket which it injects with a reference to the Core-Server's Controller.  The web-socket Actor has two responsibilities:
+			\begin{enumerate}
+				\item Convert JSON-RPC requests sent from the the browser, over the web-socket, into Scala case classes and forward them to the Core Server’s Controller.
+				\item Convert Scala case classes sent from the Core Server into JSON-RPC responses and forward them over the web-socket to the browser.
+			\end{enumerate}
+		\item Because the web-socket is handled by an Actor it can be subscribed, by the Core Server's Controller, to the Event Manager.
+		\item When the web-socket Actor receives events from the Event Manager it converts them and pushes them over the web-socket to the Client.
+	\end{itemize}		
+	
+	All communication on the Client side is handled by an AngularJs service called the Web Socket Service which:
+	\begin{itemize}
+		\item Exposes an interface to other modules on the Client so that they can to send requests to the Web-Server.
+		\item Distributes data received to the following AngularJs services:
+			\begin{itemize}
+				\item Data Model Service - market price data.
+				\item Order Book Service - unmatched and matched orders.
+				\item Auto Trader Service - information about running strategies.
+			\end{itemize}
+	\end{itemize}
+	The price service contains logic for calculating Betfair price increments which are different depending on the current price (see Appendix ~\ref{appendix:betfairPriceIncrements}).\\
+		
+	The Client was written in CoffeeScript (which compiles to JavaScript) using Google's AngularJs framework. Initially ScalaFx\cite{ScalaFx} and ScalaJs\cite{ScalaJs} were considered as alternatives but they were rejected as:
+	\begin{itemize}
+		\item The developer has written several medium sized web applications in AngularJs
+		\item AngularJs is well documented, the others are not.
+		\item AngularJs with a large on-line community, providing added support, which speed up the development process.
+	\end{itemize}		
+
+	The Web Server was implemented using Play Framework\cite{PlayFramework} which was chosen because:
+	\begin{itemize}
+		\item It integrates with existing dependencies - it is built on Scala and Akka and the Server already had a dependency on Play's ScalaJson library, part of the framework.
+		\item It compiles CoffeeScript into JavaScript in real time as it's being developed.
+		\item It supports non-blocking IO over a RESTful API and web socket.
+	\end{itemize}		
+
+	\subsection{Navigation Data Service}
+					
+	The Navigation Data Service is responsible for downloading this file on start up, caching a copy of the file locally and updating that cached copy on an hourly basis.\\ 
+			
+	The Navigation Data Service ensures the Core-Server has an up-to-date copy of the navigation data by implementing the following functionality:
+		\begin{itemize}
+			\item Downloads and caches a copy of the data on start up.
+			\item Every hour downloads and caches a new copy the data.
+			\item On request broadcasts navigation data for a given event type (i.e. Football or Horse Racing).
+		\end{itemize}
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics[height=0.5\linewidth]{"Part 1/Images/Navigation Data File".png}
+		\caption{Navigation Data File Structure}
+    		\label{fig:navigationDataFile}
+	\end{figure}	
+
+	The structure of the navigation data is shown in Figure~\ref{fig:navigationDataFile}. A package of Scala objects were written to mirror the structure of the file. When the file is downloaded it is validated and converted using Play's ScalaJson library to a data structure of these objects that can be easily searched and filtered.
+	
+	\subsection{Order Manager}
+	The Order Manager is responsible for:
+	
+	\begin{itemize}
+		\item Making requests to place, cancel, update and replace orders with the Service Layer.
+		\item Tracking and broadcasting updates on the status of orders once they have been placed with the Service Layer.
+		\item Keeping a record of the volume of back and lay orders matched for each market and broadcasts updates when these matches occur.
+	\end{itemize}	  The Order Manager is also responsible for  and 
+	
+	On start up the Order Manager creates the initial list of tracked order by requesting a list of all the user's unmatched orders at the Betfair exchange. At a configurable interval the Order Manager repeats this process reconciling its tracked orders with the list received from the exchange.
+	
+	\begin{figure}[H]
+		\includegraphics[width=4cm]{"Part 1/Images/Order Life Cycle".png}
+		\centering
+		\caption{Life Cycle of an Order}
+    		\label{fig:orderLifeCycle}
+	\end{figure}	
+	
+	Figure~\ref{fig:orderLifeCycle} shows the life cycle of an order. 
+	
+	\begin{itemize}
+		\item Once an order has been successfully placed with the Service Layer the Order Manager adds it to it's list of tracked orders and tells the Controller to subscribe it to market data updates for the given market.
+		\item As the Order Manager receives updates it compares the version of the orders in the update to those currently being tracked. If there is a difference the Order Manager will broadcast the new status of the order.
+		\item Once the order has been executed the Order Manager will remove it from its list of tracked orders. If there are no more tracked orders for that market, it tells the Controller to un-subscribe it from further market updates for the given market.
+		\item Market data updates include the total volume of matched back and lay orders for each selection and the average price they were matched at. The Order Manager keeps a list of these matches and when the matches in the market data update differ from those it holds the Order Manager broadcasts a message alerting subscribers to the update.
+	\end{itemize}
+	
+	The Order Manager was tested by
+	\begin{itemize}
+		\item Mocking the Service Layer, sending requests to place and cancel orders to the Order Manager and making assertions on its calls to the Service Layer.
+		\item Mocking the Event Manager, sending market data updates to the Order Manager and making assertions on the messages broadcast on the Event Manager.
+	\end{itemize} 
+
+	\subsection{Auto Trader}
+	\begin{figure}[H]
+		\includegraphics[width=0.7\linewidth]{"Part 1/Images/Basic Trading Strategy".png}
+		\centering
+		\caption{Basic Trading Strategy}
+    		\label{fig:basicTradingStrategy}
+	\end{figure}	
+	
+	Figure~\ref{fig:basicTradingStrategy} shows a flow chart of a basic trading strategy that places a list of predefined orders and stop outs after a given time or if a given price is reached. The strategy can be defined as a series of states with events triggering actions and changes in the state. In Figure~\ref{fig:basicTradingStrategy} States are shown in the rectangles, actions in the circles and the events as the lines connecting them:
+	
+	$$ State(w) + Event(x) = Action(y) + State(z) $$
+	
+	Reducing the Strategy to a set of states, events and actions makes it:
+		\begin{itemize}
+			\item Simple to describe.
+			\item Easier to test - because each state can be tested by applying events and testing the resulting actions and state.
+			\item Easier to integrate into the trading system's Event Driven Architecture.
+		\end{itemize}			
+
+	\subsubsection{The Strategy}
+	The strategy was implemented using an Akka FSM (Finit State Machine)\cite{AkkaFSM} which is a mixin for the Akka Actor. An Akka FSM allows the developer to define a set of states, which state to start in and for each state define a set of events and the actions and state transitions they trigger. The strategy is given access to the Core-Servers Controller and sends it commands and receives updates from the Event Manager in the same way the client does. An instance of the strategy is created every time the user instructs the server to run the strategy on a new market. On initialisation the strategy is sent instructions that include the:
+		\begin{itemize}
+			\item Start time for the strategy to commence trading.
+			\item Orders to be placed in the to be actioned.
+			\item Prices to place them.
+			\item Price at which to stop the strategy out.
+			\item End time at which the strategy must stop out.
+		\end{itemize}
+	
+	\subsubsection{The Monitor}
+	The monitor watches the strategy and broadcasts messages on the Event Manager when the strategy changes state. A new instance of the monitor is created for every strategy. Separating the reporting of a strategy's state from its implementation reduces the complexity of the strategy making it easier to build and test.
+	
+	\subsubsection{The Auto Trader}
+	The Auto Trader listens on the Event Manager for commands from the Controller to:
+		\begin{itemize}
+			\item Run the strategy on a new market with a given set of instructions.
+			\item Stop running a strategy on a market.
+			\item Broadcast a list of all the strategies currently running.
+		\end{itemize}			
+	
+	The trading strategy was tested by:
+		\begin{itemize}
+			\item Mocking the Controller.
+			\item Setting the strategy's state and data.
+			\item Sending it events and making assertions on the commands sent to the controller and the strategy's resulting state and internal data.
+			\item Each combination of State and Event is tested ensuring the strategy exhibits the correct behaviour in all states.
+		\end{itemize}
+	
+	\subsection{Data Store}
+	Although the Data Store is included in the Design section of this document it is still under construction. The decision was made to use MongoDB as the database for the data store and to create the predictive model because it can store different objects in JSON format without having to define a schema for each type of object.
+	
+	

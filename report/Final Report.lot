@@ -3,16 +3,27 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces Example PnL Breakdown: Swansea vs Arsenal\relax }}{9}{table.caption.6}
+\contentsline {table}{\numberline {4.1}{\ignorespaces Scenario 1, Potential Profit and Liability\relax }}{11}{table.caption.6}
+\contentsline {table}{\numberline {4.2}{\ignorespaces Scenario 2, Potential Profit and Liability\relax }}{11}{table.caption.8}
+\contentsline {table}{\numberline {4.3}{\ignorespaces Scenario 3, Potential Profit and Liability\relax }}{12}{table.caption.10}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {8.1}{\ignorespaces Number of markets/call by price projection\relax }}{23}{table.caption.15}
+\contentsline {table}{\numberline {8.1}{\ignorespaces Number of markets/call by price projection\relax }}{41}{table.caption.31}
+\contentsline {table}{\numberline {8.2}{\ignorespaces Price projection hierarchy\relax }}{42}{table.caption.32}
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {9.1}{\ignorespaces Decimal Odds vs Implied Probability\relax }}{34}{table.caption.32}
-\contentsline {table}{\numberline {9.2}{\ignorespaces Training and Testing Datasets\relax }}{38}{table.caption.36}
-\contentsline {table}{\numberline {9.3}{\ignorespaces Tables of Optimisation Results\relax }}{40}{table.caption.38}
+\contentsline {table}{\numberline {9.1}{\ignorespaces Implied Probability of Decimal Odds\relax }}{51}{table.caption.41}
+\contentsline {table}{\numberline {9.2}{\ignorespaces Labelled Example Data\relax }}{54}{table.caption.44}
+\contentsline {table}{\numberline {9.3}{\ignorespaces Training and Testing Datasets\relax }}{56}{table.caption.46}
+\contentsline {table}{\numberline {9.4}{\ignorespaces Tables of Optimisation Results\relax }}{58}{table.caption.48}
+\contentsline {table}{\numberline {9.5}{\ignorespaces Predicted Classes Vs Actual Classes\relax }}{59}{table.caption.50}
+\contentsline {table}{\numberline {9.6}{\ignorespaces Distribution, Precision and Recall by Class\relax }}{59}{table.caption.51}
+\contentsline {table}{\numberline {9.7}{\ignorespaces Weighted Accuracy, Precision and Recall\relax }}{59}{table.caption.52}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

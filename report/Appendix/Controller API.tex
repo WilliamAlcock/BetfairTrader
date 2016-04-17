@@ -1,0 +1,15 @@
+\begin{landscape}
+\chapter{Controller API}
+	\label{appendix:controllerAPI}
+	\noindent\adjustbox{max width=0.8\paperheight}{%
+		\pgfplotstabletypeset[
+			col sep=comma,
+			string type,
+			columns/Command/.style={column name=Command, column type={l}},
+			columns/Parameters/.style={column name=Parameters, column type={l}},
+			columns/Description/.style={column name=Description, column type={l}},
+			columns/Routed To/.style={column name=Routed To, column type={l}},
+			every head row/.style={before row=\toprule,after row=\midrule},
+			every last row/.style={after row=\bottomrule}
+		]{Appendix/Data/ControllerAPI.csv}}
+\end{landscape}

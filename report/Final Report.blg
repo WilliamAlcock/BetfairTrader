@@ -1,18 +1,15 @@
 [0] Config.pm:324> INFO - This is Biber 2.1
-[0] Config.pm:327> INFO - Logfile is 'Final Report.blg'
-[44] biber-darwin:276> INFO - === Sat Apr  9, 2016, 19:43:40
-[44] Biber.pm:333> INFO - Reading 'Final Report.bcf'
-[142] Biber.pm:645> INFO - Found 50 citekeys in bib section 0
-[159] Biber.pm:2977> INFO - Processing section 0
-[176] Biber.pm:3115> INFO - Looking for bibtex format file 'bibfile.bib' for section 0
-[179] bibtex.pm:1021> INFO - Decoding LaTeX character macros into UTF-8
-[182] bibtex.pm:895> INFO - Found BibTeX data source 'bibfile.bib'
-[206] Utils.pm:146> WARN - Possible typo (case mismatch) between citation and datasource keys: 'akkaFSM' and 'AkkaFSM' in file 'bibfile.bib'
-[219] Utils.pm:146> WARN - I didn't find a database entry for 'akkaFSM' (section 0)
-[627] UCollate.pm:66> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
-[627] UCollate.pm:66> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
-[627] Biber.pm:2854> INFO - Sorting list 'nty' of type 'entry' with scheme 'nty' and locale 'en-US'
-[627] Biber.pm:2858> INFO - No sort tailoring available for locale 'en-US'
-[726] bbl.pm:505> INFO - Writing 'Final Report.bbl' with encoding 'ascii'
-[732] bbl.pm:596> INFO - Output to Final Report.bbl
-[732] Biber.pm:106> INFO - WARNINGS: 2
+[1] Config.pm:327> INFO - Logfile is 'Final Report.blg'
+[48] biber-darwin:276> INFO - === Mon Apr 18, 2016, 14:16:41
+[48] Biber.pm:333> INFO - Reading 'Final Report.bcf'
+[153] Biber.pm:645> INFO - Found 41 citekeys in bib section 0
+[174] Biber.pm:2977> INFO - Processing section 0
+[190] Biber.pm:3115> INFO - Looking for bibtex format file 'bibfile.bib' for section 0
+[194] bibtex.pm:1021> INFO - Decoding LaTeX character macros into UTF-8
+[197] bibtex.pm:895> INFO - Found BibTeX data source 'bibfile.bib'
+[583] UCollate.pm:66> INFO - Overriding locale 'en-US' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[583] UCollate.pm:66> INFO - Overriding locale 'en-US' defaults 'variable = shifted' with 'variable = non-ignorable'
+[583] Biber.pm:2854> INFO - Sorting list 'nty' of type 'entry' with scheme 'nty' and locale 'en-US'
+[584] Biber.pm:2858> INFO - No sort tailoring available for locale 'en-US'
+[671] bbl.pm:505> INFO - Writing 'Final Report.bbl' with encoding 'ascii'
+[676] bbl.pm:596> INFO - Output to Final Report.bbl

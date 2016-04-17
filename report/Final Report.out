@@ -1,71 +1,80 @@
 \BOOKMARK [0][-]{chapter.1}{Statement Of Originality}{}% 1
 \BOOKMARK [0][-]{chapter.2}{Acknowledgements}{}% 2
 \BOOKMARK [0][-]{chapter.3}{Summary}{}% 3
-\BOOKMARK [0][-]{chapter*.3}{List of Figures}{}% 4
-\BOOKMARK [0][-]{chapter*.4}{List of Tables}{}% 5
+\BOOKMARK [0][-]{chapter*.2}{List of Figures}{}% 4
+\BOOKMARK [0][-]{chapter*.3}{List of Tables}{}% 5
 \BOOKMARK [0][-]{chapter.4}{Introduction}{}% 6
-\BOOKMARK [1][-]{section.4.1}{Motivation}{chapter.4}% 7
-\BOOKMARK [1][-]{section.4.2}{Background}{chapter.4}% 8
-\BOOKMARK [2][-]{subsection.4.2.1}{Betting exchanges opposed to historical bookmakers}{section.4.2}% 9
-\BOOKMARK [2][-]{subsection.4.2.2}{Similarities to financial markets}{section.4.2}% 10
-\BOOKMARK [2][-]{subsection.4.2.3}{Trading as opposed to gambling}{section.4.2}% 11
-\BOOKMARK [2][-]{subsection.4.2.4}{Automated Trading}{section.4.2}% 12
-\BOOKMARK [1][-]{section.4.3}{Project Objectives}{chapter.4}% 13
-\BOOKMARK [2][-]{subsection.4.3.1}{First section objectives}{section.4.3}% 14
-\BOOKMARK [2][-]{subsection.4.3.2}{Second section objectives}{section.4.3}% 15
-\BOOKMARK [2][-]{subsection.4.3.3}{Changes in the objectives from the interim report}{section.4.3}% 16
+\BOOKMARK [1][-]{section.4.1}{The Betfair Exchange}{chapter.4}% 7
+\BOOKMARK [2][-]{subsection.4.1.1}{What is The Betfair Exchange}{section.4.1}% 8
+\BOOKMARK [2][-]{subsection.4.1.2}{An Example of a Betfair Market}{section.4.1}% 9
+\BOOKMARK [2][-]{subsection.4.1.3}{Trading a Betfair Market}{section.4.1}% 10
+\BOOKMARK [1][-]{section.4.2}{Automated Trading Systems}{chapter.4}% 11
+\BOOKMARK [1][-]{section.4.3}{Technical Analysis}{chapter.4}% 12
+\BOOKMARK [1][-]{section.4.4}{Machine Learning}{chapter.4}% 13
+\BOOKMARK [1][-]{section.4.5}{Project Objectives}{chapter.4}% 14
+\BOOKMARK [2][-]{subsection.4.5.1}{Part 1}{section.4.5}% 15
+\BOOKMARK [2][-]{subsection.4.5.2}{Part 2}{section.4.5}% 16
 \BOOKMARK [0][-]{chapter.5}{Professional Considerations}{}% 17
 \BOOKMARK [1][-]{section.5.1}{Public Interest}{chapter.5}% 18
 \BOOKMARK [1][-]{section.5.2}{Professional Competence and Integrity}{chapter.5}% 19
 \BOOKMARK [1][-]{section.5.3}{Duty to Relevant Authority}{chapter.5}% 20
 \BOOKMARK [1][-]{section.5.4}{Duty to Profession}{chapter.5}% 21
-\BOOKMARK [0][-]{chapter.6}{Requirements Analysis}{}% 22
-\BOOKMARK [1][-]{section.6.1}{The Users}{chapter.6}% 23
-\BOOKMARK [0][-]{chapter.7}{Development Approach}{}% 24
-\BOOKMARK [1][-]{section.7.1}{Programming Languages}{chapter.7}% 25
-\BOOKMARK [1][-]{section.7.2}{Unit Tests}{chapter.7}% 26
-\BOOKMARK [1][-]{section.7.3}{Version Control}{chapter.7}% 27
-\BOOKMARK [1][-]{section.7.4}{Build System}{chapter.7}% 28
-\BOOKMARK [1][-]{section.7.5}{IDE}{chapter.7}% 29
-\BOOKMARK [0][-]{chapter.8}{Design And Implementation}{}% 30
-\BOOKMARK [1][-]{section.8.1}{Server}{chapter.8}% 31
-\BOOKMARK [2][-]{subsection.8.1.1}{Service Layer}{section.8.1}% 32
-\BOOKMARK [2][-]{subsection.8.1.2}{Simulated Service Layer}{section.8.1}% 33
-\BOOKMARK [2][-]{subsection.8.1.3}{Core Server Architecture}{section.8.1}% 34
-\BOOKMARK [2][-]{subsection.8.1.4}{Central Configuration}{section.8.1}% 35
-\BOOKMARK [2][-]{subsection.8.1.5}{The Event Bus}{section.8.1}% 36
-\BOOKMARK [2][-]{subsection.8.1.6}{Data Provider}{section.8.1}% 37
-\BOOKMARK [2][-]{subsection.8.1.7}{Data Model}{section.8.1}% 38
-\BOOKMARK [2][-]{subsection.8.1.8}{Order Manager}{section.8.1}% 39
-\BOOKMARK [2][-]{subsection.8.1.9}{Navigation Data Service}{section.8.1}% 40
-\BOOKMARK [2][-]{subsection.8.1.10}{Data Store}{section.8.1}% 41
-\BOOKMARK [2][-]{subsection.8.1.11}{Auto Trader}{section.8.1}% 42
-\BOOKMARK [2][-]{subsection.8.1.12}{Controller}{section.8.1}% 43
-\BOOKMARK [1][-]{section.8.2}{Web Server and Client \(GUI\)}{chapter.8}% 44
-\BOOKMARK [2][-]{subsection.8.2.1}{Web Server}{section.8.2}% 45
-\BOOKMARK [2][-]{subsection.8.2.2}{Client \(GUI\)}{section.8.2}% 46
-\BOOKMARK [0][-]{chapter.9}{Predicting Price Movement}{}% 47
-\BOOKMARK [1][-]{section.9.1}{Technical Analysis}{chapter.9}% 48
-\BOOKMARK [1][-]{section.9.2}{Historical Market Data}{chapter.9}% 49
-\BOOKMARK [1][-]{section.9.3}{Preprocessing the Data}{chapter.9}% 50
-\BOOKMARK [2][-]{subsection.9.3.1}{Grouping The Data Into Intervals}{section.9.3}% 51
-\BOOKMARK [2][-]{subsection.9.3.2}{Converting Prices to Implied Probabilities}{section.9.3}% 52
-\BOOKMARK [2][-]{subsection.9.3.3}{Technical Analysis Indicators}{section.9.3}% 53
-\BOOKMARK [1][-]{section.9.4}{Choosing a Model}{chapter.9}% 54
-\BOOKMARK [2][-]{subsection.9.4.1}{Decision Trees}{section.9.4}% 55
-\BOOKMARK [2][-]{subsection.9.4.2}{Random Forest}{section.9.4}% 56
-\BOOKMARK [2][-]{subsection.9.4.3}{Extremely Random Forest}{section.9.4}% 57
-\BOOKMARK [1][-]{section.9.5}{Implementation}{chapter.9}% 58
-\BOOKMARK [1][-]{section.9.6}{Optimisation}{chapter.9}% 59
-\BOOKMARK [2][-]{subsection.9.6.1}{Out-Of-Bag Error}{section.9.6}% 60
-\BOOKMARK [2][-]{subsection.9.6.2}{Optimisation}{section.9.6}% 61
-\BOOKMARK [1][-]{section.9.7}{Results}{chapter.9}% 62
-\BOOKMARK [0][-]{chapter.10}{Integration With The Trading System}{}% 63
-\BOOKMARK [0][-]{chapter.11}{Conclusion}{}% 64
-\BOOKMARK [1][-]{section.11.1}{Overall Assessment of the final product}{chapter.11}% 65
-\BOOKMARK [1][-]{section.11.2}{Review of the project objectives}{chapter.11}% 66
-\BOOKMARK [1][-]{section.11.3}{Suggestions for future extensions}{chapter.11}% 67
-\BOOKMARK [1][-]{section.11.4}{Review of the technologies used during the project}{chapter.11}% 68
-\BOOKMARK [0][-]{section*.47}{Appendices}{}% 69
-\BOOKMARK [0][-]{Appendix.1.A}{test appendix}{}% 70
-\BOOKMARK [0][-]{chapter*.48}{Bibliography}{}% 71
+\BOOKMARK [0][-]{chapter.6}{Development Approach}{}% 22
+\BOOKMARK [1][-]{section.6.1}{Waterfall Vs. Agile}{chapter.6}% 23
+\BOOKMARK [2][-]{subsection.6.1.1}{Waterfall}{section.6.1}% 24
+\BOOKMARK [2][-]{subsection.6.1.2}{Agile}{section.6.1}% 25
+\BOOKMARK [1][-]{section.6.2}{Testing}{chapter.6}% 26
+\BOOKMARK [2][-]{subsection.6.2.1}{Test Driven Development}{section.6.2}% 27
+\BOOKMARK [2][-]{subsection.6.2.2}{End-to-end vs Unit Tests}{section.6.2}% 28
+\BOOKMARK [2][-]{subsection.6.2.3}{Unit Testing: State vs Behaviour}{section.6.2}% 29
+\BOOKMARK [1][-]{section.6.3}{Version Control}{chapter.6}% 30
+\BOOKMARK [1][-]{section.6.4}{Programming Languages}{chapter.6}% 31
+\BOOKMARK [0][-]{chapter.7}{Requirements Analysis}{}% 32
+\BOOKMARK [1][-]{subsection.7.0.1}{Part 1 - Building a Trading System}{chapter.7}% 33
+\BOOKMARK [2][-]{subsection.7.0.2}{Part 2 - Building a Predictive Model}{subsection.7.0.1}% 34
+\BOOKMARK [0][-]{chapter.8}{The Trading System}{}% 35
+\BOOKMARK [1][-]{section.8.1}{Design}{chapter.8}% 36
+\BOOKMARK [2][-]{subsection.8.1.1}{Client-Server Vs Peer-to-Peer Architecture}{section.8.1}% 37
+\BOOKMARK [2][-]{subsection.8.1.2}{Client and WebServer}{section.8.1}% 38
+\BOOKMARK [2][-]{subsection.8.1.3}{The Core Server}{section.8.1}% 39
+\BOOKMARK [2][-]{subsection.8.1.4}{The Service Layer}{section.8.1}% 40
+\BOOKMARK [1][-]{section.8.2}{Implementation}{chapter.8}% 41
+\BOOKMARK [2][-]{subsection.8.2.1}{Central Configuration}{section.8.2}% 42
+\BOOKMARK [2][-]{subsection.8.2.2}{Service Layer}{section.8.2}% 43
+\BOOKMARK [2][-]{subsection.8.2.3}{Event Manager}{section.8.2}% 44
+\BOOKMARK [2][-]{subsection.8.2.4}{Controller}{section.8.2}% 45
+\BOOKMARK [2][-]{subsection.8.2.5}{Data Provider}{section.8.2}% 46
+\BOOKMARK [2][-]{subsection.8.2.6}{Data Model}{section.8.2}% 47
+\BOOKMARK [2][-]{subsection.8.2.7}{Web Server and Client}{section.8.2}% 48
+\BOOKMARK [2][-]{subsection.8.2.8}{Navigation Data Service}{section.8.2}% 49
+\BOOKMARK [2][-]{subsection.8.2.9}{Order Manager}{section.8.2}% 50
+\BOOKMARK [2][-]{subsection.8.2.10}{Auto Trader}{section.8.2}% 51
+\BOOKMARK [2][-]{subsection.8.2.11}{Data Store}{section.8.2}% 52
+\BOOKMARK [0][-]{chapter.9}{Predicting Price Movement}{}% 53
+\BOOKMARK [1][-]{section.9.1}{The Data}{chapter.9}% 54
+\BOOKMARK [1][-]{section.9.2}{The Indicators}{chapter.9}% 55
+\BOOKMARK [1][-]{section.9.3}{The Algorithm}{chapter.9}% 56
+\BOOKMARK [1][-]{section.9.4}{Decision Trees}{chapter.9}% 57
+\BOOKMARK [1][-]{section.9.5}{Random Forest}{chapter.9}% 58
+\BOOKMARK [2][-]{subsection.9.5.1}{Overhead of Training a Random Forest on Features with Continuous Values}{section.9.5}% 59
+\BOOKMARK [1][-]{section.9.6}{Extremely Random Forest}{chapter.9}% 60
+\BOOKMARK [1][-]{section.9.7}{Implementation}{chapter.9}% 61
+\BOOKMARK [2][-]{subsection.9.7.1}{Labelling the Data}{section.9.7}% 62
+\BOOKMARK [2][-]{subsection.9.7.2}{Reducing the Size of the Data}{section.9.7}% 63
+\BOOKMARK [2][-]{subsection.9.7.3}{Adjustments for Unevenly Distributed Data}{section.9.7}% 64
+\BOOKMARK [1][-]{section.9.8}{Optimisation}{chapter.9}% 65
+\BOOKMARK [2][-]{subsection.9.8.1}{Out-Of-Bag Error}{section.9.8}% 66
+\BOOKMARK [2][-]{subsection.9.8.2}{Optimisation Results}{section.9.8}% 67
+\BOOKMARK [1][-]{section.9.9}{Results}{chapter.9}% 68
+\BOOKMARK [0][-]{chapter.10}{Conclusion}{}% 69
+\BOOKMARK [1][-]{section.10.1}{Development Approach}{chapter.10}% 70
+\BOOKMARK [0][-]{section*.56}{Appendices}{}% 71
+\BOOKMARK [0][-]{Appendix.1.A}{Glossary of Terms}{}% 72
+\BOOKMARK [1][-]{section.1.A.1}{Gambling Terms}{Appendix.1.A}% 73
+\BOOKMARK [1][-]{section.1.A.2}{Machine Learning Terms}{Appendix.1.A}% 74
+\BOOKMARK [0][-]{Appendix.1.B}{Controller API}{}% 75
+\BOOKMARK [0][-]{Appendix.1.C}{Betfair Price Increments}{}% 76
+\BOOKMARK [0][-]{Appendix.1.D}{Historical Data Schema}{}% 77
+\BOOKMARK [0][-]{Appendix.1.E}{Technical Analysis Indicators}{}% 78
+\BOOKMARK [0][-]{Appendix.1.F}{Future Work}{}% 79
+\BOOKMARK [0][-]{chapter*.79}{Bibliography}{}% 80

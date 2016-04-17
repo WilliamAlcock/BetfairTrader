@@ -1,0 +1,182 @@
+4.1 Motivation
+	This section is supposed to give a very brief overview of the project. Instead it gives an overview of the gambling industry
+	This should contain an overview over what the project does ...
+
+4.2 Background
+	This is very important
+	Need to explain a bit more about betting, imagine the reader knows nothing about betting
+	The swansea vs arsenal example is already very hard to understand
+	Use terms such as to Back and to Lay without any real explination. this could be explained better
+		- To Back 
+		- To Lay
+		- Offering lower odds what does this mean
+		- Those that are predicted ? Who predicts them, how are they predicted ?
+
+	Figure 4.1 is very nice but:
+		- Dont explain what all the pound figures are (Volume)
+		- 4.8 representing 3.8/1 i.e. 4.8 * stake returned - this does not makes sense
+			- explain decimal odds vs fractional odds
+
+		- Explain more about the thing that revolutionised the practice of betting
+			- Can punters propose markets ? or can they just bet in either direction
+
+Have a section at the front that explains terminology. THIS IS A VERY GOOD IDEA
+	
+	4.2.2
+		The price of betting contracts will speculate over time
+			- this should be explained in more detail
+
+		Table 4.1 does this a bit but needs more explination
+			- It is confusing what win/lose this relates to
+
+		The last sentence in this section needs explaining in more detail:
+			"This free back bet can then be used to ensure the user wins a lesser amount on all eventualities of the event by backing the other outcomes (Arsenal to Win / The Draw) for a smaller amount."
+
+	4.2.3
+		Talk about price sensitivity this needs explaining in more detail
+
+		"In contrast to the gambler the trader will probably not keep the bet on by the time the event has been realised having already closed the trade" - not sure what this means
+
+4.3 Project Objectives
+		
+	This is the first time the Betfair exchange is mentioned. Maybe in previous sections explain what betfair is and what they do and why I have chosen to use the Betfair API
+
+	Also talk about building a model that can be used as an indicator. Explain what the purpose of building a model for a market is earlier on. This will fit well in the introduction
+
+	Instead of saying "This project will be split into two sections" Say "This project has two parts: Building a trading system, building machine learning strategies and models."
+
+	In the objectives I use a lot of terminology that is not explain:
+		- What is a metric
+		- WHy do you broadcast the state of orders
+		- Why do you amend orders
+		- What is it to place orders
+
+		- What is histrical data
+		- What does it mean to test and model
+		- What does it mean to train a model
+		- What is machine learning
+		- Why do we need machine learning
+		- Explain the consept of machine learning, give a brief overview early on
+
+6 Requirements Analysis
+
+	The first paragraph can be improved
+		- What is it a want to do from a traders view
+		- Doesnt say very much about the requirements as regards the machine learning parts
+		- What does it mean to implement a language to discribe strategies
+
+7 Development Approach
+
+	7.1 Programming Languages
+		- Java Bite Code is spelt wrong
+		- Explain more about the development approach explain agile vs waterfall. Explain this and explain reasoning
+
+	7.2 Unit Test
+		- "Due to the exploratory nature of the development proces..." what you are refering to is TDD
+			- What should be said is we are not using TDD because ... (TDD is the technical term)
+
+		- Say a bit about where the test orical comes from 
+			- How do you know what the outcome should be
+			- How do you know how the strategy outputs the correct trades
+			- Talk about integration test as you only mention unit test
+
+	7.3 
+		- The writing can be tightened up Remove "As such"
+		- Remove the word "Very" it never adds anything
+		- Remove I from this paragraph, dont mix I and the author
+
+8 Design and Implementation
+	Talk about distributed client server architecture, very briefly
+		- What were the alternatives ? why have you not chosen them
+	Talk about the reasons for selecting them
+		- Why are these a good thing
+			For example:
+				- The server will have central control of data and resources.
+					- Why is this good ?
+					- What happens if the server goes down ? The server is clearly a single point of failure
+					- You could answer that the project is not about the resiliancy of trading apps and that is an orthogonal problem.
+					- Currently only interested in the functionality
+					- Not interested in security or resiliance
+				- The client and server can be developed in isolation.
+					- Why is that a good thing
+					- How does client server enforce modularity
+						- Because they are connected through a wire protocol which should be as small as possible
+	8.1 Server
+		Figure 8.1
+			- Where does a trading strategy sit
+			- The Core server will communicate with this and that, is it just a communication layer, probably not, need to clarify this
+
+		The last sentence before 8.1.1 is a bit confusing remove (THIS NEEDS TO BE REMOVED)
+
+	8.1.1
+		Confusing
+			- Start by talking about betfair providing sample code
+			- At this point I should describe the services and functionality the service layer provide to the layer above and what it assumes from the layer below
+			- Seperate the description of the services the layer provides and assumes from the implementation, the Scala and Spray stuff
+			- Start with the functionality when this is locked say at the end what technologies you are using
+
+Start By describing the core sever functionality, then explain the layered approach
+
+	8.1.2
+		Live service layer, Simulated service layer
+			- Start by describing 
+
+	8.1.3
+		Suddenly start talking about the event bus and an event based architecture
+			- It would be usefull for the reader to decsribe this in detail !
+			- This is a core design detail that needs explaining in detail. 
+				- Why have you chosen it ?
+				- What does it mean, what is an event bus ?
+				- What does it mean to subscribe to a channel ?
+				- What is a channel ?
+
+	8.1.6 
+		Data provider
+			- what is the data provider
+			- is this something you have implemented or is betfair the data provider
+			- you jump from a very abstract to a very detailed description and it is a jump for level of detail and it is not highly readable
+
+	8.1.7
+		Data Model
+			- "Each time it receives a new update for a given market it checks if it is different from the copy it already has". Use it here for two different things
+			- What does it mean to compare an update for something it already has
+
+	8.1.11
+		Autotrader
+			Dont refer to the interim report.
+				- This is not necessary
+				- It is fine I have changed the objectives, dont bother the reader with it
+				- Why are Akka FSM are the perfect abstraction for defining a strategy
+
+	8.2
+
+		I say "As stated earlier in this report", in fact I do this a lot and its not necessary REMOVE IT
+
+
+	8.2.1 
+		I say "The client will be designed to run in the browser"
+			- I havent said why it is good to have the UI in the browser
+				- why not write a dedicated Scala UI
+				- Browser based UI is cross platform
+
+	9.4
+		Lots of technical terminology that is not explained
+			- Maximising Entropy gain
+			- Overfitting
+			- Low bias
+			- High variance
+			- Pruning a decision tree
+
+	9.5
+		When siting books/papers no need to write names etc in text, just add [14]
+		If you want to name the title /authors put them in italics
+		I have given an example of a decision tree but none of a random forest or extremely random forest
+		It would be good for the reader to give examples of all of them
+
+
+Martins Conclusion
+
+Can be improved still
+Get somebody else to read it from scratch
+Find places where the grammer is not right
+Use text to speach facility on computer to check it

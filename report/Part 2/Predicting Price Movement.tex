@@ -1,0 +1,365 @@
+\chapter{Predicting Price Movement}
+	This part of the project will apply technical analysis indicators to historical Betfair price data. It will train an extremely random forest to predict the future direction of horse racing markets based on their previous price movement. The following sections will:\\
+	
+	\begin{itemize}
+		\item Describe the data and how it was manipulated in order to apply the indicators.
+		\item Provide an explanation of the indicators used and the reasons for using them.
+		\item Describe the algorithm used to train the model and the reasons for selecting it.
+		\item Describe how the model was implemented and optimised.
+		\item Show and discuss the results of testing the model.
+	\end{itemize}
+	
+	\section{The Data}
+	The data is comprised of horse racing markets from the 11th October 2014 to the 10th November 2014. The data was produced by polling the Betfair exchange in 250 millisecond intervals with a new record created for each selection every time there was a delta in the price data. The data consists of 97,422,530 records over 847 markets (races) or 8358 selections (runners). The data was supplied as a csv file (see Appendix~\ref{appendix:historicalDataSchema} for schema).\\
+	
+	The data was read into a MongoDB database, splitting the data into collections, one for each market.\\ 
+	
+	The data was aggregated by market into a series of 1 minute intervals, recording the high, low and closing price, the volume traded over the interval and the weight of market at the end of the interval. The weight of market is:
+		
+		$$\frac{\text{sum of the volume at the 3 highest prices available to back}}{\text{sum of the volume at the 3 lowest prices available to let}}$$
+		
+		
+	Betfair prices are represented as decimal odds unlike financial markets where prices are quoted in pence (for securities traded in sterling). As Table~\ref{tab:impliedProbabilityOfDecimalOdds} shows a move from 1.01 to 2.00 has the same effect on the probability as a move from 2.00 to 100.0. Betfair addresses this by changing the size of the increments between prices (referred to as ticks) as the prices increase. Appendix~\ref{appendix:betfairPriceIncrements} contains a table of Betfair price increments. The technical analysis indicators used in this project were designed to be used on financial markets where the size of the ticks is generally constant. For this reason and to stop the model being biased towards movements above 2.00, all prices were converted from decimal odds to implied probabilities.
+	
+		\begin{table}[H]
+			\centering
+			\begin{tabular}{S[table-format=3.2]
+							S[table-format=2.1]
+							S[table-format=2.1]}
+				\toprule
+				{Decimal Odds} 	& \multicolumn{2}{c}{Implied Probability}\\
+				{}				& {For}		& {Against}	\\
+				\midrule
+				1.01				& 99.0 		& 1.0 \\
+				1.50				& 66.6		& 33.3 \\				
+				2.00 			& 50	.0		& 50.0 \\
+				3.00				& 33.3		& 66.6 \\				
+				100.00			& 1.0		& 99.0 \\				
+			\end{tabular}
+			\caption{Implied Probability of Decimal Odds}
+			\label{tab:impliedProbabilityOfDecimalOdds}
+		\end{table}
+	
+	\section{The Indicators}
+	The indicators used in this project are widely used in financial trading. Appendix~\ref{appendix:technicalAnalysisIndicators} contains a list of all the technical analysis indicators used in this project with a web link to the Stock Charts website for a more detailed description of their history, how they are calculated and interpreted.\\
+	
+	The indicators were selected because their outputs all oscillate within a range and as a result can be compared across markets. A major difference between financial markets and horse racing markets is that a horse racing market has a much shorter life than a financial market. Models trained on financial markets are usually trained with data from the same market they predict. This is not be possible with the horse racing markets due to their short life span as there isn't enough data. It is important that the indicators can be compared across markets because the model in this project will be trained using data from many markets.\\
+	
+	Each indicator was implemented in Scala and tested by creating unit tests with example data downloading from the Chart School website\cite{technicalIndicators} and asserting that given the input in the example data they produced the same output.\\
+	
+	 On its own each of these indicators is unlikely to accurately predict a price trend in all markets, all the time, but it is hoped by using a combination of indicators the model will better predict the trend.\\
+
+	\section{The Algorithm}
+	This project uses a Random Forest to classify the data. A Random Forest was selected because:
+		
+		\begin{itemize}
+			\item They have shown excellent performance for both classification and regression problems.
+			\item They are expressive and easy to understand\cite{Flach:2012:MLA:2490546}.
+			\item They are easy to implement due to their recursive nature\cite{Flach:2012:MLA:2490546}.
+			\item They can handle classification problems with more than two output classes.
+		\end{itemize}		 
+		
+		A Random Forests consists of an ensemble of decision trees each built from samples of the training data drawn with replacement and grown using random subsets of features. Random Forests were initially proposed in the 2001 paper Random Forests by Leo Breiman\cite{breiman2001random}.
+		
+	\section{Decision Trees}
+		\begin{figure}[H]
+			\includegraphics[width=8cm]{"Part 2/Images/Decision Tree for Mammal Classification".png}
+			\centering
+			\caption{Decision Tree for Mammal Classification}
+    			\label{fig:decisionTree}
+		\end{figure}		
+		
+		Decision Trees classify data by learning simple decision rules inferred from the data. Decision Trees are grown by splitting the data, one feature at a time, selecting the feature that produces the best split of the data. This procedure is repeated until the data is of a single classification or a set size. The quality of the split is commonly decided by maximising the entropy gain but other measures can be used. Figure~\ref{fig:decisionTree} shows an example of a simple decision tree for classifying mammals.
+		
+		Advantages of decision trees:
+			\begin{itemize}
+				\item Simple to understand.
+				\item Able to handle both numerical and categorical data.
+				\item Able to handle problems with more than two output classes.
+				\item Easy to interpret as the explanation can be explained using Boolean logic (in contrast to a neural network)
+			\end{itemize}					
+		
+		Disadvantages of decision trees:
+			\begin{itemize}
+				\item Can be prone to over-fitting the training data as they do not generalise well over the data and as a result exhibit low bias. For example: All the mammals in you training data may have green eyes whilst the non-mammals have blue eyes. The decision tree would conclude that all mammals have green eyes.
+				\item Can exhibit high variance as small changes in the data can result in a completely different model.
+			\end{itemize}		
+	
+	\section{Random Forest}
+		\begin{figure}[H]
+			\includegraphics[width=\linewidth]{"Part 2/Images/Random Forest".png}
+			\centering
+			\caption{A Random Forest with 5 trees}
+    			\label{fig:randomForest}
+		\end{figure}		
+		
+	A Random Forest is an ensemble of decision trees. It classifies data by taking the most popular class after each tree in the forest has classified the data independently. For example: if the forest in Figure~\ref{fig:randomForest} was used for the classify a mammal 3 of the trees might predict Mammal and the 2 of them Non-mammal. The random forest would select mammal as it was the majority class voted for by its trees.\\
+	
+	\begin{itemize}
+		\item Each tree in a Random Forest is grown using a subset of the training data, the same size as the training data, but selected at random for the initial dataset using replacement. These subsets are known as bootstrap samples.
+		\item As each tree is grown the algorithm only uses a random subset of features at each split to divide the data. This is known as subspace sampling.
+		\item Trees are fully grown, without pruning until:
+			\begin{itemize}
+				\item All the instances in a node are of the same class or,
+				\item All the features in a node are of the same value or,
+				\item The number of instances in a node is less that the minimum number to split on
+			\end{itemize}
+	\end{itemize}
+	
+	A Random Forest has three configurable options that can be optimised during the training process:
+	\begin{itemize}
+		\item The number of trees in the forest.
+		\item The number of random features to choose from at each split.
+		\item The minimum number of instances to split on.
+	\end{itemize}
+	
+	Introducing randomness into the trees through the bootstrap samples and subspace sampling encourages diversity within the forest. Due to averaging, the trees that are stronger predictors in the forest have a greater effect on the overall outcome with the decisions from the weaker trees cancelling each other out. As a result the bias of the forest is usually slightly higher than that of a single non-random decision tree but the variance also decreases which, in most cases more than compensates for the increase in bias.
+	
+	\subsection{Overhead of Training a Random Forest on Features with Continuous Values}
+		\begin{table}[H]
+			\centering
+			\begin{tabular}{lS[table-format=2.1]|l}
+				\toprule
+				\multicolumn{2}{c|}{Features}	& Class\\
+				{A}			& {B}				& \\
+				\midrule
+				Red			& 1					& Mammal\\
+				Red			& 2					& Mammal\\
+				Red			& 3					& Mammal\\
+				Red			& 4					& Non-Mammal\\
+				Red			& 5					& Non-Mammal\\
+				Green		& 6					& Non-Mammal\\
+				Green		& 7					& Mammal\\
+				Yellow		& 8					& Mammal\\
+				Yellow		& 9 					& Mammal\\
+				Yellow		& 10					& Non-Mammal\\
+			\end{tabular}
+			\caption{Labelled Example Data}
+			\label{tab:labelledExampleData}
+		\end{table}
+
+	When each tree is grown in a Random Forest the algorithm needs to select the optimal threshold to split each feature on, by comparing the entropy of each split, before it decides which feature to use to divide the data. If you consider the example data Table~\ref{tab:labelledExampleData}:
+	\begin{itemize}
+		\item Feature A only has three finite values that can be used to split the data, Red, Green or Yellow. 
+		\item Feature B, which contains continuous data, has 9 possible splits available.
+	\end{itemize}
+	
+	As the size of the training data increases so would the number of possible values that feature B could be split on. For a dataset of $n$ instances $n - 1$ splits would need to considered for each feature (assuming all the values were unique). If three randomly picked features with continuous data were considered this would result in $3 * (n - 1)$ comparisons for each split. The data used for training in this project has 14 features all containing continuous data and over 100,000 instances in the training set. In order to speed up the training process a variation on the Random Forest was selected.
+		
+	\section{Extremely Random Forest}
+	Extremely Random Forests\cite{geurts2006extremely} build on the Random Forests algorithm by introducing an extra level of randomness. 
+	\begin{itemize}
+		\item As each tree is grown the thresholds to split each feature on are picked at random from the features range in the dataset, e.g. for Feature B in Table~\ref{tab:labelledExampleData} a random number would be picked between 1 and 10. 
+		\item If 3 features were being compared at each split the entropy would be compared using a random threshold for each feature and the one that produces the best split chosen.
+	\end{itemize}		
+			
+	Selecting a value at random is computationally faster than comparing all the possible splits and therefore scales better. A random number picked in constant time will not be effected by the size of the dataset.\\
+		
+	Figure~\ref{fig:extremelyRandomForestTree} shows the algorithm to grow the trees used in the Extremely Random Forest.
+	
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=1.0\linewidth]{"Part 2/Images/Extremely Random Forest".png}
+			\caption{Algorithm for growing a Decision Tree for an Extremely Random Forest\cite{geurts2006extremely}}
+    			\label{fig:extremelyRandomForestTree}
+		\end{figure}		
+		
+	\section{Implementation}
+	The following implementation options were considered but rejected:
+	\begin{itemize}
+		\item Using Apache Sparks MLlib\cite{spark}. This was rejected because it can only be used with Apache Spark and jobs must be submitted to a Spark cluster. Introducing Spark to the list of technologies used would reduce development speed.
+		\item Using Python's SkLearn library\cite{Sklearn} and calling it from Scala. This was rejected because of the overhead of communicating between Scala and Python\cite{CallingPythonFromScala}.
+	\end{itemize}		
+			
+	The decision was made to implement the Extremely Random Forest from scratch in Scala.\\
+	
+	\subsection{Labelling the Data}	
+	
+	Once the data had been grouped into intervals, the prices converted and the technical indicators applied to each interval, each interval was labelled as one of three classes: "Up", "Down" or "None" indicating the delta between the interval's close and the close of the next interval in the series.\\
+	
+	The data was split into two sets; training and testing
+	\begin{itemize}
+		\item The training set comprised of data from markets between the 11th October 2014 and the 31st October 2014.
+		\item The testing set comprised of data from the 1st November 2014 to the 10th November 2014.
+	\end{itemize}
+	
+	\subsection{Reducing the Size of the Data}
+	
+	The majority of the liquidity on horse racing markets on the Betfair exchange is introduced during the last 20 minutes before the start of a race. Without sufficient liquidity prices can move irrationally. Consequently the decision was made to only include intervals from the last 20 minutes of trading for each race in both the training and testing sets and to only use the model to predict price movements in the last 20 minutes of trading on any market. However the indicators were applied on the intervals \textit{before} this was done as the majority of them are averaged over more than 20 data points and as such would require more than 20 minutes of data to output useful values.	
+	
+	\subsection{Adjustments for Unevenly Distributed Data}
+			\begin{table}[h]
+			\centering
+			\begin{tabular}{lrr}
+				\toprule
+				{Class}		& \multicolumn{2}{c}{Number of Instances}\\
+				{}			& \multicolumn{1}{c}{Training Set} & \multicolumn{1}{c}{Testing Set}\\							
+				\midrule
+				{Up} 		& 36780		& 14918\\
+				{Down}		& 35117		& 13571\\
+				{None}		& 42198		& 14907\\
+				\bottomrule
+				{}			& 114095		& 43396\\
+			\end{tabular}
+			\caption{Training and Testing Datasets}
+			\label{tab:trainingAndTestingDatasets}
+		\end{table}		
+		
+		Figure~\ref{tab:trainingAndTestingDatasets} shows the distribution by class of each dataset. The training data is not evenly distributed, even if it was there would be no guarantee that future training sets would be. Unevenly distributed training data causes the resulting model to favour the most frequently occurring classes.\\
+		
+		There are two approaches to tackle this problem: 
+			\begin{enumerate}
+				\item Assign a cost to misclassification, with a higher cost associated with the minority class whilst trying to minimize the overall cost.
+				\item Either down-sample the majority class or over-sample the minority class when creating each bootstrapped dataset for each tree\cite{chen2004using}.
+			\end{enumerate}
+			
+		This implementation uses the second of these approaches. The original dataset is divided into sets by class and each of the resulting sets sampled with replacement so the resulting bootstrapped set was the same size as the original dataset and has an equal distribution of class. This method could result in majority classes being over-sampled and minority ones being down-sampled depending on the original dataset.\\
+		
+	The trees are fully grown using the bootstrapped datasets until one of the following conditions are met:
+		
+		\begin{itemize}
+			\item The number of instances is less minimum number to split on
+			\item All the labels are of the same classification
+			\item All the attributes are constant
+		\end{itemize}
+		
+		The minimum number of instances to split on was set to 2 as is advised for classification problems, to reduce the chance of a leaf containing instances of the same class. If a leaf (end node of the tree) does contain instances of more than one class, which could occur if all the attributes were constant, the implementation selects one of those classes at random.\\
+		
+		Once the forest has been trained it is serialised to disk for later use.
+	\section{Optimisation}
+		The number of features to split on and the number of trees in the forest were optimised to reduce to out-of-bag error over the training data.
+		
+		\subsection{Out-Of-Bag Error}
+			Each tree in the forest is grown using a bootstrapped sample. When this sample is created about 37\% of the original dataset is left-out, this is known as the out-of-bag sample. Once the tree has been grown it is used to classify each instance in the out-of-bag sample. After all the trees have been grown these votes are aggregated and used to classify all the instances in the original dataset. The out-of-bag error rates is:
+	
+				$$\frac{\text{number of mis-classified instances}}{\text{total number of instances}}$$ 
+
+The out-of-bag error has been shown to be as accurate as using a test set the same size as the training set\cite{breiman1996out}.\\ 
+
+		\subsection{Optimisation Results}
+		\begin{figure}[H]
+			\begin{subfigure}{.47\linewidth}\centering
+				\begin{tikzpicture}
+					\begin{axis}[xlabel={number of features}, ylabel={error rate}, y tick label style={/pgf/number format/.cd, fixed, fixed zerofill, precision=3, /tikz/.cd}]
+						\addplot table [x=features, y=error_rate, col sep=comma]{Part 2/Results/features_error_rate.csv};
+					\end{axis}
+				\end{tikzpicture}
+				\caption{error rate for features}
+				\label{fig:outOfBagErrorFeaturesGraph}			
+			\end{subfigure}%
+			\hfill
+			\begin{subfigure}{.47\linewidth}\centering
+				\begin{tikzpicture}
+					\begin{axis}[xlabel={number of trees}, ylabel={error rate}, y tick label style={/pgf/number format/.cd, fixed, fixed zerofill, precision=3, /tikz/.cd}]
+						\addplot table [x=trees, y=error_rate, col sep=comma]{Part 2/Results/trees_error_rate.csv};
+					\end{axis}		
+				\end{tikzpicture}
+				\caption{error rate for number of trees}
+				\label{fig:outOfBagErrorTreesGraph}
+			\end{subfigure}
+			\hfill
+			\caption{Graphs of Optimisation Results}
+    			\label{fig:optimisationResultsGraphs}	
+		\end{figure}
+		
+		\begin{table}[H]
+			\centering
+			\begin{subtable}{.45\linewidth}\centering
+				\hfill
+				\pgfplotstabletypeset[
+	    				col sep=comma,
+		    			string type,
+	    				columns/features/.style={column name=Features, column type={l}},
+    					columns/error_rate/.style={column name=Error Rate, numeric type,precision=6,zerofill,dec sep align},
+		    			every head row/.style={before row=\toprule,after row=\midrule},
+    					every last row/.style={after row=\bottomrule},
+    				]{Part 2/Results/features_error_rate.csv}
+				\caption{error rate for features}
+				\label{fig:outOfBagErrorFeaturesTable}    				
+    			\end{subtable}
+    			\hfill
+			\begin{subtable}{.45\linewidth}\centering
+				\pgfplotstabletypeset[
+    					col sep=comma,
+    					string type,
+    					columns/trees/.style={column name=Trees, column type={l}},
+    					columns/error_rate/.style={column name=Error Rate, numeric type,precision=6,zerofill,dec sep align},
+    					every head row/.style={before row=\toprule,after row=\midrule},
+    					every last row/.style={after row=\bottomrule},
+    				]{Part 2/Results/trees_error_rate.csv}
+    				\caption{error rate for number of trees}
+				\label{fig:outOfBagErrorTreesTable}
+    			\end{subtable}
+    			\caption{Tables of Optimisation Results}
+    			\label{fig:optimisationResultsTables}	
+    		\end{table}
+
+		The results were recorded using the default settings below, changing either the number of features or the number of trees.
+
+		\begin{table}[h]
+			\begin{tabular}{ll}
+				{number of trees} 				& 100\\
+				{minimum leaf size to split}		& 2\\
+				{number of features to split on}	& 3\\
+			\end{tabular}
+		\end{table}		
+		
+		As shown in Table~\ref{fig:outOfBagErrorFeaturesTable} and Figure~\ref{fig:outOfBagErrorFeaturesGraph} the optimal setting for the number of features to split on to minimising the error rate was 4, which coincides with that recommended by Brieman, the square root of the total number of features.\\
+		
+		As shown in Table~\ref{fig:outOfBagErrorTreesTable} and Figure~\ref{fig:outOfBagErrorTreesGraph} the error rate decreases as the number of trees in the forest increases.
+	
+	\section{Results}		
+	\begin{table}[H]
+		\begin{tabular}{ll|S[table-format=5] S[table-format=5] S[table-format=5]| S[table-format=5]}
+			\toprule
+			\multicolumn{2}{c}{} 					& \multicolumn{3}{|c|}{Predicted}	& {}\\
+			{}		& {}		 						& {Up} 				& {Down} 	& {None} 	& {}\\
+			\midrule
+			\multirow{ 3}{*}{Actual} 	& {Up}		& \color{red}6674	& 5254				& 2990				& \textbf{14918}\\
+			{}							& {Down}		& 4811				& \color{red}6377	& 2383				& \textbf{13571}\\
+			{}							& {None}		& 5106				& 4895				& \color{red}4906	& \textbf{14907}\\
+			\midrule
+			{} 							& {}			& \textbf{16591}		& \textbf{16526}		& \textbf{10279}		& \\
+			\bottomrule
+		\end{tabular}
+		\caption{Predicted Classes Vs Actual Classes}
+    		\label{fig:predictedVsActual}	
+	\end{table}
+	
+	\begin{table}[H]
+		\pgfplotstabletypeset[
+    			col sep=comma,
+	    		string type,
+    			columns/class/.style={column name=Class, column type={l|}},
+    			columns/distribution/.style={column name=Distribution, numeric type,precision=6,zerofill,dec sep align},
+    			columns/precision/.style={column name=Precision, numeric type,precision=6,zerofill,dec sep align},
+    			columns/recall/.style={column name=Recall, numeric type,precision=6,zerofill,dec sep align},
+	    		every head row/.style={before row=\toprule,after row=\midrule},
+    			every last row/.style={after row=\bottomrule},
+    		]{Part 2/Results/results.csv}
+   	    	\caption{Distribution, Precision and Recall by Class}
+    		\label{fig:distributionPrecisionRecallByClass}	
+	\end{table}	
+	
+	\begin{table}[H]	
+		\begin{tabular}{lS[table-format=1.6]}		
+		Out-of-bag error 			& 0.597265\\	
+		Accuracy			 			& 0.413794\\ 
+		Weighted Average Precision	& 0.422910\\
+		Weighted Average Recall		& 0.413794\\
+		\end{tabular}
+		\caption{Weighted Accuracy, Precision and Recall}
+    		\label{fig:weightedResults}	
+	\end{table}
+	
+	The results in Figures~\ref{fig:predictedVsActual} ~\ref{fig:distributionPrecisionRecallByClass} and ~\ref{fig:weightedResults} were produced training the classifier on the training set with the following settings selected during the optimisation stage and testing the resulting model on the testing set:
+
+	\begin{table}[H]
+		\begin{tabular}{ll}
+			{number of trees} 				& 1000\\
+			{minimum leaf size to split}		& 2\\
+			{number of features to split on}	& 3\\
+		\end{tabular}
+	\end{table}
+
+	The results show that the classifier exhibits better accuracy, precision and recall by class than could be achieved by selecting a class at random given the distribution. Precision is highest for the "None" class and lowest for the "Down" class. Recall is highest for the "Down" class and lowest for the "None" class.

@@ -1,5 +1,6 @@
 package indicators
 
+import domain.ExchangePrices
 import play.api.libs.json.Json
 import scala.math.BigDecimal
 
@@ -42,9 +43,9 @@ case class Indicators(selectionId: Long,
 object Indicators {
   implicit val formatInterval = Json.format[Indicators]
 
-  def getNext(selectionId: Long, timestamp: Long, startTime: Long, range: Range, close: Double, volume: Double, weightOfMoney: Double, prevData: List[Indicators]): Indicators = {
+  def getNext(selectionId: Long, timestamp: Long, startTime: Long, range: Range, close: Double, volume: Double, weightOfMoney: Double, prevData: List[Indicators], book: Option[ExchangePrices]): Indicators = {
 
-    val tick = Tick.getNext(close, range, volume, weightOfMoney, prevData)
+    val tick = Tick.getNext(close, range, volume, weightOfMoney, prevData, book)
     val accumulationDistribution = AccumulationDistribution.getNext(tick, prevData)
 
     Indicators(
@@ -85,20 +86,20 @@ object Indicators {
   private def mult(o: Option[Double], m: Double): Option[Double] = applyToOption(o, (x) => x * m)
 
   def getFeatures(i: Indicators): List[Option[Double]] = List(
-    Some(i.accumulationDistribution.line),          // ?????
-    i.accumulationDistribution.lineDelta,             // -> percentage delta on this period
-    i.chaikinOscillator.oscillator,                 // 3day - 10day, + 3day above, - below, turn into percentage diff
-    i.chaikinOscillator.oscillatorDelta,               // -> percentage delta on this period
-    i.commodityChannelIndex.index,                    // increase look back period to 40, 0 Decimal Place
-//    i.easeOfMovement.smaOfEMV,                      // ????
-    i.macd.histogram,                      // -> * 100, 1 Decimal Place
-    i.moneyFlowIndex.index,                           // 0 - 100 -> 1 Decimal Place
-    i.rateOfChange,                 // -100 - 100 -> Add 100, Divide / 2, 1 Decimal Place
-    i.relativeStrengthIndex.rsi,                      // 0 - 100 -> 1 Decimal Place
-    i.stochasticOscillator.percentK,                  // 0 - 100 -> 1 Decimal Place
-    i.stochasticOscillator.percentD,                  // 0 - 100 -> 1 Decimal Place
-    i.stochasticOscillator.slowPercentD,              // 0 - 100 -> 1 Decimal Place
-    i.williamsPercentR.percentR,             // -100 - 0  -> Add 100, 1 Decimal Place
+    Some(i.accumulationDistribution.line),
+    i.accumulationDistribution.lineDelta,
+    i.chaikinOscillator.oscillator,
+    i.chaikinOscillator.oscillatorDelta,
+    i.commodityChannelIndex.index,
+//    i.easeOfMovement.smaOfEMV,
+    i.macd.histogram,
+    i.moneyFlowIndex.index,
+    i.rateOfChange,
+    i.relativeStrengthIndex.rsi,
+    i.stochasticOscillator.percentK,
+    i.stochasticOscillator.percentD,
+    i.stochasticOscillator.slowPercentD,
+    i.williamsPercentR.percentR,
     Some(i.tick.weightOfMoney)
   ).map(round(_, 3))
 }

@@ -1,11 +1,11 @@
 package dbIO
 
-import csvReader.CSVData
 import domain._
 import indicators.Indicators
 import org.joda.time.DateTime
+import play.api.libs.iteratee.Iteratee
 import play.api.libs.json.{JsObject, Json}
-import randomForest.Instance
+import randomForest.{DecisionTree, Instance, RandomForest}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.{UpdateWriteResult, WriteResult}
 import reactivemongo.api.indexes.Index
@@ -17,7 +17,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
-class DBIO {
+trait DBIO {
 
   val dbConnector: DBConnector = DBConnector
 
@@ -41,44 +41,33 @@ class DBIO {
 
   def createIndex(col: BSONCollection, index: Index): Future[WriteResult] = col.indexesManager.create(index)
 
-  def getRunners(col: BSONCollection): Future[List[RunnerCatalog]] = {
-    import col.BatchCommands.AggregationFramework.{Group, Max}
-    col.aggregate(
-      Group(BSONDocument("selectionId" -> "$selectionId", "runnerName" -> "$runnerName"))("totalMatched" -> Max("totalMatched"))
-    ).map(_.documents.map(runner => RunnerCatalog(
-      selectionId = runner.getAs[BSONDocument]("_id").get.getAs[Int]("selectionId").get,
-      runnerName = runner.getAs[BSONDocument]("_id").get.getAs[String]("runnerName").get,
-      handicap = 0.0,
-      totalMatched = Some(runner.getAs[Double]("totalMatched").get)
-    )))
-  }
-
-  def getMarketCatalogue(col: BSONCollection): Option[MarketCatalogue] = {
-    // get the first record
-    Await.result(col.find(BSONDocument()).one[CSVData], Duration.Inf) match {
-      case Some(csvData: CSVData) =>
-        val runners = Await.result(getRunners(col), Duration.Inf)
-        Some(MarketCatalogue(
-          marketId = csvData.marketId,
-          marketName = csvData.getMarketName,
-          marketStartTime = Some(csvData.startTime),
-          description = None,
-          totalMatched = runners.map(_.totalMatched.get).sum,
-          runners = Some(runners),
-          eventType = Some(EventType("7", csvData.getEventType)), // TODO get eventType Id from the name
-          competition = None,
-          event = Event(csvData.eventId, csvData.getEventName, Some(csvData.getCountryCode), "", None, csvData.startTime)
-        ))
-      case _ => None
-    }
-  }
-
   def writeMarketCatalogue(m: MarketCatalogue): Future[UpdateWriteResult] = {
     dbConnector.getCollection(dbConnector.getDB(getDBName(m.marketStartTime.get)), marketCatalogueCollectionName).update(
       Json.obj("marketId" -> m.marketId),
       Json.toJson(m).as[JsObject],
       upsert = true
     )
+  }
+
+  def writeModel(name: String, model: RandomForest) = {
+    dbConnector.getCollection(dbConnector.getDB("Models"), name).drop()         // Drop any existing collection
+    val col = dbConnector.getCollection(dbConnector.getDB("Models"), name)
+    // Write a record with the out of bag error and all the trees
+    Await.result(col.insert(BSONDocument("oobRate" -> model.oobError)), Duration.Inf)
+    model.trees.foreach(tree => Await.result(col.insert(Json.toJson(tree).as[JsObject]), Duration.Inf))
+  }
+
+  val processTrees: Iteratee[JsObject, List[DecisionTree]] = Iteratee.fold(List.empty[DecisionTree]) {(trees, tree) =>
+    print("Loaded # Trees" + trees.size + "\r")
+    tree.validate[DecisionTree].get :: trees
+  }
+
+  def readModel(name: String): RandomForest = {
+    val col = dbConnector.getCollection(dbConnector.getDB("Models"), name)
+    val oobError = Await.result(col.find(BSONDocument("oobRate" -> BSONDocument("$exists" -> true))).one[JsObject], Duration.Inf)
+    val enumerator = col.find(BSONDocument("oobRate" -> BSONDocument("$exists" -> false))).cursor[JsObject]().enumerate()
+    val trees = Await.result(enumerator |>>> processTrees, Duration.Inf)
+    RandomForest(trees, (oobError.get \ "oobRate").get.as[Double])
   }
 
   // ********************
@@ -91,5 +80,5 @@ class DBIO {
     dbConnector.getCollection(dbConnector.getDB(db), collection).insert(Json.toJson(i).as[JsObject])
   }
 
-  // readIndicators , read Instance
+  // readIndicators, readInstance
 }

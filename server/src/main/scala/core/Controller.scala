@@ -11,11 +11,8 @@ class Controller(config: Configuration, eventBus: EventBus) extends Actor {
 
   private def getCommandChannel(x: Command): String = x match {
     case x: GetNavigationData     => config.navDataInstructions
-    case x: ListEventTypes        => config.dataProviderInstructions
-    case x: ListEvents            => config.dataProviderInstructions
     case x: ListMarketCatalogue   => config.dataProviderInstructions
     case x: ListMarketBook        => config.dataModelInstructions
-    case StopPollingAllMarkets    => config.dataProviderInstructions
     case x: PlaceOrders           => config.orderManagerInstructions
     case x: CancelOrders          => config.orderManagerInstructions
     case x: ReplaceOrders         => config.orderManagerInstructions

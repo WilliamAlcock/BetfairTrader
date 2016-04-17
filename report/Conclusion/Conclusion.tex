@@ -1,30 +1,53 @@
 \chapter{Conclusion}
-	\section{Overall Assessment of the final product}
-		\todo[inline]{This section to be added for the final draft once the random forest has been incorporated into the trading system}			
-
-	\section{Review of the project objectives}
-		\todo[inline]{This section to be added for the final draft once the random forest has been incorporated into the trading system}			
-
-	\section{Suggestions for future extensions}
+	The first part of the project has met the primary objectives to build a trading system that can be used to:
+	\begin{itemize}
+		\item Navigate markets on the Betfair Exchange.
+		\item Manually trade markets on the Betfair Exchange.
+		\item Automate the trading of markets on the Betfair Exchange.
+	\end{itemize}
 	
-		\begin{itemize}
-			\item First section:
-			\begin{itemize}
-				\item Change the auto trader so it can be programmed by the user as proposed in the interim report.
-				\item Add accounting functions to the core server. The Core Server keeps track of orders and matched position by market but it doesn't keep track of a user's PnL across all markets at once.
-				\item Add more functionality to the Simulated Order Book
-				\begin{itemize}
-					\item Improve the way orders are matched
-					\item Cancel orders when markets turn to suspended, this is what happens on the Live Service for Football
-					\item Add the ability to handle all projections and order types.
-				\end{itemize}
-			\end{itemize}
+	The the first part of the project has not met the secondary objectives to add functionality to:
+	\begin{itemize}
+		\item Record market data and trading activity to be analysed after the fact.
+		\item Provide a framework to back-test an automated trading strategy against recorded market data.
+	\end{itemize}
 
-			\item Second section:
-				\item Investigate the use of a wider range of machine learning modules on the historical data and compare the results with the Random Forest
-				\item Integrate the system with Spark so the system can utilise it's MLlib.
-				\item Test the models using a larger amount of historical data. This could include more up-to-date data captured for the Betfair exchange.
-		\end{itemize}			
+
+	The second part of the project has met the primary objectives to:
+	\begin{itemize}
+		\item Select a machine learning algorithm to be used to build a model from historical market data.
+		\item Process the historical market data into intervals and select and apply technical analysis indicators.
+		\item Divide the data into sets that can be used to train and test the model.
+		\item Optimise the model using the training data.
+		\item Analyse the results of the model on the testing data.
+	\end{itemize}
 	
-	\section{Review of the technologies used during the project}
-		\todo[inline]{this section will be added before the final draft and could potentially be added to the appendix depending on the word count}
+	The second part of the project has not met the secondary objectives to:
+	\begin{itemize}
+		\item Integrate the model into a trading strategy.
+		\item Automate the trading strategy using the system built in the first part of this project.
+	\end{itemize}	
+	
+	Appendix ~\ref{appendix:futureWork} contains a list of issues raised during the development process to be implemented as future work.\\
+	
+	Additionally the predictive model needs to be integrated into the trading system to test its accuracy on a live market. At the moment the results only show its accuracy on predicting individual intervals. A true test of the model would be to incorporate it into a strategy that included:
+	\begin{itemize}
+		\item Thresholds for stopping out losing trades.
+		\item Thresholds for how much profit to take on winning trades.
+		\item How many successive Up or Down indicators are required for a trade to be actioned.
+	\end{itemize}
+	The accuracy of the predictive model could be improved by:
+	\begin{itemize}
+		\item Changing the technical analysis indicators used as features.
+		\item Experimenting with different combinations features and changing the number of features used.
+		\item Using regression as opposed to classification, outputting real numbers showing the predicted probability that a market will trend up, down or stay the same.
+		\item Comparing the results of other machine learning algorithms such as a Support Vector Machine or Multi layer Perceptron to see if they better suit the data.
+	\end{itemize}
+		
+	\section{Development Approach}
+	\subsubsection{Agile}
+	The Agile approach to development has worked well. Implementing requirements in small iterative cycles ensured consistent progress during development.
+	
+	\subsubsection{Testing}
+	The focus on continuous testing ensured that each commit didn't beak the build. Using Git and SBT to track and manager files and builds was very effective. Due to time constraints there are areas of the code that still need testing. This was a result of trying to balance the speed of development with the level of testing to ensure the project's primary objectives were met. Issues have been raised for each section and are in Appendix~\ref{appendix:futureWork}.\\
+	

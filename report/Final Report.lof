@@ -3,27 +3,39 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Example Match Odds: Swansea vs Arsenal\relax }}{9}{figure.caption.5}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Annotated Betfair Market, Match odds: Swansea vs Arsenal\relax }}{10}{figure.caption.4}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Waterfall Development Process\relax }}{18}{figure.caption.11}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Agile Development Process\relax }}{19}{figure.caption.12}
+\contentsline {figure}{\numberline {6.3}{\ignorespaces The Testing Pyramid\relax }}{20}{figure.caption.13}
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {8.1}{\ignorespaces Server Layers\relax }}{17}{figure.caption.8}
-\contentsline {figure}{\numberline {8.2}{\ignorespaces Live and Simulated Service Layer\relax }}{19}{figure.caption.9}
-\contentsline {figure}{\numberline {8.3}{\ignorespaces Example Back and Lay Volume\relax }}{19}{figure.caption.10}
-\contentsline {figure}{\numberline {8.4}{\ignorespaces Core Server Architecture\relax }}{20}{figure.caption.11}
-\contentsline {figure}{\numberline {8.5}{\ignorespaces ListMarketBook Price Projections\relax }}{22}{figure.caption.13}
-\contentsline {figure}{\numberline {8.6}{\ignorespaces ListMarketBook Market Data Limits\relax }}{22}{figure.caption.14}
-\contentsline {figure}{\numberline {8.7}{\ignorespaces Data Provider Polling Mechanism\relax }}{24}{figure.caption.16}
-\contentsline {figure}{\numberline {8.8}{\ignorespaces Life Cycle of an Order\relax }}{26}{figure.caption.18}
-\contentsline {figure}{\numberline {8.9}{\ignorespaces Web Server and Client Architecture\relax }}{30}{figure.caption.26}
-\contentsline {figure}{\numberline {8.10}{\ignorespaces Betfair Price Increments\relax }}{31}{figure.caption.27}
-\contentsline {figure}{\numberline {8.11}{\ignorespaces GUI Main Window\relax }}{31}{figure.caption.29}
-\contentsline {figure}{\numberline {8.12}{\ignorespaces GUI Ladder Window\relax }}{32}{figure.caption.30}
+\contentsline {figure}{\numberline {8.1}{\ignorespaces Trading System Architecture\relax }}{27}{figure.caption.14}
+\contentsline {figure}{\numberline {8.2}{\ignorespaces Client-Server Architecture\relax }}{28}{figure.caption.15}
+\contentsline {figure}{\numberline {8.3}{\ignorespaces Peer-to-Peer Architecture\relax }}{28}{figure.caption.16}
+\contentsline {figure}{\numberline {8.4}{\ignorespaces GUI Main Window\relax }}{30}{figure.caption.19}
+\contentsline {figure}{\numberline {8.5}{\ignorespaces GUI Ladder Window\relax }}{31}{figure.caption.20}
+\contentsline {figure}{\numberline {8.6}{\ignorespaces Service Layer Message Flow\relax }}{36}{figure.caption.23}
+\contentsline {figure}{\numberline {8.7}{\ignorespaces Test Service Layer Message Flow\relax }}{37}{figure.caption.25}
+\contentsline {figure}{\numberline {8.8}{\ignorespaces Local Order Book Hierarchy of Objects\relax }}{39}{figure.caption.27}
+\contentsline {figure}{\numberline {8.9}{\ignorespaces Market Book Price Projections\relax }}{41}{figure.caption.29}
+\contentsline {figure}{\numberline {8.10}{\ignorespaces Market Book Market Data Limits\relax }}{41}{figure.caption.30}
+\contentsline {figure}{\numberline {8.11}{\ignorespaces Data Provider Polling Mechanism\relax }}{42}{figure.caption.33}
+\contentsline {figure}{\numberline {8.12}{\ignorespaces Web Server and Client Architecture\relax }}{43}{figure.caption.34}
+\contentsline {figure}{\numberline {8.13}{\ignorespaces Navigation Data File Structure\relax }}{45}{figure.caption.35}
+\contentsline {figure}{\numberline {8.14}{\ignorespaces Life Cycle of an Order\relax }}{46}{figure.caption.36}
+\contentsline {figure}{\numberline {8.15}{\ignorespaces Basic Trading Strategy\relax }}{47}{figure.caption.37}
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {9.1}{\ignorespaces Decision Tree for Mammal Classification\relax }}{35}{figure.caption.34}
-\contentsline {figure}{\numberline {9.2}{\ignorespaces Algorithm for growing a Decision Tree for an Extremely Random Forest\relax }}{37}{figure.caption.35}
-\contentsline {figure}{\numberline {9.3}{\ignorespaces Graphs of Optimisation Results\relax }}{40}{figure.caption.39}
+\contentsline {figure}{\numberline {9.1}{\ignorespaces Decision Tree for Mammal Classification\relax }}{52}{figure.caption.42}
+\contentsline {figure}{\numberline {9.2}{\ignorespaces A Random Forest with 5 trees\relax }}{53}{figure.caption.43}
+\contentsline {figure}{\numberline {9.3}{\ignorespaces Algorithm for growing a Decision Tree for an Extremely Random Forest\cite {geurts2006extremely}\relax }}{55}{figure.caption.45}
+\contentsline {figure}{\numberline {9.4}{\ignorespaces Graphs of Optimisation Results\relax }}{58}{figure.caption.47}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {A.1}{\ignorespaces Example of underfitting, rightfitting and overfitting\cite {stackExchangeOverfitting}\relax }}{66}{figure.caption.73}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

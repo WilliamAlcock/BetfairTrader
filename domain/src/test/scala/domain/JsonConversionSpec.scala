@@ -371,9 +371,9 @@ object JsonConversionSpec extends Properties("") {
     matches <- Gen.option(Set(_match))
   } yield Runner(selectionId, handicap, status, adjustmentFactor, lastPriceTraded, totalMatched, removalDate, sp, ex, orders, matches)
 
-  property("Runner") = forAll(genRunner) { (a: Runner) =>
-    Json.toJson(a).validate[Runner].get equals a
-  }
+//  property("Runner") = forAll(genRunner) { (a: Runner) =>
+//    Json.toJson(a).validate[Runner].get equals a
+//  }
 
   val genMarketBook: Gen[MarketBook] = for {
     marketId <- Arbitrary.arbitrary[String]
@@ -397,17 +397,17 @@ object JsonConversionSpec extends Properties("") {
       numberOfRunners, numberOfActiveRunners, lastMatchTime, totalMatched, totalAvailable, crossMatching, runnersVoidable,
       version, Set(runners))
 
-  property("MarketBook") = forAll(genMarketBook) { (a: MarketBook) =>
-    Json.toJson(a).validate[MarketBook].get equals a
-  }
+//  property("MarketBook") = forAll(genMarketBook) { (a: MarketBook) =>
+//    Json.toJson(a).validate[MarketBook].get equals a
+//  }
 
   val genListMarketBookContainer: Gen[ListMarketBookContainer] = for {
     result <- Gen.listOf(genMarketBook)
   } yield ListMarketBookContainer(result)
 
-  property("ListMarketBookContainer") = forAll(genListMarketBookContainer) { (a: ListMarketBookContainer) =>
-    Json.toJson(a).validate[ListMarketBookContainer].get equals a
-  }
+//  property("ListMarketBookContainer") = forAll(genListMarketBookContainer) { (a: ListMarketBookContainer) =>
+//    Json.toJson(a).validate[ListMarketBookContainer].get equals a
+//  }
 
   val genMarketDescription: Gen[MarketDescription] = for {
     persistenceEnabled <- Arbitrary.arbitrary[Boolean]

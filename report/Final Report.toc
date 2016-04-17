@@ -2,77 +2,114 @@
 \contentsline {chapter}{\numberline {1}Statement Of Originality}{1}{chapter.1}
 \contentsline {chapter}{\numberline {2}Acknowledgements}{2}{chapter.2}
 \contentsline {chapter}{\numberline {3}Summary}{3}{chapter.3}
-\contentsline {chapter}{List of Figures}{6}{chapter*.3}
-\contentsline {chapter}{List of Tables}{7}{chapter*.4}
-\contentsline {chapter}{\numberline {4}Introduction}{8}{chapter.4}
-\contentsline {section}{\numberline {4.1}Motivation}{8}{section.4.1}
-\contentsline {section}{\numberline {4.2}Background}{8}{section.4.2}
-\contentsline {subsection}{\numberline {4.2.1}Betting exchanges opposed to historical bookmakers}{8}{subsection.4.2.1}
-\contentsline {subsection}{\numberline {4.2.2}Similarities to financial markets}{9}{subsection.4.2.2}
-\contentsline {subsection}{\numberline {4.2.3}Trading as opposed to gambling}{10}{subsection.4.2.3}
-\contentsline {subsection}{\numberline {4.2.4}Automated Trading}{10}{subsection.4.2.4}
-\contentsline {section}{\numberline {4.3}Project Objectives}{10}{section.4.3}
-\contentsline {subsection}{\numberline {4.3.1}First section objectives}{10}{subsection.4.3.1}
-\contentsline {subsection}{\numberline {4.3.2}Second section objectives}{11}{subsection.4.3.2}
-\contentsline {subsection}{\numberline {4.3.3}Changes in the objectives from the interim report}{11}{subsection.4.3.3}
-\contentsline {chapter}{\numberline {5}Professional Considerations}{12}{chapter.5}
-\contentsline {section}{\numberline {5.1}Public Interest}{12}{section.5.1}
-\contentsline {section}{\numberline {5.2}Professional Competence and Integrity}{12}{section.5.2}
-\contentsline {section}{\numberline {5.3}Duty to Relevant Authority}{13}{section.5.3}
-\contentsline {section}{\numberline {5.4}Duty to Profession}{13}{section.5.4}
-\contentsline {chapter}{\numberline {6}Requirements Analysis}{14}{chapter.6}
-\contentsline {section}{\numberline {6.1}The Users}{14}{section.6.1}
-\contentsline {chapter}{\numberline {7}Development Approach}{15}{chapter.7}
-\contentsline {section}{\numberline {7.1}Programming Languages}{15}{section.7.1}
-\contentsline {section}{\numberline {7.2}Unit Tests}{15}{section.7.2}
-\contentsline {section}{\numberline {7.3}Version Control}{16}{section.7.3}
-\contentsline {section}{\numberline {7.4}Build System}{16}{section.7.4}
-\contentsline {section}{\numberline {7.5}IDE}{16}{section.7.5}
-\contentsline {chapter}{\numberline {8}Design And Implementation}{17}{chapter.8}
-\contentsline {section}{\numberline {8.1}Server}{17}{section.8.1}
-\contentsline {subsection}{\numberline {8.1.1}Service Layer}{18}{subsection.8.1.1}
-\contentsline {subsection}{\numberline {8.1.2}Simulated Service Layer}{18}{subsection.8.1.2}
-\contentsline {subsection}{\numberline {8.1.3}Core Server Architecture}{20}{subsection.8.1.3}
-\contentsline {subsection}{\numberline {8.1.4}Central Configuration}{21}{subsection.8.1.4}
-\contentsline {subsection}{\numberline {8.1.5}The Event Bus}{21}{subsection.8.1.5}
-\contentsline {subsection}{\numberline {8.1.6}Data Provider}{21}{subsection.8.1.6}
-\contentsline {subsubsection}{ListMarketBook}{21}{subsubsection*.12}
-\contentsline {subsubsection}{ListMarketCatalogue}{24}{subsubsection*.17}
-\contentsline {subsection}{\numberline {8.1.7}Data Model}{25}{subsection.8.1.7}
-\contentsline {subsection}{\numberline {8.1.8}Order Manager}{25}{subsection.8.1.8}
-\contentsline {subsection}{\numberline {8.1.9}Navigation Data Service}{26}{subsection.8.1.9}
-\contentsline {subsection}{\numberline {8.1.10}Data Store}{27}{subsection.8.1.10}
-\contentsline {subsection}{\numberline {8.1.11}Auto Trader}{27}{subsection.8.1.11}
-\contentsline {subsubsection}{The Auto Trader}{27}{subsubsection*.21}
-\contentsline {subsubsection}{The Monitor}{28}{subsubsection*.22}
-\contentsline {subsubsection}{The Strategy}{28}{subsubsection*.23}
-\contentsline {subsection}{\numberline {8.1.12}Controller}{28}{subsection.8.1.12}
-\contentsline {section}{\numberline {8.2}Web Server and Client (GUI)}{29}{section.8.2}
-\contentsline {subsection}{\numberline {8.2.1}Web Server}{29}{subsection.8.2.1}
-\contentsline {subsection}{\numberline {8.2.2}Client (GUI)}{30}{subsection.8.2.2}
-\contentsline {subsubsection}{Visual Design of the GUI}{31}{subsubsection*.28}
-\contentsline {chapter}{\numberline {9}Predicting Price Movement}{33}{chapter.9}
-\contentsline {section}{\numberline {9.1}Technical Analysis}{33}{section.9.1}
-\contentsline {section}{\numberline {9.2}Historical Market Data}{33}{section.9.2}
-\contentsline {section}{\numberline {9.3}Preprocessing the Data}{33}{section.9.3}
-\contentsline {subsection}{\numberline {9.3.1}Grouping The Data Into Intervals}{34}{subsection.9.3.1}
-\contentsline {subsection}{\numberline {9.3.2}Converting Prices to Implied Probabilities}{34}{subsection.9.3.2}
-\contentsline {subsection}{\numberline {9.3.3}Technical Analysis Indicators}{34}{subsection.9.3.3}
-\contentsline {section}{\numberline {9.4}Choosing a Model}{35}{section.9.4}
-\contentsline {subsection}{\numberline {9.4.1}Decision Trees}{35}{subsection.9.4.1}
-\contentsline {subsection}{\numberline {9.4.2}Random Forest}{36}{subsection.9.4.2}
-\contentsline {subsection}{\numberline {9.4.3}Extremely Random Forest}{37}{subsection.9.4.3}
-\contentsline {section}{\numberline {9.5}Implementation}{37}{section.9.5}
-\contentsline {section}{\numberline {9.6}Optimisation}{39}{section.9.6}
-\contentsline {subsection}{\numberline {9.6.1}Out-Of-Bag Error}{39}{subsection.9.6.1}
-\contentsline {subsection}{\numberline {9.6.2}Optimisation}{39}{subsection.9.6.2}
-\contentsline {section}{\numberline {9.7}Results}{40}{section.9.7}
-\contentsline {chapter}{\numberline {10}Integration With The Trading System}{42}{chapter.10}
-\contentsline {chapter}{\numberline {11}Conclusion}{43}{chapter.11}
-\contentsline {section}{\numberline {11.1}Overall Assessment of the final product}{43}{section.11.1}
-\contentsline {section}{\numberline {11.2}Review of the project objectives}{43}{section.11.2}
-\contentsline {section}{\numberline {11.3}Suggestions for future extensions}{43}{section.11.3}
-\contentsline {section}{\numberline {11.4}Review of the technologies used during the project}{43}{section.11.4}
-\contentsline {chapter}{Appendices}{44}{section*.47}
-\contentsline {chapter}{\numberline {A}test appendix}{45}{Appendix.1.A}
-\contentsline {chapter}{Bibliography}{46}{chapter*.48}
+\contentsline {chapter}{List of Figures}{7}{chapter*.2}
+\contentsline {chapter}{List of Tables}{8}{chapter*.3}
+\contentsline {chapter}{\numberline {4}Introduction}{9}{chapter.4}
+\contentsline {section}{\numberline {4.1}The Betfair Exchange}{9}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}What is The Betfair Exchange}{9}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}An Example of a Betfair Market}{10}{subsection.4.1.2}
+\contentsline {subsection}{\numberline {4.1.3}Trading a Betfair Market}{10}{subsection.4.1.3}
+\contentsline {subsubsection}{Scenario 1}{11}{subsubsection*.5}
+\contentsline {subsubsection}{Scenario 2}{11}{subsubsection*.7}
+\contentsline {subsubsection}{Scenario 3}{12}{subsubsection*.9}
+\contentsline {section}{\numberline {4.2}Automated Trading Systems}{12}{section.4.2}
+\contentsline {section}{\numberline {4.3}Technical Analysis}{13}{section.4.3}
+\contentsline {section}{\numberline {4.4}Machine Learning}{13}{section.4.4}
+\contentsline {section}{\numberline {4.5}Project Objectives}{14}{section.4.5}
+\contentsline {subsection}{\numberline {4.5.1}Part 1}{14}{subsection.4.5.1}
+\contentsline {subsection}{\numberline {4.5.2}Part 2}{14}{subsection.4.5.2}
+\contentsline {chapter}{\numberline {5}Professional Considerations}{16}{chapter.5}
+\contentsline {section}{\numberline {5.1}Public Interest}{16}{section.5.1}
+\contentsline {section}{\numberline {5.2}Professional Competence and Integrity}{16}{section.5.2}
+\contentsline {section}{\numberline {5.3}Duty to Relevant Authority}{17}{section.5.3}
+\contentsline {section}{\numberline {5.4}Duty to Profession}{17}{section.5.4}
+\contentsline {chapter}{\numberline {6}Development Approach}{18}{chapter.6}
+\contentsline {section}{\numberline {6.1}Waterfall Vs. Agile}{18}{section.6.1}
+\contentsline {subsection}{\numberline {6.1.1}Waterfall}{18}{subsection.6.1.1}
+\contentsline {subsection}{\numberline {6.1.2}Agile}{19}{subsection.6.1.2}
+\contentsline {section}{\numberline {6.2}Testing}{19}{section.6.2}
+\contentsline {subsection}{\numberline {6.2.1}Test Driven Development}{20}{subsection.6.2.1}
+\contentsline {subsection}{\numberline {6.2.2}End-to-end vs Unit Tests}{20}{subsection.6.2.2}
+\contentsline {subsection}{\numberline {6.2.3}Unit Testing: State vs Behaviour}{21}{subsection.6.2.3}
+\contentsline {section}{\numberline {6.3}Version Control}{21}{section.6.3}
+\contentsline {section}{\numberline {6.4}Programming Languages}{21}{section.6.4}
+\contentsline {chapter}{\numberline {7}Requirements Analysis}{23}{chapter.7}
+\contentsline {subsection}{\numberline {7.0.1}Part 1 - Building a Trading System}{23}{subsection.7.0.1}
+\contentsline {subsection}{\numberline {7.0.2}Part 2 - Building a Predictive Model}{25}{subsection.7.0.2}
+\contentsline {chapter}{\numberline {8}The Trading System}{26}{chapter.8}
+\contentsline {section}{\numberline {8.1}Design}{27}{section.8.1}
+\contentsline {subsection}{\numberline {8.1.1}Client-Server Vs Peer-to-Peer Architecture}{28}{subsection.8.1.1}
+\contentsline {subsection}{\numberline {8.1.2}Client and WebServer}{29}{subsection.8.1.2}
+\contentsline {subsubsection}{Thin Client Vs. Thick Client}{29}{subsubsection*.17}
+\contentsline {subsubsection}{GUI Visual Design}{30}{subsubsection*.18}
+\contentsline {subsection}{\numberline {8.1.3}The Core Server}{31}{subsection.8.1.3}
+\contentsline {subsubsection}{Event Based Architecture}{31}{subsubsection*.21}
+\contentsline {subsubsection}{Responsibilities of the Core-Server Components}{32}{subsubsection*.22}
+\contentsline {subsection}{\numberline {8.1.4}The Service Layer}{34}{subsection.8.1.4}
+\contentsline {section}{\numberline {8.2}Implementation}{34}{section.8.2}
+\contentsline {subsection}{\numberline {8.2.1}Central Configuration}{35}{subsection.8.2.1}
+\contentsline {subsection}{\numberline {8.2.2}Service Layer}{36}{subsection.8.2.2}
+\contentsline {subsubsection}{Test Service Layer}{37}{subsubsection*.24}
+\contentsline {subsubsection}{Local Order Book}{37}{subsubsection*.26}
+\contentsline {subsection}{\numberline {8.2.3}Event Manager}{39}{subsection.8.2.3}
+\contentsline {subsection}{\numberline {8.2.4}Controller}{40}{subsection.8.2.4}
+\contentsline {subsection}{\numberline {8.2.5}Data Provider}{40}{subsection.8.2.5}
+\contentsline {subsubsection}{Market Book Data}{41}{subsubsection*.28}
+\contentsline {subsection}{\numberline {8.2.6}Data Model}{43}{subsection.8.2.6}
+\contentsline {subsection}{\numberline {8.2.7}Web Server and Client}{43}{subsection.8.2.7}
+\contentsline {subsection}{\numberline {8.2.8}Navigation Data Service}{44}{subsection.8.2.8}
+\contentsline {subsection}{\numberline {8.2.9}Order Manager}{45}{subsection.8.2.9}
+\contentsline {subsection}{\numberline {8.2.10}Auto Trader}{47}{subsection.8.2.10}
+\contentsline {subsubsection}{The Strategy}{48}{subsubsection*.38}
+\contentsline {subsubsection}{The Monitor}{48}{subsubsection*.39}
+\contentsline {subsubsection}{The Auto Trader}{48}{subsubsection*.40}
+\contentsline {subsection}{\numberline {8.2.11}Data Store}{49}{subsection.8.2.11}
+\contentsline {chapter}{\numberline {9}Predicting Price Movement}{50}{chapter.9}
+\contentsline {section}{\numberline {9.1}The Data}{50}{section.9.1}
+\contentsline {section}{\numberline {9.2}The Indicators}{51}{section.9.2}
+\contentsline {section}{\numberline {9.3}The Algorithm}{51}{section.9.3}
+\contentsline {section}{\numberline {9.4}Decision Trees}{52}{section.9.4}
+\contentsline {section}{\numberline {9.5}Random Forest}{53}{section.9.5}
+\contentsline {subsection}{\numberline {9.5.1}Overhead of Training a Random Forest on Features with Continuous Values}{54}{subsection.9.5.1}
+\contentsline {section}{\numberline {9.6}Extremely Random Forest}{54}{section.9.6}
+\contentsline {section}{\numberline {9.7}Implementation}{55}{section.9.7}
+\contentsline {subsection}{\numberline {9.7.1}Labelling the Data}{56}{subsection.9.7.1}
+\contentsline {subsection}{\numberline {9.7.2}Reducing the Size of the Data}{56}{subsection.9.7.2}
+\contentsline {subsection}{\numberline {9.7.3}Adjustments for Unevenly Distributed Data}{56}{subsection.9.7.3}
+\contentsline {section}{\numberline {9.8}Optimisation}{57}{section.9.8}
+\contentsline {subsection}{\numberline {9.8.1}Out-Of-Bag Error}{57}{subsection.9.8.1}
+\contentsline {subsection}{\numberline {9.8.2}Optimisation Results}{58}{subsection.9.8.2}
+\contentsline {section}{\numberline {9.9}Results}{59}{section.9.9}
+\contentsline {chapter}{\numberline {10}Conclusion}{60}{chapter.10}
+\contentsline {section}{\numberline {10.1}Development Approach}{61}{section.10.1}
+\contentsline {subsubsection}{Agile}{61}{subsubsection*.54}
+\contentsline {subsubsection}{Testing}{61}{subsubsection*.55}
+\contentsline {chapter}{Appendices}{62}{section*.56}
+\contentsline {chapter}{\numberline {A}Glossary of Terms}{63}{Appendix.1.A}
+\contentsline {section}{\numberline {A.1}Gambling Terms}{63}{section.1.A.1}
+\contentsline {subsubsection}{Back}{63}{subsubsection*.57}
+\contentsline {subsubsection}{Lay}{63}{subsubsection*.58}
+\contentsline {subsubsection}{Side of a Bet}{63}{subsubsection*.59}
+\contentsline {subsubsection}{Offering Odds}{63}{subsubsection*.60}
+\contentsline {subsubsection}{Stake/Size}{63}{subsubsection*.61}
+\contentsline {subsubsection}{Odds/Price}{63}{subsubsection*.62}
+\contentsline {subsubsection}{Decimal odds vs Fractional odds}{63}{subsubsection*.63}
+\contentsline {subsubsection}{Profit}{64}{subsubsection*.64}
+\contentsline {subsubsection}{Liability}{64}{subsubsection*.65}
+\contentsline {subsubsection}{Return}{64}{subsubsection*.66}
+\contentsline {subsubsection}{Matched Bets}{64}{subsubsection*.67}
+\contentsline {subsubsection}{Unmatched Bets}{64}{subsubsection*.68}
+\contentsline {subsubsection}{Orders}{64}{subsubsection*.69}
+\contentsline {section}{\numberline {A.2}Machine Learning Terms}{65}{section.1.A.2}
+\contentsline {subsubsection}{Entropy}{65}{subsubsection*.70}
+\contentsline {subsubsection}{Overfitting}{65}{subsubsection*.72}
+\contentsline {subsubsection}{Bias}{66}{subsubsection*.74}
+\contentsline {subsubsection}{Variance}{66}{subsubsection*.75}
+\contentsline {subsubsection}{Sampling with Replacement Vs Sampling without Replacement}{66}{subsubsection*.76}
+\contentsline {subsubsection}{Pruning a Decision Tree}{66}{subsubsection*.77}
+\contentsline {chapter}{\numberline {B}Controller API}{67}{Appendix.1.B}
+\contentsline {chapter}{\numberline {C}Betfair Price Increments}{68}{Appendix.1.C}
+\contentsline {chapter}{\numberline {D}Historical Data Schema}{69}{Appendix.1.D}
+\contentsline {chapter}{\numberline {E}Technical Analysis Indicators}{70}{Appendix.1.E}
+\contentsline {chapter}{\numberline {F}Future Work}{71}{Appendix.1.F}
+\contentsline {chapter}{Bibliography}{72}{chapter*.79}

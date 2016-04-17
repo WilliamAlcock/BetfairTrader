@@ -1,0 +1,102 @@
+taking closing price:
+
+10 trees
+
+Total Pnl: 13144.060000000061
+Highest Win: 1855.7900000000768
+Number of Wins: 138
+Highest Loss: -609.6500000000482
+Number of Losses: 110
+Number of scratches: 0
+
+1000 trees
+
+Total Pnl: 15567.689999999979
+Highest Win: 1410.1999999999634
+Number of Wins: 142
+Highest Loss: -585.6199999999751
+Number of Losses: 106
+Number of scratches: 0
+FINISHED !
+
+taking worse case (av to back / av to lay):
+
+10 trees - numInd = 3
+
+Total Pnl: -2275.8400000000015
+Highest Win: 169.36
+Number of Wins: 90
+Highest Loss: -536.46
+Number of Losses: 155
+Number of scratches: 3
+
+10 trees - numInd = 2
+
+Total Pnl: -5036.31
+Highest Win: 252.66
+Number of Wins: 67
+Highest Loss: -672.44
+Number of Losses: 178
+Number of scratches: 3
+
+1000 trees - numInd = 3
+
+Total Pnl: -2173.7199999999993
+Highest Win: 550.5
+Number of Wins: 85
+Highest Loss: -233.8
+Number of Losses: 161
+Number of scratches: 2
+
+1000 trees - numInd = 2
+
+Total Pnl: -6140.789999999999
+Highest Win: 541.9000000000001
+Number of Wins: 60
+Highest Loss: -772.14
+Number of Losses: 187
+Number of scratches: 1
+
+taking average of (av to back / av to lay):
+
+10 trees - numInd = 2
+
+Total Pnl: 663.005
+Highest Win: 292.89
+Number of Wins: 128
+Highest Loss: -442.58000000000004
+Number of Losses: 118
+Number of scratches: 2
+
+10 trees - numInd = 3
+
+Total Pnl: 159.10000000000034
+Highest Win: 191.65
+Number of Wins: 125
+Highest Loss: -468.17
+Number of Losses: 120
+Number of scratches: 3
+
+10 trees - numInd = 1
+
+1000 trees - numInd = 3
+
+Total Pnl: 1396.445
+Highest Win: 570.25
+Number of Wins: 129
+Highest Loss: -97.5
+Number of Losses: 117
+Number of scratches: 2
+
+taking best case in, worst case out:
+
+
+
+1000 trees - numInd = 3
+
+Total Pnl: 871.7300000000007
+Highest Win: 573.4
+Number of Wins: 126
+Highest Loss: -227.72000000000003
+Number of Losses: 120
+Number of scratches: 2
